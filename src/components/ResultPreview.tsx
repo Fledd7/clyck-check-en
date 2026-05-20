@@ -1,4 +1,11 @@
-import type { ChannelData, Diagnosis, Insight, Lever, ResultCategory } from "../lib/types";
+import type {
+  ChannelData,
+  ClarityLevel,
+  Diagnosis,
+  Insight,
+  Lever,
+  ResultCategory,
+} from "../lib/types";
 import ThumbnailGrid from "./ThumbnailGrid";
 
 type Props = {
@@ -6,6 +13,7 @@ type Props = {
   channelData: ChannelData | null;
   channelNote: string | null;
   clarityLabel: string;
+  clarityLevel: ClarityLevel;
   insights: Insight[];
   levers: Lever[];
   diagnosis: Diagnosis;
@@ -37,6 +45,7 @@ export default function ResultPreview({
   channelData,
   channelNote,
   clarityLabel,
+  clarityLevel,
   insights,
   levers,
   diagnosis,
@@ -53,7 +62,21 @@ export default function ResultPreview({
       <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">
         {category.headline}
       </h1>
-      <p className="mt-2 text-sm font-medium text-ink/80">{clarityLabel}</p>
+      <p className="mt-2">
+        <span
+          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
+            clarityLevel === "Sehr hoch"
+              ? "bg-ink text-white border-ink"
+              : clarityLevel === "Hoch"
+              ? "border-ink/70 text-ink bg-white"
+              : clarityLevel === "Mittel"
+              ? "border-ink/40 text-ink bg-white"
+              : "border-line text-ink/60 bg-white"
+          }`}
+        >
+          {clarityLabel}
+        </span>
+      </p>
       <p className="mt-1 text-xs text-ink/55">
         Basierend auf deinen Antworten und öffentlichen Kanaldaten.
       </p>

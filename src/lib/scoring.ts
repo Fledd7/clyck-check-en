@@ -1,4 +1,16 @@
-import type { Answers, ChannelData, LeadClass } from "./types";
+import type { Answers, ChannelData, ChannelMaturity, LeadClass } from "./types";
+
+export function getChannelMaturity(channel: ChannelData | null): ChannelMaturity | null {
+  if (!channel) return null;
+  const subs = channel.subscriberCount;
+  const videos = channel.videoCount ?? 0;
+  if (typeof subs !== "number") return null;
+  if (subs > 1_000_000) return "authority";
+  if (subs > 100_000) return "strong";
+  if (subs > 10_000) return "established";
+  if (subs > 1_000 || videos > 10) return "growing";
+  return "early";
+}
 
 const statusScore: Record<string, number> = {
   regelmaessig: 15,
@@ -64,6 +76,26 @@ export function computeScore(
       channel.uploadCadenceDays <= 21
     ) {
       score += 5;
+    }
+
+    const subs = channel.subscriberCount;
+    if (typeof subs === "number") {
+      if (subs > 1_000_000) score += 20;
+      else if (subs > 100_000) score += 12;
+      else if (subs > 10_000) score += 5;
+    }
+
+    const medianViews = channel.medianViews;
+    if (typeof medianViews === "number") {
+      if (medianViews > 1_000_000) score += 25;
+      else if (medianViews > 100_000) score += 15;
+      else if (medianViews > 10_000) score += 8;
+    }
+
+    const videos = channel.videoCount;
+    if (typeof videos === "number") {
+      if (videos > 200) score += 10;
+      else if (videos > 50) score += 5;
     }
   }
 

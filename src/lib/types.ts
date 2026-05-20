@@ -36,6 +36,9 @@ export type Diagnosis = {
   cadence: DiagnosisLevel;
 };
 
+export type ChannelMaturity = "early" | "growing" | "established" | "strong" | "authority";
+export type ClarityLevel = "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch";
+
 export type ChannelLookupResult =
   | { ok: true; data: ChannelData }
   | { ok: false; reason: "missing_key" | "not_found" | "error" | "skipped" };

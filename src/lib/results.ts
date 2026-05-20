@@ -1,6 +1,8 @@
 import type {
   Answers,
   ChannelData,
+  ChannelMaturity,
+  ClarityLevel,
   Diagnosis,
   DiagnosisLevel,
   Insight,
@@ -81,14 +83,67 @@ export function channelDataNote(channel: ChannelData | null): string | null {
   return null;
 }
 
-export function clarityLevel(score: number): { label: string; level: "Niedrig" | "Mittel" | "Hoch" } {
-  if (score < 35) return { label: "Klarheits-Level: Niedrig", level: "Niedrig" };
-  if (score < 65) return { label: "Klarheits-Level: Mittel", level: "Mittel" };
-  return { label: "Klarheits-Level: Hoch", level: "Hoch" };
+export function clarityLevel(score: number): { label: string; level: ClarityLevel } {
+  if (score >= 85) return { label: "Klarheits-Level: Sehr hoch", level: "Sehr hoch" };
+  if (score >= 65) return { label: "Klarheits-Level: Hoch", level: "Hoch" };
+  if (score >= 35) return { label: "Klarheits-Level: Mittel", level: "Mittel" };
+  return { label: "Klarheits-Level: Niedrig", level: "Niedrig" };
 }
 
-function rhythmInsight(answers: Answers, channel: ChannelData | null): Insight {
+export function applyMaturityOverride(
+  quizCategory: ResultCategoryId,
+  maturity: ChannelMaturity | null,
+  answers: Answers
+): ResultCategoryId {
+  if (!maturity) return quizCategory;
+
+  if (maturity === "authority" || maturity === "strong") {
+    if (quizCategory === "D") return "B";
+    if (quizCategory === "C") {
+      const isStrategyProblem =
+        answers.problem === "ideen_visualisieren" || answers.problem === "keine_richtung";
+      const isGoalUnclear = answers.goal === "unklar";
+      if (!isStrategyProblem && !isGoalUnclear) return "B";
+    }
+    return quizCategory;
+  }
+
+  if (maturity === "established") {
+    if (quizCategory === "D") return "B";
+    if (quizCategory === "C" && answers.goal !== "unklar") return "B";
+    return quizCategory;
+  }
+
+  return quizCategory;
+}
+
+function rhythmInsight(
+  answers: Answers,
+  channel: ChannelData | null,
+  maturity: ChannelMaturity | null
+): Insight {
   const cadence = channel?.uploadCadenceDays ?? null;
+  const medianViews = channel?.medianViews ?? null;
+
+  if (maturity === "authority" || maturity === "strong") {
+    if (typeof medianViews === "number" && medianViews > 1_000_000) {
+      return {
+        headline: "Reichweite ist bewiesen — jetzt geht es ums System",
+        text: "Deine Videos erreichen Menschen. Die Frage ist, ob das Thumbnail-System diese Reichweite auch strategisch nutzt — oder ob sie trotz des Systems entsteht.",
+      };
+    }
+    if (typeof cadence === "number" && cadence > 14) {
+      return {
+        headline: "Rhythmus mit Luft nach oben",
+        text: "Auf diesem Kanal-Level ist Upload-Kadenz weniger entscheidend als visuelle Konsistenz. Aber ein engerer Rhythmus würde das System stabiler machen.",
+      };
+    }
+    return {
+      headline: "Stabiler Rhythmus auf hohem Niveau",
+      text: "Regelmäßige Uploads auf diesem Level sind keine Selbstverständlichkeit. Der Fokus liegt jetzt auf dem System hinter den Thumbnails.",
+    };
+  }
+
   if (channel && typeof cadence === "number" && cadence > 0) {
     if (cadence <= 7) {
       return {
@@ -133,7 +188,20 @@ function rhythmInsight(answers: Answers, channel: ChannelData | null): Insight {
   }
 }
 
-function thumbnailInsight(answers: Answers): Insight {
+function thumbnailInsight(answers: Answers, maturity: ChannelMaturity | null): Insight {
+  if (maturity === "authority" || maturity === "strong") {
+    if (answers.thumbnails === "einheitlich") {
+      return {
+        headline: "Visuelle Konsistenz erkennbar",
+        text: "Dein Kanal wirkt visuell gefestigt. Die spannende Frage ist, ob das System bewusst entwickelt wurde — oder sich über die Zeit zufällig ergeben hat.",
+      };
+    }
+    return {
+      headline: "System auf diesem Level entscheidend",
+      text: "Mit einem Kanal dieser Größe ist ein wiederholbares Thumbnail-System kein Nice-to-have mehr, sondern die Grundlage für konsistente Performance.",
+    };
+  }
+
   switch (answers.thumbnails) {
     case "einheitlich":
       return {
@@ -168,7 +236,17 @@ function thumbnailInsight(answers: Answers): Insight {
   }
 }
 
-function strategyInsight(answers: Answers, category: ResultCategoryId): Insight {
+function strategyInsight(
+  answers: Answers,
+  category: ResultCategoryId,
+  maturity: ChannelMaturity | null
+): Insight {
+  if (maturity === "authority" || maturity === "strong") {
+    return {
+      headline: "Optimierung auf hohem Niveau",
+      text: "Bei einem etablierten Kanal geht es nicht mehr ums Grundsetup — sondern darum, was auf diesem Level noch mehr herauszuholen ist.",
+    };
+  }
   if (
     answers.problem === "ideen_visualisieren" ||
     answers.problem === "keine_richtung" ||
@@ -206,12 +284,13 @@ function strategyInsight(answers: Answers, category: ResultCategoryId): Insight 
 export function buildInsights(
   category: ResultCategoryId,
   answers: Answers,
-  channel: ChannelData | null
+  channel: ChannelData | null,
+  maturity: ChannelMaturity | null
 ): Insight[] {
   return [
-    rhythmInsight(answers, channel),
-    thumbnailInsight(answers),
-    strategyInsight(answers, category),
+    rhythmInsight(answers, channel, maturity),
+    thumbnailInsight(answers, maturity),
+    strategyInsight(answers, category, maturity),
   ];
 }
 
@@ -278,32 +357,36 @@ export function buildLevers(category: ResultCategoryId): Lever[] {
   return leversByCategory[category];
 }
 
-export function buildDiagnosis(answers: Answers, channel: ChannelData | null): Diagnosis {
+export function buildDiagnosis(
+  answers: Answers,
+  channel: ChannelData | null,
+  maturity: ChannelMaturity | null
+): Diagnosis {
   const direction: DiagnosisLevel = (() => {
-    if (answers.goal === "unklar" || answers.problem === "keine_richtung") return "niedrig";
-    if (
-      (answers.goal === "kundenanfragen" || answers.goal === "expertenstatus") &&
-      answers.problem &&
-      answers.problem !== "keine_richtung" &&
-      answers.problem !== "ideen_visualisieren"
-    ) {
-      return "hoch";
+    if (maturity === "authority" || maturity === "strong") return "hoch";
+    if (maturity === "established") {
+      return answers.goal === "unklar" ? "mittel" : "hoch";
     }
+    if (answers.goal === "unklar" || answers.problem === "keine_richtung") return "niedrig";
+    if (answers.goal === "kundenanfragen" || answers.goal === "expertenstatus") return "hoch";
     return "mittel";
   })();
 
   const system: DiagnosisLevel = (() => {
+    if (
+      (maturity === "authority" || maturity === "strong") &&
+      answers.thumbnails === "einheitlich"
+    ) {
+      return "hoch";
+    }
     switch (answers.thumbnails) {
       case "einheitlich":
         return "hoch";
       case "teilweise_gut":
       case "sehr_unterschiedlich":
         return "mittel";
-      case "schnell_gebaut":
-      case "keine_eigenen":
-        return "niedrig";
       default:
-        return "mittel";
+        return "niedrig";
     }
   })();
 
@@ -319,11 +402,8 @@ export function buildDiagnosis(answers: Answers, channel: ChannelData | null): D
         return "hoch";
       case "unregelmaessig":
         return "mittel";
-      case "kaum_aktiv":
-      case "plant_start":
-        return "niedrig";
       default:
-        return "mittel";
+        return "niedrig";
     }
   })();
 

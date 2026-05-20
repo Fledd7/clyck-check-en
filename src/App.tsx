@@ -8,6 +8,7 @@ import LeadCaptureForm, { type LeadFormValues } from "./components/LeadCaptureFo
 import ConfirmationScreen from "./components/ConfirmationScreen";
 import { questions } from "./lib/questions";
 import {
+  applyMaturityOverride,
   buildDiagnosis,
   buildInsights,
   buildLevers,
@@ -16,7 +17,7 @@ import {
   clarityLevel,
   selectCategory,
 } from "./lib/results";
-import { computeScore, leadClassFromScore } from "./lib/scoring";
+import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
 import type { Answers, ChannelData, QuestionId } from "./lib/types";
 
 type Step =
@@ -36,7 +37,12 @@ export default function App() {
 
   const totalQuestions = questions.length;
 
-  const categoryId = useMemo(() => selectCategory(answers), [answers]);
+  const maturity = useMemo(() => getChannelMaturity(channelData), [channelData]);
+  const quizCategoryId = useMemo(() => selectCategory(answers), [answers]);
+  const categoryId = useMemo(
+    () => applyMaturityOverride(quizCategoryId, maturity, answers),
+    [quizCategoryId, maturity, answers]
+  );
   const category = categories[categoryId];
   const previewScore = useMemo(
     () => computeScore(answers, channelData, undefined),
@@ -44,13 +50,13 @@ export default function App() {
   );
   const clarity = useMemo(() => clarityLevel(previewScore), [previewScore]);
   const insights = useMemo(
-    () => buildInsights(categoryId, answers, channelData),
-    [categoryId, answers, channelData]
+    () => buildInsights(categoryId, answers, channelData, maturity),
+    [categoryId, answers, channelData, maturity]
   );
   const levers = useMemo(() => buildLevers(categoryId), [categoryId]);
   const diagnosis = useMemo(
-    () => buildDiagnosis(answers, channelData),
-    [answers, channelData]
+    () => buildDiagnosis(answers, channelData, maturity),
+    [answers, channelData, maturity]
   );
 
   function goToStart() {
@@ -214,6 +220,7 @@ export default function App() {
           channelData={channelData}
           channelNote={channelDataNote(channelData)}
           clarityLabel={clarity.label}
+          clarityLevel={clarity.level}
           insights={insights}
           levers={levers}
           diagnosis={diagnosis}
