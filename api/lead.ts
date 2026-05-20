@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 type LeadClass = "top" | "good" | "mid" | "weak";
+type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
 
 type ChannelData = {
   title?: string;
@@ -10,10 +11,13 @@ type ChannelData = {
   uploadCadenceDays?: number | null;
   medianViews?: number | null;
   thumbnails?: string[];
+  longformCount?: number;
   channelUrl?: string;
 };
 
 type Answers = Record<string, string | undefined>;
+
+type InsightOrLever = { headline: string; text?: string };
 
 type Body = {
   name?: string;
@@ -27,6 +31,13 @@ type Body = {
     categoryId?: string;
     score?: number;
     leadClass?: LeadClass;
+    insights?: InsightOrLever[];
+    levers?: InsightOrLever[];
+    diagnosis?: {
+      direction?: DiagnosisLevel;
+      system?: DiagnosisLevel;
+      cadence?: DiagnosisLevel;
+    };
   };
 };
 
@@ -78,6 +89,12 @@ const leadClassLabel: Record<LeadClass, string> = {
   weak: "Schwacher Lead",
 };
 
+const diagLabel: Record<DiagnosisLevel, string> = {
+  niedrig: "Niedrig",
+  mittel: "Mittel",
+  hoch: "Hoch",
+};
+
 function escape(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -86,65 +103,88 @@ function escape(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function lineBlock(label: string, value: string): string {
+  return `<p style="margin:2px 0"><strong>${escape(label)}:</strong> ${escape(value)}</p>`;
+}
+
 function buildHtml(body: Required<Pick<Body, "name" | "email">> & Body): string {
   const lc: LeadClass = body.result?.leadClass ?? "mid";
   const score = body.result?.score ?? 0;
   const cat = body.result?.categoryId ?? "?";
   const a = body.answers ?? {};
   const ch = body.channelData ?? null;
+  const insights = body.result?.insights ?? [];
+  const levers = body.result?.levers ?? [];
+  const diag = body.result?.diagnosis;
 
-  const answerRows = Object.entries(questionLabels)
-    .map(
-      ([k, label]) =>
-        `<tr><td style="padding:4px 8px;color:#666">${label}</td><td style="padding:4px 8px">${escape(
-          optionLabels[a[k] ?? ""] ?? a[k] ?? "—"
-        )}</td></tr>`
-    )
+  const answerLines = Object.entries(questionLabels)
+    .map(([k, label]) => {
+      const v = a[k];
+      const text = optionLabels[v ?? ""] ?? v ?? "—";
+      return lineBlock(label, text);
+    })
     .join("");
 
-  const channelBlock = ch
-    ? `
-    <h3 style="margin-top:24px">Kanal</h3>
-    <ul>
-      ${ch.title ? `<li>Titel: ${escape(ch.title)}</li>` : ""}
-      ${ch.handle ? `<li>Handle: @${escape(ch.handle)}</li>` : ""}
-      ${typeof ch.subscriberCount === "number" ? `<li>Abos: ${ch.subscriberCount}</li>` : ""}
-      ${typeof ch.videoCount === "number" ? `<li>Videos: ${ch.videoCount}</li>` : ""}
-      ${typeof ch.uploadCadenceDays === "number" ? `<li>Upload-Cadenz: ~${ch.uploadCadenceDays} Tage</li>` : ""}
-      ${typeof ch.medianViews === "number" ? `<li>Median-Views: ${ch.medianViews}</li>` : ""}
-      ${body.channelUrl ? `<li>URL: <a href="${escape(body.channelUrl)}">${escape(body.channelUrl)}</a></li>` : ""}
-    </ul>
-    ${
-      ch.thumbnails && ch.thumbnails.length > 0
-        ? `<p>Thumbnails:</p><div>${ch.thumbnails
-            .slice(0, 12)
-            .map((u) => `<img src="${escape(u)}" style="width:160px;height:auto;margin:2px;border-radius:4px" />`)
-            .join("")}</div>`
-        : ""
-    }
-  `
-    : body.channelUrl
-    ? `<p>Kanal-URL: <a href="${escape(body.channelUrl)}">${escape(body.channelUrl)}</a></p>`
+  const channelLines: string[] = [];
+  if (body.channelUrl) channelLines.push(lineBlock("Kanal-URL", body.channelUrl));
+  if (ch?.title) channelLines.push(lineBlock("Kanal", ch.title));
+  if (ch?.handle) channelLines.push(lineBlock("Handle", "@" + ch.handle));
+  if (typeof ch?.subscriberCount === "number") channelLines.push(lineBlock("Abonnenten", String(ch.subscriberCount)));
+  if (typeof ch?.videoCount === "number") channelLines.push(lineBlock("Videos gesamt", String(ch.videoCount)));
+  if (typeof ch?.longformCount === "number") channelLines.push(lineBlock("Longform Videos analysiert", String(ch.longformCount)));
+  if (typeof ch?.medianViews === "number") channelLines.push(lineBlock("Median Views (Longform)", String(ch.medianViews)));
+  if (typeof ch?.uploadCadenceDays === "number" && ch.uploadCadenceDays > 0) {
+    channelLines.push(lineBlock("Upload-Kadenz (Longform)", `${ch.uploadCadenceDays} Tage`));
+  }
+
+  const insightLines = insights.length
+    ? `<p style="margin:12px 0 4px"><strong>Generierte Insights</strong></p>` +
+      insights.map((i) => `<p style="margin:2px 0">· ${escape(i.headline)}</p>`).join("")
     : "";
 
+  const leverLines = levers.length
+    ? `<p style="margin:12px 0 4px"><strong>Nächste 3 Hebel</strong></p>` +
+      levers
+        .map((l, idx) => `<p style="margin:2px 0">${idx + 1}. ${escape(l.headline)}</p>`)
+        .join("")
+    : "";
+
+  const diagLines = diag
+    ? `<p style="margin:12px 0 4px"><strong>Packaging-Diagnose</strong></p>` +
+      lineBlock("Kanalrichtung", diagLabel[diag.direction ?? "mittel"]) +
+      lineBlock("Thumbnail-System", diagLabel[diag.system ?? "mittel"]) +
+      lineBlock("Upload-Rhythmus", diagLabel[diag.cadence ?? "mittel"])
+    : "";
+
+  const thumbsLine =
+    ch?.thumbnails && ch.thumbnails.length > 0
+      ? `<p style="margin:12px 0 4px"><strong>Thumbnail-URLs (Longform)</strong></p><p style="word-break:break-all;font-size:12px;color:#555">${ch.thumbnails
+          .map((u) => escape(u))
+          .join(", ")}</p>`
+      : "";
+
   return `
-  <div style="font-family:Inter,Helvetica,Arial,sans-serif;color:#111;max-width:640px">
+  <div style="font-family:Inter,Helvetica,Arial,sans-serif;color:#111;max-width:680px">
     <h2 style="margin:0 0 8px">Neuer Klarheitscheck-Lead</h2>
-    <p style="margin:0 0 16px;color:#555">
-      ${leadClassLabel[lc]} · Score ${score} · Kategorie ${escape(String(cat))}
-    </p>
-    <table style="border-collapse:collapse;width:100%;margin-bottom:16px">
-      <tr><td style="padding:4px 8px;color:#666">Name</td><td style="padding:4px 8px"><strong>${escape(body.name ?? "")}</strong></td></tr>
-      <tr><td style="padding:4px 8px;color:#666">E-Mail</td><td style="padding:4px 8px"><a href="mailto:${escape(body.email ?? "")}">${escape(body.email ?? "")}</a></td></tr>
-    </table>
+    ${lineBlock("Name", body.name ?? "")}
+    ${lineBlock("E-Mail", body.email ?? "")}
+    ${lineBlock("Score", String(score))}
+    ${lineBlock("Lead-Klasse", leadClassLabel[lc])}
+    ${lineBlock("Ergebnis-Kategorie", `Kategorie ${String(cat)}`)}
     ${
       body.message
-        ? `<h3>Nachricht</h3><p style="white-space:pre-wrap">${escape(body.message)}</p>`
+        ? `<p style="margin:12px 0 4px"><strong>Nachricht</strong></p><p style="white-space:pre-wrap;margin:0">${escape(
+            body.message
+          )}</p>`
         : ""
     }
-    <h3>Antworten</h3>
-    <table style="border-collapse:collapse">${answerRows}</table>
-    ${channelBlock}
+    <p style="margin:16px 0 4px"><strong>Antworten</strong></p>
+    ${answerLines}
+    ${channelLines.length ? `<p style="margin:16px 0 4px"><strong>Kanaldaten</strong></p>${channelLines.join("")}` : ""}
+    ${diagLines}
+    ${insightLines}
+    ${leverLines}
+    ${thumbsLine}
   </div>
   `;
 }
@@ -179,7 +219,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const lc = body.result?.leadClass ?? "mid";
-  const subject = `Klarheitscheck · ${leadClassLabel[lc as LeadClass] ?? "Lead"} · ${name}`;
+  const categoryId = body.result?.categoryId ?? "?";
+  const subject = `Klarheitscheck · ${leadClassLabel[lc as LeadClass] ?? "Lead"} · Kategorie ${categoryId} · ${name}`;
   const html = buildHtml({ ...body, name, email });
 
   try {

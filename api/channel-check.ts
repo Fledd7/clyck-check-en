@@ -8,6 +8,7 @@ type ChannelData = {
   uploadCadenceDays?: number | null;
   medianViews?: number | null;
   thumbnails?: string[];
+  longformCount?: number;
 };
 
 type Ok = { ok: true; data: ChannelData };
@@ -83,8 +84,15 @@ type YtPlaylistItem = {
   contentDetails?: { videoId?: string };
 };
 
-type YtVideo = {
+type YtVideoDetails = {
   id: string;
+  snippet?: {
+    title?: string;
+    description?: string;
+    publishedAt?: string;
+    thumbnails?: Record<string, { url?: string } | undefined>;
+  };
+  contentDetails?: { duration?: string };
   statistics?: { viewCount?: string };
 };
 
@@ -100,19 +108,20 @@ async function fetchRecentUploads(
   apiKey: string,
   uploadsPlaylistId: string
 ): Promise<YtPlaylistItem[]> {
-  const url = `${YT}/playlistItems?part=snippet,contentDetails&maxResults=12&playlistId=${uploadsPlaylistId}&key=${apiKey}`;
+  const url = `${YT}/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${uploadsPlaylistId}&key=${apiKey}`;
   const r = await fetch(url);
   if (!r.ok) return [];
   const j = (await r.json()) as { items?: YtPlaylistItem[] };
   return j.items ?? [];
 }
 
-async function fetchVideoStats(apiKey: string, ids: string[]): Promise<YtVideo[]> {
+async function fetchVideoDetails(apiKey: string, ids: string[]): Promise<YtVideoDetails[]> {
   if (ids.length === 0) return [];
-  const url = `${YT}/videos?part=statistics&id=${ids.join(",")}&key=${apiKey}`;
+  // YouTube allows up to 50 ids per request
+  const url = `${YT}/videos?part=snippet,contentDetails,statistics&id=${ids.slice(0, 50).join(",")}&key=${apiKey}`;
   const r = await fetch(url);
   if (!r.ok) return [];
-  const j = (await r.json()) as { items?: YtVideo[] };
+  const j = (await r.json()) as { items?: YtVideoDetails[] };
   return j.items ?? [];
 }
 
@@ -123,12 +132,36 @@ function median(nums: number[]): number | null {
   return sorted.length % 2 === 0 ? Math.round((sorted[mid - 1] + sorted[mid]) / 2) : sorted[mid];
 }
 
-function pickThumb(t: YtPlaylistItem): string | null {
-  const th = t.snippet?.thumbnails ?? {};
+function pickThumbFromVideo(v: YtVideoDetails): string | null {
+  const th = v.snippet?.thumbnails ?? {};
   return th.maxres?.url ?? th.standard?.url ?? th.high?.url ?? th.medium?.url ?? th.default?.url ?? null;
 }
 
-function uploadCadenceDays(items: YtPlaylistItem[]): number | null {
+function parseDurationSeconds(iso: string | undefined): number | null {
+  if (!iso) return null;
+  const m = /^P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/.exec(iso);
+  if (!m) return null;
+  const days = Number(m[1] ?? 0);
+  const hours = Number(m[2] ?? 0);
+  const minutes = Number(m[3] ?? 0);
+  const seconds = Number(m[4] ?? 0);
+  return days * 86400 + hours * 3600 + minutes * 60 + seconds;
+}
+
+const SHORT_TAGS_TITLE = ["#shorts", "#short", "#reels", "#reel"];
+const SHORT_TAGS_DESC = ["#shorts", "#short"];
+
+function isLongform(v: YtVideoDetails): boolean {
+  const dur = parseDurationSeconds(v.contentDetails?.duration);
+  if (dur === null || dur <= 180) return false;
+  const title = (v.snippet?.title ?? "").toLowerCase();
+  if (SHORT_TAGS_TITLE.some((t) => title.includes(t))) return false;
+  const desc = (v.snippet?.description ?? "").slice(0, 200).toLowerCase();
+  if (SHORT_TAGS_DESC.some((t) => desc.includes(t))) return false;
+  return true;
+}
+
+function medianCadenceDays(items: YtVideoDetails[]): number | null {
   const dates = items
     .map((i) => i.snippet?.publishedAt)
     .filter((d): d is string => !!d)
@@ -140,8 +173,8 @@ function uploadCadenceDays(items: YtPlaylistItem[]): number | null {
   for (let i = 0; i < dates.length - 1; i++) {
     diffs.push((dates[i] - dates[i + 1]) / (1000 * 60 * 60 * 24));
   }
-  const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-  return Math.round(avg);
+  const m = median(diffs);
+  return m === null ? null : Math.round(m);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -181,40 +214,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
 
-    const uploadsId = channel.contentDetails?.relatedPlaylists?.uploads;
-    const recents = uploadsId ? await fetchRecentUploads(apiKey, uploadsId) : [];
-    const videoIds = recents
-      .map((i) => i.contentDetails?.videoId ?? i.snippet?.resourceId?.videoId)
-      .filter((v): v is string => !!v);
-    const stats = await fetchVideoStats(apiKey, videoIds.slice(0, 12));
-    const views = stats
-      .map((s) => Number(s.statistics?.viewCount ?? 0))
-      .filter((n) => Number.isFinite(n) && n > 0);
-    const thumbnails = recents
-      .map((r) => pickThumb(r))
-      .filter((u): u is string => !!u);
-
     const handle = channel.snippet?.customUrl
       ? channel.snippet.customUrl.replace(/^@/, "")
       : undefined;
-
     const subs =
       channel.statistics?.hiddenSubscriberCount === true
         ? null
         : channel.statistics?.subscriberCount
         ? Number(channel.statistics.subscriberCount)
         : null;
-
     const videoCount = channel.statistics?.videoCount ? Number(channel.statistics.videoCount) : null;
+
+    const uploadsId = channel.contentDetails?.relatedPlaylists?.uploads;
+    const recents = uploadsId ? await fetchRecentUploads(apiKey, uploadsId) : [];
+    const videoIds = recents
+      .map((i) => i.contentDetails?.videoId ?? i.snippet?.resourceId?.videoId)
+      .filter((v): v is string => !!v);
+
+    const details = await fetchVideoDetails(apiKey, videoIds);
+
+    const detailById = new Map(details.map((d) => [d.id, d]));
+    const orderedDetails: YtVideoDetails[] = videoIds
+      .map((id) => detailById.get(id))
+      .filter((d): d is YtVideoDetails => !!d);
+
+    const longforms = orderedDetails.filter(isLongform).slice(0, 12);
+
+    const thumbnails = longforms
+      .map((v) => pickThumbFromVideo(v))
+      .filter((u): u is string => !!u);
+
+    const views = longforms
+      .map((v) => Number(v.statistics?.viewCount ?? 0))
+      .filter((n) => Number.isFinite(n) && n > 0);
 
     const data: ChannelData = {
       title: channel.snippet?.title,
       handle,
       subscriberCount: subs,
       videoCount,
-      uploadCadenceDays: uploadCadenceDays(recents),
+      uploadCadenceDays: medianCadenceDays(longforms),
       medianViews: median(views),
       thumbnails,
+      longformCount: longforms.length,
     };
 
     res.status(200).json({ ok: true, data } as Ok);

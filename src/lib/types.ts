@@ -23,7 +23,17 @@ export type ChannelData = {
   uploadCadenceDays?: number | null;
   medianViews?: number | null;
   thumbnails?: string[];
+  longformCount?: number;
   channelUrl?: string;
+};
+
+export type Insight = { headline: string; text: string };
+export type Lever = { headline: string; text: string };
+export type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
+export type Diagnosis = {
+  direction: DiagnosisLevel;
+  system: DiagnosisLevel;
+  cadence: DiagnosisLevel;
 };
 
 export type ChannelLookupResult =

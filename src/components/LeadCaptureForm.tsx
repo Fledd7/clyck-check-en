@@ -83,11 +83,11 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
           />
         </div>
         <div>
-          <label htmlFor="message" className="label">Nachricht (optional)</label>
+          <label htmlFor="message" className="label">Was möchtest du mit deinem Kanal erreichen?</label>
           <textarea
             id="message"
             rows={4}
-            placeholder="Worum geht es konkret? Was hast du schon versucht?"
+            placeholder="z. B. mehr Kundenanfragen, klarere Positionierung, professionellerer Auftritt..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="input resize-y"

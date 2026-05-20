@@ -7,7 +7,15 @@ import ResultPreview from "./components/ResultPreview";
 import LeadCaptureForm, { type LeadFormValues } from "./components/LeadCaptureForm";
 import ConfirmationScreen from "./components/ConfirmationScreen";
 import { questions } from "./lib/questions";
-import { categories, channelDataNote, selectCategory } from "./lib/results";
+import {
+  buildDiagnosis,
+  buildInsights,
+  buildLevers,
+  categories,
+  channelDataNote,
+  clarityLevel,
+  selectCategory,
+} from "./lib/results";
 import { computeScore, leadClassFromScore } from "./lib/scoring";
 import type { Answers, ChannelData, QuestionId } from "./lib/types";
 
@@ -30,6 +38,20 @@ export default function App() {
 
   const categoryId = useMemo(() => selectCategory(answers), [answers]);
   const category = categories[categoryId];
+  const previewScore = useMemo(
+    () => computeScore(answers, channelData, undefined),
+    [answers, channelData]
+  );
+  const clarity = useMemo(() => clarityLevel(previewScore), [previewScore]);
+  const insights = useMemo(
+    () => buildInsights(categoryId, answers, channelData),
+    [categoryId, answers, channelData]
+  );
+  const levers = useMemo(() => buildLevers(categoryId), [categoryId]);
+  const diagnosis = useMemo(
+    () => buildDiagnosis(answers, channelData),
+    [answers, channelData]
+  );
 
   function goToStart() {
     setStep({ kind: "start" });
@@ -117,6 +139,9 @@ export default function App() {
           categoryId,
           score,
           leadClass,
+          insights,
+          levers,
+          diagnosis,
         },
       }),
     });
@@ -188,6 +213,10 @@ export default function App() {
           category={category}
           channelData={channelData}
           channelNote={channelDataNote(channelData)}
+          clarityLabel={clarity.label}
+          insights={insights}
+          levers={levers}
+          diagnosis={diagnosis}
           onContinue={goToLead}
         />
       )}
