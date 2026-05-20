@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-ink/70 ring-offset-2 ring-offset-bg;
+  }
+}
+
+@layer components {
+  .container-narrow {
+    @apply mx-auto w-full max-w-xl px-5;
+  }
+  .card {
+    @apply rounded-2xl border border-line bg-white p-6 shadow-card;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-ink px-5 py-3 text-base font-medium text-white transition hover:bg-ink/90 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-line bg-white px-5 py-3 text-base font-medium text-ink transition hover:bg-line/40 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .option-card {
+    @apply flex w-full items-start gap-3 rounded-xl border border-line bg-white p-4 text-left text-base transition hover:border-ink/40 hover:bg-white;
+  }
+  .option-card[aria-pressed="true"] {
+    @apply border-ink ring-2 ring-ink/10;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-base text-ink placeholder:text-ink/40;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-ink/80;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 220ms ease-out both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
