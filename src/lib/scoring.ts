@@ -1,4 +1,4 @@
-import type { Answers, ChannelData, ChannelMaturity, FitResult, LeadClass } from "./types";
+import type { Answers, ChannelData, ChannelMaturity, LeadClass } from "./types";
 
 export function getChannelMaturity(channel: ChannelData | null): ChannelMaturity | null {
   if (!channel) return null;
@@ -68,8 +68,7 @@ function scoreMultiSelect(values: string[] | undefined, scores: Record<string, n
 export function computeScore(
   answers: Answers,
   channel: ChannelData | null,
-  message: string | undefined,
-  fitResults?: FitResult[] | null
+  message: string | undefined
 ): number {
   let score = 0;
   score += statusScore[answers.status ?? ""] ?? 0;
@@ -110,12 +109,6 @@ export function computeScore(
   }
 
   if (message && message.trim().length > 20) score += 2;
-
-  if (fitResults && fitResults.length > 0) {
-    const fitRatio = fitResults.filter((r) => r.fit === "yes").length / fitResults.length;
-    if (fitRatio < 0.4) score += 10;
-    else if (fitRatio < 0.7) score += 5;
-  }
 
   return Math.min(100, score);
 }

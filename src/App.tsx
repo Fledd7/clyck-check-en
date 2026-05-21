@@ -18,7 +18,7 @@ import {
   selectCategory,
 } from "./lib/results";
 import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
-import type { Answers, ChannelData, FitResult, QuestionId } from "./lib/types";
+import type { Answers, ChannelData, QuestionId, TitleAnalysisResult } from "./lib/types";
 
 // ── localStorage ──────────────────────────────────────────────────────────────
 const LS_KEY = "klarheitscheck_progress";
@@ -113,7 +113,9 @@ export default function App() {
   const [answers, setAnswers] = useState<Answers>({});
   const [channelUrl, setChannelUrl] = useState<string>("");
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
-  const [fitResults, setFitResults] = useState<FitResult[] | null>(null);
+  const [titleAnalysis, setTitleAnalysis] = useState<TitleAnalysisResult | null>(null);
+  const [titleAnalysisLoading, setTitleAnalysisLoading] = useState(false);
+  const [titleAnalysisError, setTitleAnalysisError] = useState(false);
 
   const totalQuestions = questions.length;
 
@@ -135,13 +137,13 @@ export default function App() {
   );
   const category = categories[categoryId];
   const previewScore = useMemo(
-    () => computeScore(answers, channelData, undefined, fitResults),
-    [answers, channelData, fitResults]
+    () => computeScore(answers, channelData, undefined),
+    [answers, channelData]
   );
   const clarity = useMemo(() => clarityLevel(previewScore), [previewScore]);
   const insights = useMemo(
-    () => buildInsights(categoryId, answers, channelData, maturity, fitResults),
-    [categoryId, answers, channelData, maturity, fitResults]
+    () => buildInsights(categoryId, answers, channelData, maturity),
+    [categoryId, answers, channelData, maturity]
   );
   const levers = useMemo(() => buildLevers(categoryId), [categoryId]);
   const diagnosis = useMemo(
@@ -182,7 +184,9 @@ export default function App() {
   function goToStart() {
     setStep({ kind: "start" });
     setAnswers({});
-    setFitResults(null);
+    setTitleAnalysis(null);
+    setTitleAnalysisLoading(false);
+    setTitleAnalysisError(false);
     window.history.replaceState(null, "", window.location.pathname);
   }
 
@@ -214,6 +218,7 @@ export default function App() {
   async function submitChannel(url: string) {
     setChannelUrl(url);
     setStep({ kind: "loading" });
+    let resolvedChannelData: ChannelData | null = null;
     try {
       const res = await fetch("/api/channel-check", {
         method: "POST",
@@ -222,7 +227,8 @@ export default function App() {
       });
       const data = await res.json();
       if (data && data.ok && data.data) {
-        setChannelData({ ...data.data, channelUrl: url });
+        resolvedChannelData = { ...data.data, channelUrl: url };
+        setChannelData(resolvedChannelData);
       } else {
         setChannelData(null);
       }
@@ -230,6 +236,31 @@ export default function App() {
       setChannelData(null);
     }
     setStep({ kind: "result" });
+
+    // Trigger title analysis if we have enough videos
+    const videos = resolvedChannelData?.videos ?? [];
+    if (videos.length >= 3) {
+      setTitleAnalysisLoading(true);
+      setTitleAnalysisError(false);
+      setTitleAnalysis(null);
+      try {
+        const taRes = await fetch("/api/title-analysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ videos: videos.slice(0, 8).map((v) => ({ id: v.id, title: v.title })) }),
+        });
+        const taData = await taRes.json();
+        if (taData?.ok && taData.data) {
+          setTitleAnalysis(taData.data);
+        } else {
+          setTitleAnalysisError(true);
+        }
+      } catch {
+        setTitleAnalysisError(true);
+      } finally {
+        setTitleAnalysisLoading(false);
+      }
+    }
   }
 
   function skipChannel() {
@@ -251,7 +282,7 @@ export default function App() {
   }
 
   async function submitLead(values: LeadFormValues) {
-    const score = computeScore(answers, channelData, values.message, fitResults);
+    const score = computeScore(answers, channelData, values.message);
     const leadClass = leadClassFromScore(score);
     const res = await fetch("/api/lead", {
       method: "POST",
@@ -264,7 +295,6 @@ export default function App() {
         answers,
         channelUrl: channelUrl || undefined,
         channelData,
-        fitResults,
         result: {
           categoryId,
           categoryHeadline: category.headline,
@@ -368,8 +398,9 @@ export default function App() {
           insights={insights}
           levers={levers}
           diagnosis={diagnosis}
-          fitResults={fitResults}
-          onFitComplete={setFitResults}
+          titleAnalysis={titleAnalysis}
+          titleAnalysisLoading={titleAnalysisLoading}
+          titleAnalysisError={titleAnalysisError}
           shareUrl={shareUrl}
           onContinue={goToLead}
         />

@@ -5,7 +5,6 @@ import type {
   ClarityLevel,
   Diagnosis,
   DiagnosisLevel,
-  FitResult,
   Insight,
   Lever,
   Option,
@@ -285,25 +284,8 @@ function thumbnailInsight(answers: Answers, maturity: ChannelMaturity | null): I
 function strategyInsight(
   answers: Answers,
   category: ResultCategoryId,
-  maturity: ChannelMaturity | null,
-  fitResults: FitResult[] | null
+  maturity: ChannelMaturity | null
 ): Insight {
-  if (fitResults && fitResults.length > 0) {
-    const fitRatio = fitResults.filter((r) => r.fit === "yes").length / fitResults.length;
-    if (fitRatio < 0.4) {
-      return {
-        headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
-        text: "Du hast selbst gesehen, dass bei den meisten Videos Titel und Bild nicht zusammenpassen. Das kann dazu führen, dass weniger Menschen den Zusammenhang sofort verstehen.",
-      };
-    }
-    if (fitRatio < 0.7) {
-      return {
-        headline: "Titel-Thumbnail-Fit ausbaufähig",
-        text: "Titel und Bild sollten gemeinsam Neugier erzeugen — nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
-      };
-    }
-  }
-
   if (maturity === "authority" || maturity === "strong") {
     return {
       headline: "Optimierung auf hohem Niveau",
@@ -347,13 +329,12 @@ export function buildInsights(
   category: ResultCategoryId,
   answers: Answers,
   channel: ChannelData | null,
-  maturity: ChannelMaturity | null,
-  fitResults?: FitResult[] | null
+  maturity: ChannelMaturity | null
 ): Insight[] {
   return [
     rhythmInsight(answers, channel, maturity),
     thumbnailInsight(answers, maturity),
-    strategyInsight(answers, category, maturity, fitResults ?? null),
+    strategyInsight(answers, category, maturity),
   ];
 }
 

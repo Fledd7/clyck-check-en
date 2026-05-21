@@ -33,24 +33,36 @@ export const questions: Question[] = [
     question: "Was ist gerade dein größtes Problem mit deinem YouTube-Auftritt?",
     options: [
       { value: "wenig_klicks", label: "Zu wenig Klicks", tags: ["packaging"] },
-      { value: "unprofessionell", label: "Thumbnails wirken unprofessionell", tags: ["design"] },
-      { value: "uneinheitlich", label: "Kanal wirkt uneinheitlich", tags: ["system"] },
+      {
+        value: "unprofessionell",
+        label: "Ich bin mit meinen Thumbnails nicht zufrieden",
+        tags: ["design"],
+      },
+      {
+        value: "uneinheitlich",
+        label: "Mir fehlt ein roter Faden im Look meines Kanals",
+        tags: ["system"],
+      },
       {
         value: "kein_thumbnail_konzept",
-        label: "Ich weiß nicht, was aufs Thumbnail soll",
+        label: "Ich weiß oft nicht, was aufs Thumbnail soll",
         tags: ["system", "strategy"],
       },
       {
         value: "titel_thumbnail_mismatch",
-        label: "Titel und Thumbnail passen nicht zusammen",
+        label: "Titel und Thumbnail passen nicht richtig zusammen",
         tags: ["packaging"],
       },
       {
         value: "ideen_visualisieren",
-        label: "Meine Ideen sind schwer visuell darzustellen",
+        label: "Meine Themen sind schwer in ein Bild zu übersetzen",
         tags: ["strategy"],
       },
-      { value: "keine_richtung", label: "Keine klare Richtung", tags: ["strategy"] },
+      {
+        value: "keine_richtung",
+        label: "Ich bin noch dabei, meine Kanalrichtung zu finden",
+        tags: ["strategy"],
+      },
     ],
   },
   {
@@ -58,12 +70,12 @@ export const questions: Question[] = [
     multiSelect: false,
     question: "Wie würdest du deine aktuellen Thumbnails beschreiben?",
     options: [
-      { value: "einheitlich", label: "Einheitlich und professionell" },
-      { value: "teilweise_gut", label: "Teilweise gut, aber ohne klares System" },
-      { value: "sehr_unterschiedlich", label: "Sehr unterschiedlich" },
-      { value: "schnell_gebaut", label: "Eher schnell zusammengebaut" },
-      { value: "keine_eigenen", label: "Noch keine eigenen" },
-      { value: "unsicher", label: "Bin unsicher" },
+      { value: "einheitlich", label: "Ich habe einen klaren, konsistenten Stil" },
+      { value: "teilweise_gut", label: "Teilweise gut, aber ohne klares System dahinter" },
+      { value: "sehr_unterschiedlich", label: "Jedes Thumbnail sieht anders aus" },
+      { value: "schnell_gebaut", label: "Ich erstelle sie schnell, ohne festes Konzept" },
+      { value: "keine_eigenen", label: "Ich habe noch keine eigenen Thumbnails" },
+      { value: "unsicher", label: "Ich weiß nicht, wie ich sie einordnen soll" },
     ],
   },
   {
