@@ -81,6 +81,8 @@ function clampScore(n: unknown): AnalysisScore {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log("title-analysis called, key present:", !!process.env.GOOGLE_AI_KEY);
+
   if (req.method !== "POST") {
     res.status(405).json({ ok: false });
     return;
@@ -107,7 +109,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const genAI = new GoogleGenerativeAI(key);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const results: ResultItem[] = [];
 

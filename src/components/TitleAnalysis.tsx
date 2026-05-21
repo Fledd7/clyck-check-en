@@ -77,7 +77,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
 }
 
 export default function TitleAnalysis({ results, loading }: Props) {
-  if (!loading && results.length === 0) return null;
+  const showFallback = !loading && results.length === 0;
 
   return (
     <div>
@@ -87,7 +87,9 @@ export default function TitleAnalysis({ results, loading }: Props) {
         gemeinsam an.
       </p>
 
-      {loading ? (
+      {showFallback ? (
+        <p className="mt-4 text-sm text-ink/60">Titel-Analyse wird geladen…</p>
+      ) : loading ? (
         <div className="mt-4 grid gap-3">
           {[1, 2, 3, 4].map((i) => (
             <SkeletonCard key={i} />
