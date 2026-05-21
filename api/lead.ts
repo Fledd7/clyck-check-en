@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 type LeadClass = "top" | "good" | "mid" | "weak";
 type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
-type TitleRating = "hoch" | "mittel" | "niedrig";
+type TitleAnalysisScore = 1 | 2 | 3 | 4 | 5;
 
 type ChannelData = {
   title?: string;
@@ -16,8 +16,15 @@ type ChannelData = {
   channelUrl?: string;
 };
 
-type TitleAnalysisItem = { videoId: string; title: string; rating: TitleRating; reason: string };
-type TitleAnalysis = { items: TitleAnalysisItem[]; summary: string };
+type TitleAnalysisItem = {
+  id: string;
+  title: string;
+  score: TitleAnalysisScore;
+  label: string;
+  reason: string;
+  strong: string;
+  weak: string;
+};
 type InsightOrLever = { headline: string; text?: string };
 type AnswerValue = string | string[] | undefined;
 type Answers = Record<string, AnswerValue>;
@@ -30,7 +37,7 @@ type Body = {
   answers?: Answers;
   channelUrl?: string;
   channelData?: ChannelData | null;
-  titleAnalysis?: TitleAnalysis | null;
+  titleAnalysis?: TitleAnalysisItem[] | null;
   result?: {
     categoryId?: string;
     categoryHeadline?: string;
@@ -147,16 +154,23 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
   if (typeof ch?.uploadCadenceDays === "number" && ch.uploadCadenceDays > 0)
     channelLines.push(lineBlock("Upload-Kadenz (Longform)", `${ch.uploadCadenceDays} Tage`));
 
-  const ratingLabel: Record<TitleRating, string> = { hoch: "Hoch", mittel: "Mittel", niedrig: "Niedrig" };
-  const titleAnalysisLines = ta?.items.length
-    ? `<p style="margin:12px 0 4px"><strong>Titel-Analyse (Gemini)</strong></p>` +
-      (ta.summary ? `<p style="margin:2px 0 8px;font-style:italic;color:#555">${escape(ta.summary)}</p>` : "") +
-      ta.items
-        .map(
-          (item) =>
-            `<p style="margin:2px 0">[${escape(ratingLabel[item.rating])}] ${escape(item.title)} — <span style="color:#666">${escape(item.reason)}</span></p>`
-        )
-        .join("")
+  const titleAnalysisLines = ta && ta.length > 0
+    ? (() => {
+        const avg = ta.reduce((s, r) => s + r.score, 0) / ta.length;
+        const header = `<p style="margin:12px 0 4px"><strong>Titel-Thumbnail-Fit (Gemini Vision)</strong></p>` +
+          `<p style="margin:2px 0 8px;font-style:italic;color:#555">Ø ${avg.toFixed(1)} / 5</p>`;
+        const rows = ta
+          .map(
+            (item) =>
+              `<p style="margin:2px 0">[${item.score}/5 · ${escape(item.label)}] ${escape(item.title)}` +
+              (item.reason ? ` — <span style="color:#666">${escape(item.reason)}</span>` : "") +
+              `</p>` +
+              (item.strong ? `<p style="margin:0 0 0 16px;color:#15803d;font-size:12px">✓ ${escape(item.strong)}</p>` : "") +
+              (item.weak ? `<p style="margin:0 0 0 16px;color:#b91c1c;font-size:12px">✗ ${escape(item.weak)}</p>` : "")
+          )
+          .join("");
+        return header + rows;
+      })()
     : "";
 
   const insightLines = insights.length

@@ -20,9 +20,8 @@ type Props = {
   insights: Insight[];
   levers: Lever[];
   diagnosis: Diagnosis;
-  titleAnalysis: TitleAnalysisResult | null;
+  titleAnalysis: TitleAnalysisResult[];
   titleAnalysisLoading: boolean;
-  titleAnalysisError: boolean;
   shareUrl: string;
   onContinue: () => void;
 };
@@ -60,7 +59,6 @@ export default function ResultPreview({
   diagnosis,
   titleAnalysis,
   titleAnalysisLoading,
-  titleAnalysisError,
   shareUrl,
   onContinue,
 }: Props) {
@@ -73,7 +71,7 @@ export default function ResultPreview({
       typeof channelData.videoCount === "number" ||
       (channelData.thumbnails?.length ?? 0) > 0 ||
       titleAnalysisLoading ||
-      !!titleAnalysis);
+      titleAnalysis.length > 0);
 
   const longformCount = channelData?.longformCount ?? 0;
   const hasLongform = longformCount > 0 && (channelData?.thumbnails?.length ?? 0) > 0;
@@ -247,13 +245,9 @@ export default function ResultPreview({
             </div>
           )}
 
-          {(channelData.videos?.length ?? 0) >= 3 && (
+          {(titleAnalysisLoading || titleAnalysis.length > 0) && (
             <div className="mt-6 card">
-              <TitleAnalysis
-                loading={titleAnalysisLoading}
-                result={titleAnalysis}
-                error={titleAnalysisError}
-              />
+              <TitleAnalysis loading={titleAnalysisLoading} results={titleAnalysis} />
             </div>
           )}
 

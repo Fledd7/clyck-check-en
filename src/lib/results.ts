@@ -8,6 +8,7 @@ import type {
   Insight,
   Lever,
   Option,
+  TitleAnalysisResult,
   ResultCategory,
   ResultCategoryId,
 } from "./types";
@@ -437,16 +438,40 @@ function strategyInsight(
   };
 }
 
+function fitInsight(titleAnalysis: TitleAnalysisResult[]): Insight | null {
+  if (titleAnalysis.length === 0) return null;
+  const avg =
+    titleAnalysis.reduce((sum, r) => sum + r.score, 0) / titleAnalysis.length;
+  if (avg < 2.5) {
+    return {
+      headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
+      text: "Die KI-Analyse zeigt: Bei den meisten Videos arbeiten Titel und Bild nicht zusammen. Genau hier entstehen die meisten verlorenen Klicks.",
+    };
+  }
+  if (avg < 3.5) {
+    return {
+      headline: "Titel-Thumbnail-Fit ausbaufähig",
+      text: "Bild und Titel sollten gemeinsam Neugier erzeugen — nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
+    };
+  }
+  return {
+    headline: "Gutes Zusammenspiel erkennbar",
+    text: "Deine Videos nutzen das Zusammenspiel aus Bild und Titel bereits gut. Der Fokus liegt auf konsequenter Umsetzung.",
+  };
+}
+
 export function buildInsights(
   category: ResultCategoryId,
   answers: Answers,
   channel: ChannelData | null,
-  maturity: ChannelMaturity | null
+  maturity: ChannelMaturity | null,
+  titleAnalysis: TitleAnalysisResult[] = []
 ): Insight[] {
+  const fit = fitInsight(titleAnalysis);
   return [
     rhythmInsight(answers, channel, maturity),
     thumbnailInsight(answers, maturity),
-    strategyInsight(answers, category, maturity),
+    fit ?? strategyInsight(answers, category, maturity),
   ];
 }
 

@@ -1,46 +1,83 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-type VideoInput = { id: string; title: string };
+type VideoInput = { id: string; title: string; thumbnail: string };
 
-type RatedItem = {
-  videoId: string;
+type AnalysisScore = 1 | 2 | 3 | 4 | 5;
+type AnalysisLabel =
+  | "Kein Fit"
+  | "Schwacher Fit"
+  | "Mittlerer Fit"
+  | "Guter Fit"
+  | "Perfekter Fit";
+
+type ResultItem = {
+  id: string;
   title: string;
-  rating: "hoch" | "mittel" | "niedrig";
+  thumbnail: string;
+  score: AnalysisScore;
+  label: AnalysisLabel;
   reason: string;
+  strong: string;
+  weak: string;
 };
 
-function buildPrompt(videos: VideoInput[]): string {
-  const list = videos.map((v, i) => `${i + 1}. "${v.title}"`).join("\n");
-  return `Du bist ein YouTube-Packaging-Experte. Bewerte jeden Videotitel nach seinem Klick-Potenzial und Thumbnail-Eignung auf einer Skala: hoch, mittel oder niedrig.
+const scoreLabels: Record<AnalysisScore, AnalysisLabel> = {
+  1: "Kein Fit",
+  2: "Schwacher Fit",
+  3: "Mittlerer Fit",
+  4: "Guter Fit",
+  5: "Perfekter Fit",
+};
 
-Kriterien für "hoch": klarer Nutzenversprechen oder starke Neugier, leicht visuell umsetzbar, spricht eine spezifische Zielgruppe an.
-Kriterien für "mittel": Ansätze vorhanden, aber unklar oder zu generisch.
-Kriterien für "niedrig": kein Klickreiz, schwer visuell umzusetzen, zu intern oder zu abstrakt.
-
-Videotitel:
-${list}
-
-Antworte ausschließlich als JSON-Array (kein Markdown, kein Text davor oder danach):
-[
-  { "index": 1, "rating": "hoch"|"mittel"|"niedrig", "reason": "Kurze Begründung auf Deutsch (max. 1 Satz)" },
-  ...
-]`;
+async function fetchImageAsBase64(
+  url: string
+): Promise<{ data: string; mimeType: string } | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const buffer = await res.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    const contentType = res.headers.get("content-type") ?? "image/jpeg";
+    return { data: base64, mimeType: contentType };
+  } catch {
+    return null;
+  }
 }
 
-function buildSummary(items: RatedItem[]): string {
-  const total = items.length;
-  const hoch = items.filter((i) => i.rating === "hoch").length;
-  const mittel = items.filter((i) => i.rating === "mittel").length;
-  const niedrig = items.filter((i) => i.rating === "niedrig").length;
+function buildPrompt(title: string): string {
+  return `Du bist ein YouTube-Stratege mit Expertise in Thumbnail-Design und Klickpsychologie.
 
-  if (hoch >= total * 0.6) {
-    return `${hoch} von ${total} Titeln zeigen starkes Klick-Potenzial. Deine Titel-Arbeit ist solide – der nächste Schritt ist, dieses Potenzial konsequent in starke Thumbnails zu übersetzen.`;
-  }
-  if (niedrig >= total * 0.5) {
-    return `${niedrig} von ${total} Titeln bieten wenig Klick-Potenzial. Hier liegt oft ungenutztes Potenzial – stärkere Titel-Formulierungen können helfen, den Klickreiz klarer zu machen.`;
-  }
-  return `${mittel + hoch} von ${total} Titeln haben ausbaufähiges Potenzial. Mit klareren Nutzenversprechen und mehr Neugier-Elementen lässt sich hier noch mehr herausholen.`;
+Analysiere das Zusammenspiel aus diesem YouTube-Thumbnail und dem zugehörigen Videotitel.
+
+Videotitel: "${title}"
+
+Bewertungskriterien:
+1. Erzeugen Bild und Titel gemeinsam eine klare Botschaft?
+2. Verstärken sie sich gegenseitig oder arbeiten sie gegeneinander?
+3. Entsteht Neugier durch die Kombination — oder reicht eines allein nicht aus?
+4. Ist das Bild konkret genug, um den Titel zu visualisieren?
+
+Bewerte den Titel-Thumbnail-Fit auf einer Skala von 1 bis 5:
+1 = Kein Fit (Bild und Titel haben keine erkennbare Verbindung)
+2 = Schwacher Fit (lose Verbindung, aber keine gemeinsame Botschaft)
+3 = Mittlerer Fit (Verbindung erkennbar, aber Potenzial nicht ausgeschöpft)
+4 = Guter Fit (Bild und Titel ergänzen sich gut)
+5 = Perfekter Fit (starke Einheit, klare Botschaft, hoher Klickanreiz)
+
+Antworte NUR als JSON-Objekt. Kein weiterer Text. Kein Markdown.
+{
+  "score": <Zahl 1-5>,
+  "reason": "<1 Satz auf Deutsch, max. 20 Wörter, was den Score begründet>",
+  "strong": "<1 kurzer Satz was gut funktioniert, oder leer wenn score <= 2>",
+  "weak": "<1 kurzer Satz was fehlt oder stört, oder leer wenn score = 5>"
+}`;
+}
+
+function clampScore(n: unknown): AnalysisScore {
+  const num = typeof n === "number" ? Math.round(n) : parseInt(String(n), 10);
+  if (num >= 1 && num <= 5) return num as AnalysisScore;
+  return 3;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -65,37 +102,57 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const key = process.env.GOOGLE_AI_KEY;
   if (!key) {
-    res.status(200).json({ ok: false, reason: "missing_config" });
+    res.status(200).json({ ok: false, reason: "no_key" });
     return;
   }
 
-  try {
-    const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(buildPrompt(videos));
-    const text = result.response.text().trim();
+  const genAI = new GoogleGenerativeAI(key);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    // Strip markdown fences if present
-    const json = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
-    const parsed = JSON.parse(json) as Array<{
-      index: number;
-      rating: "hoch" | "mittel" | "niedrig";
-      reason: string;
-    }>;
+  const results: ResultItem[] = [];
 
-    const items: RatedItem[] = parsed.map((p) => {
-      const video = videos[p.index - 1];
-      return {
-        videoId: video?.id ?? String(p.index),
-        title: video?.title ?? "",
-        rating: p.rating,
-        reason: p.reason,
+  for (const video of videos.slice(0, 8)) {
+    try {
+      const image = await fetchImageAsBase64(video.thumbnail);
+      if (!image) continue;
+
+      const result = await model.generateContent([
+        { inlineData: { mimeType: image.mimeType, data: image.data } },
+        { text: buildPrompt(video.title) },
+      ]);
+
+      const text = result.response.text().trim();
+      const clean = text.replace(/```json|```/g, "").trim();
+      const parsed = JSON.parse(clean) as {
+        score?: number;
+        reason?: string;
+        strong?: string;
+        weak?: string;
       };
-    });
 
-    res.status(200).json({ ok: true, data: { items, summary: buildSummary(items) } });
-  } catch (err) {
-    console.error("title-analysis error", err);
-    res.status(200).json({ ok: false, reason: "ai_error" });
+      const score = clampScore(parsed.score);
+      results.push({
+        id: video.id,
+        title: video.title,
+        thumbnail: video.thumbnail,
+        score,
+        label: scoreLabels[score],
+        reason: typeof parsed.reason === "string" ? parsed.reason : "",
+        strong: typeof parsed.strong === "string" ? parsed.strong : "",
+        weak: typeof parsed.weak === "string" ? parsed.weak : "",
+      });
+
+      await new Promise((r) => setTimeout(r, 300));
+    } catch (err) {
+      console.error(`title-analysis: error on video ${video.id}`, err);
+      continue;
+    }
   }
+
+  if (results.length === 0) {
+    res.status(200).json({ ok: false, reason: "no_results" });
+    return;
+  }
+
+  res.status(200).json({ ok: true, results });
 }

@@ -72,16 +72,21 @@ export type ResultCategory = {
 
 export type LeadClass = "top" | "good" | "mid" | "weak";
 
-export type TitleRating = "hoch" | "mittel" | "niedrig";
-
-export type TitleAnalysisItem = {
-  videoId: string;
-  title: string;
-  rating: TitleRating;
-  reason: string;
-};
+export type TitleAnalysisScore = 1 | 2 | 3 | 4 | 5;
+export type TitleAnalysisLabel =
+  | "Kein Fit"
+  | "Schwacher Fit"
+  | "Mittlerer Fit"
+  | "Guter Fit"
+  | "Perfekter Fit";
 
 export type TitleAnalysisResult = {
-  items: TitleAnalysisItem[];
-  summary: string;
+  id: string;
+  title: string;
+  thumbnail?: string;
+  score: TitleAnalysisScore;
+  label: TitleAnalysisLabel;
+  reason: string;
+  strong: string;
+  weak: string;
 };
