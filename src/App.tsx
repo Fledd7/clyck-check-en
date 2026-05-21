@@ -327,6 +327,7 @@ export default function App() {
           const val = answers[q.id as keyof Answers];
           return (
             <QuestionStep
+              key={q.id}
               question={q}
               value={val as string | string[] | undefined}
               onAnswer={(v) => answerQuestion(q.id, v)}

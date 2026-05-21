@@ -11,21 +11,17 @@ type VideoState = "unanswered" | "yes" | "no";
 export default function TitleThumbnailFitCheck({ videos, onComplete }: Props) {
   const shown = videos.slice(0, 6);
   const [ratings, setRatings] = useState<Record<string, VideoState>>({});
-  const [done, setDone] = useState(false);
 
   function rate(videoId: string, fit: "yes" | "no") {
     const next = { ...ratings, [videoId]: fit };
     setRatings(next);
-    const allRated = shown.every((v) => next[v.id] && next[v.id] !== "unanswered");
-    if (allRated && !done) {
-      setDone(true);
-      const results: FitResult[] = shown
-        .filter((v) => next[v.id] !== "unanswered")
-        .map((v) => ({
-          videoId: v.id,
-          title: v.title,
-          fit: next[v.id] as "yes" | "no",
-        }));
+    const allRated = shown.every((v) => next[v.id] === "yes" || next[v.id] === "no");
+    if (allRated) {
+      const results: FitResult[] = shown.map((v) => ({
+        videoId: v.id,
+        title: v.title,
+        fit: next[v.id] as "yes" | "no",
+      }));
       onComplete(results);
     }
   }
@@ -116,8 +112,7 @@ export function FitSummary({ results }: { results: FitResult[] }) {
         <p className="font-medium text-yellow-900">⚠ Gemischter Titel-Thumbnail-Fit</p>
         <p className="mt-1 text-sm text-yellow-800">
           {noFitCount} von {total} deiner Videos haben ein schwaches Zusammenspiel aus Titel und
-          Bild. Das ist einer der häufigsten Gründe für schlechte Klickraten — auch wenn das
-          Thumbnail selbst gut aussieht.
+          Bild. Das kann den Klickreiz schwächen — auch wenn das Thumbnail selbst gut aussieht.
         </p>
         <p className="mt-2 text-xs text-yellow-700">
           Diese Einschätzung basiert auf deiner eigenen Bewertung.
@@ -130,7 +125,7 @@ export function FitSummary({ results }: { results: FitResult[] }) {
       <p className="font-medium text-red-900">✗ Schwacher Titel-Thumbnail-Fit</p>
       <p className="mt-1 text-sm text-red-800">
         Bei den meisten deiner Videos arbeiten Titel und Bild gegeneinander, nicht miteinander. Das
-        kostet Klicks — unabhängig davon, wie gut die einzelnen Thumbnails sind.
+        kann Klickpotenzial kosten — unabhängig davon, wie gut die einzelnen Thumbnails sind.
       </p>
       <p className="mt-2 text-xs text-red-700">
         Diese Einschätzung basiert auf deiner eigenen Bewertung.

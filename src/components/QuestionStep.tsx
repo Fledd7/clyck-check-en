@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OptionCard from "./OptionCard";
 import type { Question } from "../lib/types";
 
@@ -18,6 +18,19 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
     if (!multi) return [];
     return Array.isArray(value) ? value : value ? [value] : [];
   });
+
+  // Reset / sync local selection when the question itself changes (e.g. next/back)
+  // or when the stored value for that question changes (e.g. resumed progress).
+  useEffect(() => {
+    if (!multi) {
+      setSelected([]);
+      return;
+    }
+    setSelected(Array.isArray(value) ? value : value ? [value] : []);
+    // We deliberately key on question.id so each question starts with its own
+    // stored value, not the previous question's selection.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [question.id, multi]);
 
   function toggleOption(v: string) {
     setSelected((prev) => {

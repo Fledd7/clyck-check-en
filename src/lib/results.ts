@@ -293,7 +293,7 @@ function strategyInsight(
     if (fitRatio < 0.4) {
       return {
         headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
-        text: "Du hast selbst gesehen, dass bei den meisten Videos Titel und Bild nicht zusammenpassen. Genau hier entstehen die meisten verlorenen Klicks.",
+        text: "Du hast selbst gesehen, dass bei den meisten Videos Titel und Bild nicht zusammenpassen. Das kann dazu führen, dass weniger Menschen den Zusammenhang sofort verstehen.",
       };
     }
     if (fitRatio < 0.7) {
@@ -326,8 +326,8 @@ function strategyInsight(
   }
   if (problem.includes("wenig_klicks")) {
     return {
-      headline: "Klickproblem, nicht Qualitätsproblem",
-      text: "Oft sind Videos gut, aber die Verpackung schafft keinen Anreiz zu klicken. Das lässt sich mit dem richtigen System beheben.",
+      headline: "Klickreiz, nicht Qualität",
+      text: "Oft sind Videos gut, aber die Verpackung schafft wenig Anreiz, draufzuklicken. Das kann den Klickreiz schwächen — und lässt sich mit dem richtigen System verbessern.",
     };
   }
   const support = answers.support ?? [];
