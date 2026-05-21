@@ -1,4 +1,4 @@
-import type { Answers, ChannelData, ChannelMaturity, LeadClass } from "./types";
+import type { Answers, ChannelData, ChannelMaturity, FitResult, LeadClass } from "./types";
 
 export function getChannelMaturity(channel: ChannelData | null): ChannelMaturity | null {
   if (!channel) return null;
@@ -56,17 +56,27 @@ const supportScore: Record<string, number> = {
   unklar: 2,
 };
 
+function scoreMultiSelect(values: string[] | undefined, scores: Record<string, number>): number {
+  if (!values || values.length === 0) return 0;
+  const nums = values.map((v) => scores[v] ?? 0).sort((a, b) => b - a);
+  const highest = nums[0];
+  if (nums.length === 1) return highest;
+  const bonus = nums.slice(1).reduce((sum, s) => sum + s * 0.4, 0);
+  return Math.min(highest + bonus, highest * 1.4);
+}
+
 export function computeScore(
   answers: Answers,
   channel: ChannelData | null,
-  message: string | undefined
+  message: string | undefined,
+  fitResults?: FitResult[] | null
 ): number {
   let score = 0;
   score += statusScore[answers.status ?? ""] ?? 0;
-  score += goalScore[answers.goal ?? ""] ?? 0;
-  score += problemScore[answers.problem ?? ""] ?? 0;
+  score += scoreMultiSelect(answers.goal, goalScore);
+  score += scoreMultiSelect(answers.problem, problemScore);
   score += thumbnailsScore[answers.thumbnails ?? ""] ?? 0;
-  score += supportScore[answers.support ?? ""] ?? 0;
+  score += scoreMultiSelect(answers.support, supportScore);
 
   if (channel) {
     score += 5;
@@ -100,6 +110,12 @@ export function computeScore(
   }
 
   if (message && message.trim().length > 20) score += 2;
+
+  if (fitResults && fitResults.length > 0) {
+    const fitRatio = fitResults.filter((r) => r.fit === "yes").length / fitResults.length;
+    if (fitRatio < 0.4) score += 10;
+    else if (fitRatio < 0.7) score += 5;
+  }
 
   return Math.min(100, score);
 }

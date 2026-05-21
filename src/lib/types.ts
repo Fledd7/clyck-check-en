@@ -3,17 +3,38 @@ export type QuestionId = "status" | "goal" | "problem" | "thumbnails" | "support
 export type Option = {
   value: string;
   label: string;
-  /** internal classification tags for scoring / result selection */
   tags?: string[];
 };
 
 export type Question = {
   id: QuestionId;
   question: string;
+  multiSelect?: boolean;
+  maxSelect?: number;
   options: Option[];
 };
 
-export type Answers = Partial<Record<QuestionId, string>>;
+export type Answers = {
+  status?: string;
+  goal?: string[];
+  problem?: string[];
+  thumbnails?: string;
+  support?: string[];
+};
+
+export type VideoItem = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  views: number;
+  publishedAt: string;
+};
+
+export type FitResult = {
+  videoId: string;
+  title: string;
+  fit: "yes" | "no";
+};
 
 export type ChannelData = {
   title?: string;
@@ -25,6 +46,7 @@ export type ChannelData = {
   thumbnails?: string[];
   longformCount?: number;
   channelUrl?: string;
+  videos?: VideoItem[];
 };
 
 export type Insight = { headline: string; text: string };
@@ -39,10 +61,6 @@ export type Diagnosis = {
 export type ChannelMaturity = "early" | "growing" | "established" | "strong" | "authority";
 export type ClarityLevel = "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch";
 
-export type ChannelLookupResult =
-  | { ok: true; data: ChannelData }
-  | { ok: false; reason: "missing_key" | "not_found" | "error" | "skipped" };
-
 export type ResultCategoryId = "A" | "B" | "C" | "D";
 
 export type ResultCategory = {
@@ -53,18 +71,3 @@ export type ResultCategory = {
 };
 
 export type LeadClass = "top" | "good" | "mid" | "weak";
-
-export type LeadPayload = {
-  name: string;
-  email: string;
-  message?: string;
-  consent: boolean;
-  answers: Answers;
-  channelUrl?: string;
-  channelData?: ChannelData | null;
-  result: {
-    categoryId: ResultCategoryId;
-    score: number;
-    leadClass: LeadClass;
-  };
-};

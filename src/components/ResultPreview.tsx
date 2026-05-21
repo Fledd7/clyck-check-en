@@ -1,12 +1,16 @@
+import { useState } from "react";
 import type {
   ChannelData,
   ClarityLevel,
   Diagnosis,
+  FitResult,
   Insight,
   Lever,
   ResultCategory,
 } from "../lib/types";
 import ThumbnailGrid from "./ThumbnailGrid";
+import TitleThumbnailFitCheck, { FitSummary } from "./TitleThumbnailFitCheck";
+import { getBenchmarkText } from "../lib/results";
 
 type Props = {
   category: ResultCategory;
@@ -17,6 +21,9 @@ type Props = {
   insights: Insight[];
   levers: Lever[];
   diagnosis: Diagnosis;
+  fitResults: FitResult[] | null;
+  onFitComplete: (results: FitResult[]) => void;
+  shareUrl: string;
   onContinue: () => void;
 };
 
@@ -34,7 +41,9 @@ function Badge({ level }: { level: Diagnosis["direction"] }) {
       ? "bg-white text-ink border-ink/40"
       : "bg-white text-ink/60 border-line";
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${tone}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${tone}`}
+    >
       {levelLabel[level]}
     </span>
   );
@@ -49,19 +58,28 @@ export default function ResultPreview({
   insights,
   levers,
   diagnosis,
+  fitResults,
+  onFitComplete,
+  shareUrl,
   onContinue,
 }: Props) {
+  const [linkCopied, setLinkCopied] = useState(false);
+
   const longformCount = channelData?.longformCount ?? 0;
   const hasLongform = longformCount > 0 && (channelData?.thumbnails?.length ?? 0) > 0;
+  const fitVideos = channelData?.videos?.slice(0, 6) ?? [];
+  const showFitCheck = fitVideos.length >= 3;
+
+  function copyShareUrl() {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  }
 
   return (
     <section className="container-narrow fade-in py-8">
-      <p className="text-sm font-medium uppercase tracking-wide text-ink/60">
-        Erste Einschätzung
-      </p>
-      <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">
-        {category.headline}
-      </h1>
+      <p className="text-sm font-medium uppercase tracking-wide text-ink/60">Erste Einschätzung</p>
+      <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">{category.headline}</h1>
       <p className="mt-2">
         <span
           className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
@@ -97,9 +115,10 @@ export default function ResultPreview({
             {typeof channelData.videoCount === "number" && (
               <li>Videos: {channelData.videoCount.toLocaleString("de-DE")}</li>
             )}
-            {typeof channelData.uploadCadenceDays === "number" && channelData.uploadCadenceDays > 0 && (
-              <li>Ø Upload-Abstand: ca. {channelData.uploadCadenceDays} Tage</li>
-            )}
+            {typeof channelData.uploadCadenceDays === "number" &&
+              channelData.uploadCadenceDays > 0 && (
+                <li>Ø Upload-Abstand: ca. {channelData.uploadCadenceDays} Tage</li>
+              )}
             {typeof channelData.medianViews === "number" && (
               <li>Median-Views: {channelData.medianViews.toLocaleString("de-DE")}</li>
             )}
@@ -107,21 +126,32 @@ export default function ResultPreview({
               <li>Longform-Videos: {channelData.longformCount}</li>
             )}
           </ul>
+          {typeof channelData.subscriberCount === "number" && (
+            <p className="mt-3 text-sm text-ink/65 leading-relaxed">
+              {getBenchmarkText(channelData.subscriberCount)}
+            </p>
+          )}
           {hasLongform && (
             <div className="mt-4">
-              <p className="mb-2 text-sm font-medium text-ink/70">Deine letzten Longform-Thumbnails</p>
+              <p className="mb-2 text-sm font-medium text-ink/70">
+                Deine letzten Longform-Thumbnails
+              </p>
               <ThumbnailGrid thumbnails={channelData.thumbnails ?? []} />
               <p className="mt-2 text-xs text-ink/55">
-                Analysiert werden nur erkennbare Longform-Videos. Shorts werden für diese Einschätzung bewusst ausgelassen.
+                Analysiert werden nur erkennbare Longform-Videos. Shorts werden für diese
+                Einschätzung bewusst ausgelassen.
               </p>
             </div>
           )}
+
+          {showFitCheck && (
+            <TitleThumbnailFitCheck videos={fitVideos} onComplete={onFitComplete} />
+          )}
+          {fitResults && fitResults.length > 0 && <FitSummary results={fitResults} />}
         </div>
       )}
 
-      {channelNote && (
-        <p className="mt-5 text-sm italic text-ink/70">{channelNote}</p>
-      )}
+      {channelNote && <p className="mt-5 text-sm italic text-ink/70">{channelNote}</p>}
 
       <div className="mt-10">
         <h2 className="text-lg font-semibold">Was bei dir auffällt</h2>
@@ -189,6 +219,16 @@ export default function ResultPreview({
         </ul>
         <button type="button" onClick={onContinue} className="btn-primary mt-6">
           Persönliche Einschätzung anfragen
+        </button>
+      </div>
+
+      <div className="mt-8 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={copyShareUrl}
+          className="btn-secondary text-sm"
+        >
+          {linkCopied ? "Kopiert!" : "🔗 Ergebnis-Link kopieren"}
         </button>
       </div>
     </section>

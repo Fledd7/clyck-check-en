@@ -5,8 +5,10 @@ import type {
   ClarityLevel,
   Diagnosis,
   DiagnosisLevel,
+  FitResult,
   Insight,
   Lever,
+  Option,
   ResultCategory,
   ResultCategoryId,
 } from "./types";
@@ -42,11 +44,40 @@ export const categories: Record<ResultCategoryId, ResultCategory> = {
   },
 };
 
+function getDominantTag(problemValues: string[], allOptions: Option[]): string | null {
+  const counts: Record<string, number> = {};
+  for (const v of problemValues) {
+    const opt = allOptions.find((o) => o.value === v);
+    for (const tag of opt?.tags ?? []) {
+      counts[tag] = (counts[tag] ?? 0) + 1;
+    }
+  }
+  let dominant: string | null = null;
+  let max = 0;
+  for (const [tag, count] of Object.entries(counts)) {
+    if (count > max) {
+      max = count;
+      dominant = tag;
+    }
+  }
+  return dominant;
+}
+
+import { questions } from "./questions";
+
 export function selectCategory(answers: Answers): ResultCategoryId {
+  const goal = answers.goal ?? [];
+  const problem = answers.problem ?? [];
+  const support = answers.support ?? [];
+
+  const problemOptions = questions.find((q) => q.id === "problem")?.options ?? [];
+  const dominantProblemTag = getDominantTag(problem, problemOptions);
+
   const strategyConfusion =
-    answers.goal === "unklar" ||
-    answers.problem === "keine_richtung" ||
-    answers.support === "strategie";
+    goal.includes("unklar") ||
+    problem.includes("keine_richtung") ||
+    dominantProblemTag === "strategy" ||
+    support.includes("strategie");
 
   const earlyStage =
     answers.status === "plant_start" ||
@@ -56,8 +87,9 @@ export function selectCategory(answers: Answers): ResultCategoryId {
   const systemNeed =
     answers.thumbnails === "teilweise_gut" ||
     answers.thumbnails === "sehr_unterschiedlich" ||
-    answers.support === "system" ||
-    answers.support === "retainer";
+    support.includes("system") ||
+    support.includes("retainer") ||
+    dominantProblemTag === "system";
 
   if (strategyConfusion) return "C";
   if (earlyStage) return "D";
@@ -96,13 +128,15 @@ export function applyMaturityOverride(
   answers: Answers
 ): ResultCategoryId {
   if (!maturity) return quizCategory;
+  const problem = answers.problem ?? [];
+  const goal = answers.goal ?? [];
 
   if (maturity === "authority" || maturity === "strong") {
     if (quizCategory === "D") return "B";
     if (quizCategory === "C") {
       const isStrategyProblem =
-        answers.problem === "ideen_visualisieren" || answers.problem === "keine_richtung";
-      const isGoalUnclear = answers.goal === "unklar";
+        problem.includes("ideen_visualisieren") || problem.includes("keine_richtung");
+      const isGoalUnclear = goal.includes("unklar");
       if (!isStrategyProblem && !isGoalUnclear) return "B";
     }
     return quizCategory;
@@ -110,11 +144,23 @@ export function applyMaturityOverride(
 
   if (maturity === "established") {
     if (quizCategory === "D") return "B";
-    if (quizCategory === "C" && answers.goal !== "unklar") return "B";
+    if (quizCategory === "C" && !goal.includes("unklar")) return "B";
     return quizCategory;
   }
 
   return quizCategory;
+}
+
+export function getBenchmarkText(subs: number): string {
+  if (subs > 1_000_000)
+    return "Dein Kanal hat eine signifikante Reichweite aufgebaut. Auf diesem Level entscheidet das System hinter den Thumbnails.";
+  if (subs > 100_000)
+    return "Dein Kanal hat bewiesen, dass das Thema funktioniert. Die nächste Stufe erfordert ein klares visuelles System.";
+  if (subs > 10_000)
+    return "Du hast erste echte Aufmerksamkeit aufgebaut. Jetzt wird Konsistenz zum entscheidenden Faktor.";
+  if (subs > 1_000)
+    return "Du bist in der Aufbauphase — genau hier entscheidet sich, ob der Kanal später skaliert oder nicht.";
+  return "Du stehst am Anfang. Jetzt ist der beste Moment, visuelle Klarheit von Anfang an aufzubauen.";
 }
 
 function rhythmInsight(
@@ -239,37 +285,53 @@ function thumbnailInsight(answers: Answers, maturity: ChannelMaturity | null): I
 function strategyInsight(
   answers: Answers,
   category: ResultCategoryId,
-  maturity: ChannelMaturity | null
+  maturity: ChannelMaturity | null,
+  fitResults: FitResult[] | null
 ): Insight {
+  if (fitResults && fitResults.length > 0) {
+    const fitRatio = fitResults.filter((r) => r.fit === "yes").length / fitResults.length;
+    if (fitRatio < 0.4) {
+      return {
+        headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
+        text: "Du hast selbst gesehen, dass bei den meisten Videos Titel und Bild nicht zusammenpassen. Genau hier entstehen die meisten verlorenen Klicks.",
+      };
+    }
+    if (fitRatio < 0.7) {
+      return {
+        headline: "Titel-Thumbnail-Fit ausbaufähig",
+        text: "Titel und Bild sollten gemeinsam Neugier erzeugen — nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
+      };
+    }
+  }
+
   if (maturity === "authority" || maturity === "strong") {
     return {
       headline: "Optimierung auf hohem Niveau",
       text: "Bei einem etablierten Kanal geht es nicht mehr ums Grundsetup — sondern darum, was auf diesem Level noch mehr herauszuholen ist.",
     };
   }
-  if (
-    answers.problem === "ideen_visualisieren" ||
-    answers.problem === "keine_richtung" ||
-    category === "C"
-  ) {
+
+  const problem = answers.problem ?? [];
+  if (problem.includes("ideen_visualisieren") || problem.includes("keine_richtung") || category === "C") {
     return {
       headline: "Hebel liegt vor dem Design",
       text: "Bevor gestaltet wird, muss klar sein, was eigentlich verpackt werden soll — Richtung, Idee und Titel kommen vor dem Bild.",
     };
   }
-  if (answers.problem === "titel_thumbnail_mismatch") {
+  if (problem.includes("titel_thumbnail_mismatch")) {
     return {
       headline: "Titel-Thumbnail-Fit ausbaufähig",
       text: "Titel und Bild sollten gemeinsam Neugier erzeugen, nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
     };
   }
-  if (answers.problem === "wenig_klicks") {
+  if (problem.includes("wenig_klicks")) {
     return {
       headline: "Klickproblem, nicht Qualitätsproblem",
       text: "Oft sind Videos gut, aber die Verpackung schafft keinen Anreiz zu klicken. Das lässt sich mit dem richtigen System beheben.",
     };
   }
-  if (answers.support === "retainer" || answers.support === "audit") {
+  const support = answers.support ?? [];
+  if (support.includes("retainer") || support.includes("audit")) {
     return {
       headline: "Systemdenken ist bereits vorhanden",
       text: "Wer an laufende Unterstützung oder ein Audit denkt, hat verstanden, dass Thumbnails kein Einmalprojekt sind.",
@@ -285,12 +347,13 @@ export function buildInsights(
   category: ResultCategoryId,
   answers: Answers,
   channel: ChannelData | null,
-  maturity: ChannelMaturity | null
+  maturity: ChannelMaturity | null,
+  fitResults?: FitResult[] | null
 ): Insight[] {
   return [
     rhythmInsight(answers, channel, maturity),
     thumbnailInsight(answers, maturity),
-    strategyInsight(answers, category, maturity),
+    strategyInsight(answers, category, maturity, fitResults ?? null),
   ];
 }
 
@@ -362,13 +425,16 @@ export function buildDiagnosis(
   channel: ChannelData | null,
   maturity: ChannelMaturity | null
 ): Diagnosis {
+  const goal = answers.goal ?? [];
+  const problem = answers.problem ?? [];
+
   const direction: DiagnosisLevel = (() => {
     if (maturity === "authority" || maturity === "strong") return "hoch";
     if (maturity === "established") {
-      return answers.goal === "unklar" ? "mittel" : "hoch";
+      return goal.includes("unklar") ? "mittel" : "hoch";
     }
-    if (answers.goal === "unklar" || answers.problem === "keine_richtung") return "niedrig";
-    if (answers.goal === "kundenanfragen" || answers.goal === "expertenstatus") return "hoch";
+    if (goal.includes("unklar") || problem.includes("keine_richtung")) return "niedrig";
+    if (goal.includes("kundenanfragen") || goal.includes("expertenstatus")) return "hoch";
     return "mittel";
   })();
 

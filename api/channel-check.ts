@@ -1,5 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
+type VideoItem = {
+  id: string;
+  title: string;
+  thumbnail: string;
+  views: number;
+  publishedAt: string;
+};
+
 type ChannelData = {
   title?: string;
   handle?: string;
@@ -9,6 +17,7 @@ type ChannelData = {
   medianViews?: number | null;
   thumbnails?: string[];
   longformCount?: number;
+  videos?: VideoItem[];
 };
 
 type Ok = { ok: true; data: ChannelData };
@@ -240,13 +249,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const longforms = orderedDetails.filter(isLongform).slice(0, 12);
 
-    const thumbnails = longforms
-      .map((v) => pickThumbFromVideo(v))
-      .filter((u): u is string => !!u);
+    const videos: VideoItem[] = longforms
+      .map((v) => {
+        const thumb = pickThumbFromVideo(v);
+        if (!thumb) return null;
+        return {
+          id: v.id,
+          title: v.snippet?.title ?? "",
+          thumbnail: thumb,
+          views: Number(v.statistics?.viewCount ?? 0),
+          publishedAt: v.snippet?.publishedAt ?? "",
+        };
+      })
+      .filter((v): v is VideoItem => !!v);
 
-    const views = longforms
-      .map((v) => Number(v.statistics?.viewCount ?? 0))
-      .filter((n) => Number.isFinite(n) && n > 0);
+    const thumbnails = videos.map((v) => v.thumbnail);
+    const views = videos.map((v) => v.views).filter((n) => Number.isFinite(n) && n > 0);
 
     const data: ChannelData = {
       title: channel.snippet?.title,
@@ -257,6 +275,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       medianViews: median(views),
       thumbnails,
       longformCount: longforms.length,
+      videos,
     };
 
     res.status(200).json({ ok: true, data } as Ok);

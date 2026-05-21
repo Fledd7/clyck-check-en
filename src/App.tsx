@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import StartScreen from "./components/StartScreen";
 import ProgressBar from "./components/ProgressBar";
 import QuestionStep from "./components/QuestionStep";
@@ -18,8 +18,74 @@ import {
   selectCategory,
 } from "./lib/results";
 import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
-import type { Answers, ChannelData, QuestionId } from "./lib/types";
+import type { Answers, ChannelData, FitResult, QuestionId } from "./lib/types";
 
+// ── localStorage ──────────────────────────────────────────────────────────────
+const LS_KEY = "klarheitscheck_progress";
+const LS_MAX_AGE = 24 * 60 * 60 * 1000;
+
+type SavedProgress = {
+  stepIndex: number;
+  answers: Answers;
+  channelUrl: string;
+  savedAt: number;
+};
+
+function loadProgress(): SavedProgress | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw) as SavedProgress;
+    if (Date.now() - p.savedAt > LS_MAX_AGE) return null;
+    return p;
+  } catch {
+    return null;
+  }
+}
+
+function saveProgress(index: number, answers: Answers, channelUrl: string) {
+  try {
+    localStorage.setItem(
+      LS_KEY,
+      JSON.stringify({ stepIndex: index, answers, channelUrl, savedAt: Date.now() })
+    );
+  } catch {
+    // Private mode – ignore
+  }
+}
+
+function clearProgress() {
+  try {
+    localStorage.removeItem(LS_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+// ── Share URL ─────────────────────────────────────────────────────────────────
+type SharePayload = {
+  cat: "A" | "B" | "C" | "D";
+  score: number;
+  cl: string;
+};
+
+function encodeShare(payload: SharePayload): string {
+  return btoa(JSON.stringify(payload));
+}
+
+function decodeShare(encoded: string): SharePayload | null {
+  try {
+    return JSON.parse(atob(encoded)) as SharePayload;
+  } catch {
+    return null;
+  }
+}
+
+function buildShareUrl(payload: SharePayload): string {
+  return `${window.location.origin}${window.location.pathname}?d=${encodeShare(payload)}`;
+}
+
+// ── Step type ─────────────────────────────────────────────────────────────────
 type Step =
   | { kind: "start" }
   | { kind: "question"; index: number }
@@ -27,16 +93,40 @@ type Step =
   | { kind: "loading" }
   | { kind: "result" }
   | { kind: "lead" }
-  | { kind: "done" };
+  | { kind: "done" }
+  | { kind: "shared"; payload: SharePayload };
 
 export default function App() {
-  const [step, setStep] = useState<Step>({ kind: "start" });
+  const savedProgress = useMemo(() => loadProgress(), []);
+
+  const [showResume, setShowResume] = useState<boolean>(!!savedProgress);
+  const [step, setStep] = useState<Step>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const d = params.get("d");
+    if (d) {
+      const payload = decodeShare(d);
+      if (payload) return { kind: "shared", payload };
+    }
+    return { kind: "start" };
+  });
+
   const [answers, setAnswers] = useState<Answers>({});
   const [channelUrl, setChannelUrl] = useState<string>("");
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
+  const [fitResults, setFitResults] = useState<FitResult[] | null>(null);
 
   const totalQuestions = questions.length;
 
+  // Save progress on step changes during quiz
+  useEffect(() => {
+    if (step.kind === "question") {
+      saveProgress(step.index, answers, channelUrl);
+    } else if (step.kind === "channel") {
+      saveProgress(totalQuestions, answers, channelUrl);
+    }
+  }, [step, answers, channelUrl, totalQuestions]);
+
+  // Derived state
   const maturity = useMemo(() => getChannelMaturity(channelData), [channelData]);
   const quizCategoryId = useMemo(() => selectCategory(answers), [answers]);
   const categoryId = useMemo(
@@ -45,13 +135,13 @@ export default function App() {
   );
   const category = categories[categoryId];
   const previewScore = useMemo(
-    () => computeScore(answers, channelData, undefined),
-    [answers, channelData]
+    () => computeScore(answers, channelData, undefined, fitResults),
+    [answers, channelData, fitResults]
   );
   const clarity = useMemo(() => clarityLevel(previewScore), [previewScore]);
   const insights = useMemo(
-    () => buildInsights(categoryId, answers, channelData, maturity),
-    [categoryId, answers, channelData, maturity]
+    () => buildInsights(categoryId, answers, channelData, maturity, fitResults),
+    [categoryId, answers, channelData, maturity, fitResults]
   );
   const levers = useMemo(() => buildLevers(categoryId), [categoryId]);
   const diagnosis = useMemo(
@@ -59,16 +149,49 @@ export default function App() {
     [answers, channelData, maturity]
   );
 
+  const shareUrl = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return buildShareUrl({ cat: categoryId, score: previewScore, cl: clarity.level });
+  }, [categoryId, previewScore, clarity.level]);
+
+  // Push share URL when entering result step
+  useEffect(() => {
+    if (step.kind === "result") {
+      window.history.replaceState(null, "", shareUrl);
+    }
+  }, [step.kind, shareUrl]);
+
+  function resumeProgress() {
+    if (!savedProgress) return;
+    setAnswers(savedProgress.answers);
+    setChannelUrl(savedProgress.channelUrl);
+    const idx = savedProgress.stepIndex;
+    if (idx >= totalQuestions) {
+      setStep({ kind: "channel" });
+    } else {
+      setStep({ kind: "question", index: idx });
+    }
+    setShowResume(false);
+  }
+
+  function discardProgress() {
+    clearProgress();
+    setShowResume(false);
+  }
+
   function goToStart() {
     setStep({ kind: "start" });
+    setAnswers({});
+    setFitResults(null);
+    window.history.replaceState(null, "", window.location.pathname);
   }
 
   function startQuestions() {
     setStep({ kind: "question", index: 0 });
   }
 
-  function answerQuestion(qid: QuestionId, value: string) {
-    setAnswers((prev) => ({ ...prev, [qid]: value }));
+  function answerQuestion(qid: QuestionId, value: string | string[]) {
+    setAnswers((prev) => ({ ...prev, [qid]: value as never }));
     if (step.kind === "question") {
       const next = step.index + 1;
       if (next < totalQuestions) {
@@ -128,7 +251,7 @@ export default function App() {
   }
 
   async function submitLead(values: LeadFormValues) {
-    const score = computeScore(answers, channelData, values.message);
+    const score = computeScore(answers, channelData, values.message, fitResults);
     const leadClass = leadClassFromScore(score);
     const res = await fetch("/api/lead", {
       method: "POST",
@@ -141,8 +264,11 @@ export default function App() {
         answers,
         channelUrl: channelUrl || undefined,
         channelData,
+        fitResults,
         result: {
           categoryId,
+          categoryHeadline: category.headline,
+          categoryText: category.text,
           score,
           leadClass,
           insights,
@@ -163,6 +289,7 @@ export default function App() {
         "Die Anfrage konnte gerade nicht gesendet werden. Bitte noch einmal versuchen."
       );
     }
+    clearProgress();
     setStep({ kind: "done" });
   }
 
@@ -175,16 +302,34 @@ export default function App() {
     <main className="min-h-full pb-16">
       {showProgress && <ProgressBar current={progressCurrent} total={progressTotal} />}
 
+      {/* Resume banner */}
+      {showResume && step.kind === "start" && (
+        <div className="container-narrow pt-6">
+          <div className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-ink/80">Du hast den Check bereits begonnen.</p>
+            <div className="flex gap-3">
+              <button type="button" onClick={resumeProgress} className="btn-primary text-sm py-2">
+                Weitermachen
+              </button>
+              <button type="button" onClick={discardProgress} className="btn-secondary text-sm py-2">
+                Neu starten
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {step.kind === "start" && <StartScreen onStart={startQuestions} />}
 
       {step.kind === "question" &&
         (() => {
           const q = questions[step.index];
+          const val = answers[q.id as keyof Answers];
           return (
             <QuestionStep
               question={q}
-              value={answers[q.id]}
-              onSelect={(v) => answerQuestion(q.id, v)}
+              value={val as string | string[] | undefined}
+              onAnswer={(v) => answerQuestion(q.id, v)}
               onBack={backFromQuestion}
               isFirst={step.index === 0}
             />
@@ -202,9 +347,7 @@ export default function App() {
 
       {step.kind === "loading" && (
         <section className="container-narrow fade-in py-16">
-          <p className="text-sm font-medium uppercase tracking-wide text-ink/60">
-            Einen Moment
-          </p>
+          <p className="text-sm font-medium uppercase tracking-wide text-ink/60">Einen Moment</p>
           <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">
             Öffentliche Kanaldaten werden geladen …
           </h1>
@@ -224,8 +367,43 @@ export default function App() {
           insights={insights}
           levers={levers}
           diagnosis={diagnosis}
+          fitResults={fitResults}
+          onFitComplete={setFitResults}
+          shareUrl={shareUrl}
           onContinue={goToLead}
         />
+      )}
+
+      {step.kind === "shared" && (
+        <section className="container-narrow fade-in py-8">
+          <p className="text-sm font-medium uppercase tracking-wide text-ink/60">
+            Geteilte Einschätzung
+          </p>
+          <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">
+            {categories[step.payload.cat].headline}
+          </h1>
+          <p className="mt-2">
+            <span className="inline-flex items-center rounded-full border border-line px-3 py-1 text-xs font-medium text-ink/70">
+              {step.payload.cl}
+            </span>
+          </p>
+          <p className="mt-4 text-base leading-relaxed text-ink/80">
+            {categories[step.payload.cat].text}
+          </p>
+          <p className="mt-6 text-sm text-ink/60">
+            Das ist eine geteilte Einschätzung. Mach deinen eigenen Check:
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              window.history.replaceState(null, "", window.location.pathname);
+              setStep({ kind: "start" });
+            }}
+            className="btn-primary mt-4"
+          >
+            Klarheitscheck starten
+          </button>
+        </section>
       )}
 
       {step.kind === "lead" && (

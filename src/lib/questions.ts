@@ -1,8 +1,9 @@
-import type { Question } from "./types";
+import type { Question, QuestionId } from "./types";
 
 export const questions: Question[] = [
   {
     id: "status",
+    multiSelect: false,
     question: "Wo stehst du gerade mit deinem YouTube-Kanal?",
     options: [
       { value: "regelmaessig", label: "Ich veröffentliche regelmäßig" },
@@ -13,6 +14,8 @@ export const questions: Question[] = [
   },
   {
     id: "goal",
+    multiSelect: true,
+    maxSelect: 3,
     question: "Was soll dein Kanal vor allem erreichen?",
     options: [
       { value: "kundenanfragen", label: "Mehr Kundenanfragen" },
@@ -25,6 +28,8 @@ export const questions: Question[] = [
   },
   {
     id: "problem",
+    multiSelect: true,
+    maxSelect: 3,
     question: "Was ist gerade dein größtes Problem mit deinem YouTube-Auftritt?",
     options: [
       { value: "wenig_klicks", label: "Zu wenig Klicks", tags: ["packaging"] },
@@ -50,6 +55,7 @@ export const questions: Question[] = [
   },
   {
     id: "thumbnails",
+    multiSelect: false,
     question: "Wie würdest du deine aktuellen Thumbnails beschreiben?",
     options: [
       { value: "einheitlich", label: "Einheitlich und professionell" },
@@ -62,6 +68,8 @@ export const questions: Question[] = [
   },
   {
     id: "support",
+    multiSelect: true,
+    maxSelect: 3,
     question: "Welche Unterstützung wäre für dich am wertvollsten?",
     options: [
       { value: "system", label: "Ein klares Thumbnail-System für meinen Kanal" },
@@ -74,8 +82,6 @@ export const questions: Question[] = [
   },
 ];
 
-export function getOptionLabel(qid: Question["id"], value: string | undefined): string {
-  if (!value) return "";
-  const q = questions.find((x) => x.id === qid);
-  return q?.options.find((o) => o.value === value)?.label ?? "";
+export function getQuestionById(id: QuestionId): Question | undefined {
+  return questions.find((q) => q.id === id);
 }
