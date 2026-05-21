@@ -5,15 +5,14 @@ import type {
   Diagnosis,
   Insight,
   Lever,
-  ResultCategory,
   TitleAnalysisResult,
 } from "../lib/types";
 import ThumbnailGrid from "./ThumbnailGrid";
 import TitleAnalysis from "./TitleAnalysis";
-import { getBenchmarkText } from "../lib/results";
+import { getBenchmarkText, type CategoryContent } from "../lib/results";
 
 type Props = {
-  category: ResultCategory;
+  category: CategoryContent;
   channelData: ChannelData | null;
   channelNote: string | null;
   clarityLabel: string;
@@ -142,7 +141,7 @@ export default function ResultPreview({
       {/* ── Tab 1: Einschätzung ── */}
       {tab === "assessment" && (
         <>
-          <p className="mt-6 text-base leading-relaxed text-ink/80">{category.text}</p>
+          <p className="mt-6 text-base leading-relaxed text-ink/80">{category.explanation}</p>
 
           {channelNote && <p className="mt-5 text-sm italic text-ink/70">{channelNote}</p>}
 
