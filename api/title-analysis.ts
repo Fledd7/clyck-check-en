@@ -38,7 +38,7 @@ function buildSummary(items: RatedItem[]): string {
     return `${hoch} von ${total} Titeln zeigen starkes Klick-Potenzial. Deine Titel-Arbeit ist solide – der nächste Schritt ist, dieses Potenzial konsequent in starke Thumbnails zu übersetzen.`;
   }
   if (niedrig >= total * 0.5) {
-    return `${niedrig} von ${total} Titeln bieten wenig Klick-Potenzial. Hier liegt oft ungenutztes Wachstumspotenzial – stärkere Titel-Formulierungen können die Klickrate deutlich verbessern.`;
+    return `${niedrig} von ${total} Titeln bieten wenig Klick-Potenzial. Hier liegt oft ungenutztes Potenzial – stärkere Titel-Formulierungen können helfen, den Klickreiz klarer zu machen.`;
   }
   return `${mittel + hoch} von ${total} Titeln haben ausbaufähiges Potenzial. Mit klareren Nutzenversprechen und mehr Neugier-Elementen lässt sich hier noch mehr herausholen.`;
 }

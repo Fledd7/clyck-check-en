@@ -295,6 +295,7 @@ export default function App() {
         answers,
         channelUrl: channelUrl || undefined,
         channelData,
+        titleAnalysis: titleAnalysis || undefined,
         result: {
           categoryId,
           categoryHeadline: category.headline,

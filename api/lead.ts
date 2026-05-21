@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 type LeadClass = "top" | "good" | "mid" | "weak";
 type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
+type TitleRating = "hoch" | "mittel" | "niedrig";
 
 type ChannelData = {
   title?: string;
@@ -15,7 +16,8 @@ type ChannelData = {
   channelUrl?: string;
 };
 
-type FitResult = { videoId: string; title: string; fit: "yes" | "no" };
+type TitleAnalysisItem = { videoId: string; title: string; rating: TitleRating; reason: string };
+type TitleAnalysis = { items: TitleAnalysisItem[]; summary: string };
 type InsightOrLever = { headline: string; text?: string };
 type AnswerValue = string | string[] | undefined;
 type Answers = Record<string, AnswerValue>;
@@ -28,7 +30,7 @@ type Body = {
   answers?: Answers;
   channelUrl?: string;
   channelData?: ChannelData | null;
-  fitResults?: FitResult[] | null;
+  titleAnalysis?: TitleAnalysis | null;
   result?: {
     categoryId?: string;
     categoryHeadline?: string;
@@ -125,7 +127,7 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
   const insights = body.result?.insights ?? [];
   const levers = body.result?.levers ?? [];
   const diag = body.result?.diagnosis;
-  const fits = body.fitResults ?? [];
+  const ta = body.titleAnalysis ?? null;
 
   const answerLines = Object.entries(questionLabels)
     .map(([k, label]) => lineBlock(label, renderAnswerValue(a[k])))
@@ -146,16 +148,17 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
   if (typeof ch?.uploadCadenceDays === "number" && ch.uploadCadenceDays > 0)
     channelLines.push(lineBlock("Upload-Kadenz (Longform)", `${ch.uploadCadenceDays} Tage`));
 
-  const fitLines =
-    fits.length > 0
-      ? `<p style="margin:12px 0 4px"><strong>Titel-Thumbnail-Fit-Bewertung</strong></p>` +
-        fits
-          .map(
-            (f) =>
-              `<p style="margin:2px 0">${f.fit === "yes" ? "✓" : "✗"} ${escape(f.title)}</p>`
-          )
-          .join("")
-      : "";
+  const ratingLabel: Record<TitleRating, string> = { hoch: "Hoch", mittel: "Mittel", niedrig: "Niedrig" };
+  const titleAnalysisLines = ta?.items.length
+    ? `<p style="margin:12px 0 4px"><strong>Titel-Analyse (Gemini)</strong></p>` +
+      (ta.summary ? `<p style="margin:2px 0 8px;font-style:italic;color:#555">${escape(ta.summary)}</p>` : "") +
+      ta.items
+        .map(
+          (item) =>
+            `<p style="margin:2px 0">[${escape(ratingLabel[item.rating])}] ${escape(item.title)} — <span style="color:#666">${escape(item.reason)}</span></p>`
+        )
+        .join("")
+    : "";
 
   const insightLines = insights.length
     ? `<p style="margin:12px 0 4px"><strong>Generierte Insights</strong></p>` +
@@ -199,7 +202,7 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
     <p style="margin:16px 0 4px"><strong>Antworten</strong></p>
     ${answerLines}
     ${channelLines.length ? `<p style="margin:16px 0 4px"><strong>Kanaldaten</strong></p>${channelLines.join("")}` : ""}
-    ${fitLines}
+    ${titleAnalysisLines}
     ${diagLines}
     ${insightLines}
     ${leverLines}
