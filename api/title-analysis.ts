@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai";
+
+export const maxDuration = 60;
 
 type VideoInput = { id: string; title: string; thumbnail: string };
 
@@ -80,6 +82,48 @@ function clampScore(n: unknown): AnalysisScore {
   return 3;
 }
 
+async function analyzeVideo(
+  model: GenerativeModel,
+  video: VideoInput
+): Promise<ResultItem | null> {
+  try {
+    const image = await fetchImageAsBase64(video.thumbnail);
+    if (!image) {
+      console.error(`title-analysis: no image for video ${video.id}`);
+      return null;
+    }
+
+    const result = await model.generateContent([
+      { inlineData: { mimeType: image.mimeType, data: image.data } },
+      { text: buildPrompt(video.title) },
+    ]);
+
+    const text = result.response.text().trim();
+    const clean = text.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean) as {
+      score?: number;
+      reason?: string;
+      strong?: string;
+      weak?: string;
+    };
+
+    const score = clampScore(parsed.score);
+    return {
+      id: video.id,
+      title: video.title,
+      thumbnail: video.thumbnail,
+      score,
+      label: scoreLabels[score],
+      reason: typeof parsed.reason === "string" ? parsed.reason : "",
+      strong: typeof parsed.strong === "string" ? parsed.strong : "",
+      weak: typeof parsed.weak === "string" ? parsed.weak : "",
+    };
+  } catch (err) {
+    console.error(`title-analysis: error on video ${video.id}`, err);
+    return null;
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log("title-analysis called, key present:", !!process.env.GOOGLE_AI_KEY);
 
@@ -111,45 +155,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const genAI = new GoogleGenerativeAI(key);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const results: ResultItem[] = [];
-
-  for (const video of videos.slice(0, 8)) {
-    try {
-      const image = await fetchImageAsBase64(video.thumbnail);
-      if (!image) continue;
-
-      const result = await model.generateContent([
-        { inlineData: { mimeType: image.mimeType, data: image.data } },
-        { text: buildPrompt(video.title) },
-      ]);
-
-      const text = result.response.text().trim();
-      const clean = text.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean) as {
-        score?: number;
-        reason?: string;
-        strong?: string;
-        weak?: string;
-      };
-
-      const score = clampScore(parsed.score);
-      results.push({
-        id: video.id,
-        title: video.title,
-        thumbnail: video.thumbnail,
-        score,
-        label: scoreLabels[score],
-        reason: typeof parsed.reason === "string" ? parsed.reason : "",
-        strong: typeof parsed.strong === "string" ? parsed.strong : "",
-        weak: typeof parsed.weak === "string" ? parsed.weak : "",
-      });
-
-      await new Promise((r) => setTimeout(r, 300));
-    } catch (err) {
-      console.error(`title-analysis: error on video ${video.id}`, err);
-      continue;
-    }
-  }
+  const videoSubset = videos.slice(0, 5);
+  const settled = await Promise.allSettled(
+    videoSubset.map((video) => analyzeVideo(model, video))
+  );
+  const results: ResultItem[] = settled
+    .filter(
+      (r): r is PromiseFulfilledResult<ResultItem | null> => r.status === "fulfilled"
+    )
+    .map((r) => r.value)
+    .filter((v): v is ResultItem => v !== null);
 
   if (results.length === 0) {
     res.status(200).json({ ok: false, reason: "no_results" });
