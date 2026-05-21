@@ -50,8 +50,8 @@ export const questions: Question[] = [
       },
       {
         value: "titel_thumbnail_mismatch",
-        label: "Titel und Thumbnail passen nicht richtig zusammen",
-        tags: ["packaging"],
+        label: "Ich bin unsicher, wie ich meine Videoideen visuell verpacken soll",
+        tags: ["system"],
       },
       {
         value: "ideen_visualisieren",
@@ -74,7 +74,7 @@ export const questions: Question[] = [
       { value: "teilweise_gut", label: "Teilweise gut, aber ohne klares System dahinter" },
       { value: "sehr_unterschiedlich", label: "Jedes Thumbnail sieht anders aus" },
       { value: "schnell_gebaut", label: "Ich erstelle sie schnell, ohne festes Konzept" },
-      { value: "keine_eigenen", label: "Ich habe noch keine eigenen Thumbnails" },
+      { value: "keine_eigenen", label: "Ich habe noch nie bewusst an meinen Thumbnails gearbeitet" },
       { value: "unsicher", label: "Ich weiß nicht, wie ich sie einordnen soll" },
     ],
   },
@@ -88,7 +88,6 @@ export const questions: Question[] = [
       { value: "strategie", label: "Strategie für Ideen, Titel & Thumbnails" },
       { value: "audit", label: "Ein Audit meines aktuellen Kanals" },
       { value: "retainer", label: "Laufende Betreuung pro Monat" },
-      { value: "einzelne", label: "Bessere einzelne Thumbnails" },
       { value: "unklar", label: "Weiß noch nicht" },
     ],
   },

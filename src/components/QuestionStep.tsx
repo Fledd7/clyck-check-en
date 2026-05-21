@@ -15,32 +15,36 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
   const max = question.maxSelect ?? 3;
 
   const [selected, setSelected] = useState<string[]>(() => {
-    if (!multi) return [];
-    return Array.isArray(value) ? value : value ? [value] : [];
+    if (Array.isArray(value)) return value;
+    return value ? [value] : [];
   });
 
-  // Reset / sync local selection when the question itself changes (e.g. next/back)
-  // or when the stored value for that question changes (e.g. resumed progress).
+  // Reset / sync local selection when the question changes.
   useEffect(() => {
-    if (!multi) {
-      setSelected([]);
-      return;
+    if (Array.isArray(value)) {
+      setSelected(value);
+    } else {
+      setSelected(value ? [value] : []);
     }
-    setSelected(Array.isArray(value) ? value : value ? [value] : []);
-    // We deliberately key on question.id so each question starts with its own
-    // stored value, not the previous question's selection.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question.id, multi]);
+  }, [question.id]);
 
-  function toggleOption(v: string) {
-    setSelected((prev) => {
-      if (prev.includes(v)) return prev.filter((x) => x !== v);
-      if (prev.length >= max) return prev;
-      return [...prev, v];
-    });
+  function handleSelect(v: string) {
+    if (multi) {
+      setSelected((prev) => {
+        if (prev.includes(v)) return prev.filter((x) => x !== v);
+        if (prev.length >= max) return prev;
+        return [...prev, v];
+      });
+    } else {
+      setSelected([v]);
+    }
   }
 
-  const singleValue = multi ? undefined : (Array.isArray(value) ? undefined : value);
+  function handleContinue() {
+    if (selected.length === 0) return;
+    onAnswer(multi ? selected : selected[0]);
+  }
 
   return (
     <section className="container-narrow fade-in py-8">
@@ -54,7 +58,7 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
       </h1>
       <div className="mt-6 grid gap-3">
         {question.options.map((opt) => {
-          const isSelected = multi ? selected.includes(opt.value) : singleValue === opt.value;
+          const isSelected = selected.includes(opt.value);
           const isDisabled = multi && !isSelected && selected.length >= max;
           return (
             <OptionCard
@@ -63,30 +67,22 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
               selected={isSelected}
               disabled={isDisabled}
               multi={multi}
-              onSelect={() => {
-                if (multi) {
-                  toggleOption(opt.value);
-                } else {
-                  onAnswer(opt.value);
-                }
-              }}
+              onSelect={() => handleSelect(opt.value)}
             />
           );
         })}
       </div>
 
-      {multi && (
-        <div className="mt-6">
-          <button
-            type="button"
-            disabled={selected.length === 0}
-            onClick={() => onAnswer(selected)}
-            className="btn-primary"
-          >
-            Weiter
-          </button>
-        </div>
-      )}
+      <div className="mt-6">
+        <button
+          type="button"
+          disabled={selected.length === 0}
+          onClick={handleContinue}
+          className="btn-primary w-full sm:w-auto"
+        >
+          Weiter
+        </button>
+      </div>
 
       {!isFirst && onBack && (
         <div className="mt-4">

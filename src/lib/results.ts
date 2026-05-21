@@ -12,6 +12,118 @@ import type {
   ResultCategoryId,
 } from "./types";
 
+export type CategoryContent = {
+  headline: string;
+  explanation: string;
+  ctaText: string;
+};
+
+export function getCategoryContent(
+  category: ResultCategoryId,
+  maturity: ChannelMaturity | null
+): CategoryContent {
+  if (maturity === "authority") {
+    return {
+      headline: "Etablierter Kanal — System entscheidet jetzt",
+      explanation:
+        "Dein Kanal hat Reichweite und Substanz bewiesen. " +
+        "Auf diesem Level ist die Frage nicht mehr, ob der Kanal funktioniert — " +
+        "sondern ob das visuelle System so stark ist wie der Content dahinter.",
+      ctaText:
+        "Lass uns prüfen, ob dein Packaging auf diesem Level wirklich ausgereizt ist.",
+    };
+  }
+
+  if (maturity === "strong") {
+    return {
+      headline: "Starker Kanal — Packaging auf das nächste Level",
+      explanation:
+        "Du hast eine echte Zuschauerschaft aufgebaut. " +
+        "Jetzt geht es darum, ob dein visuelles System diese Stärke " +
+        "konsequent nach außen trägt.",
+      ctaText: "Lass uns dein Packaging auf diesem Level schärfen.",
+    };
+  }
+
+  if (maturity === "established") {
+    switch (category) {
+      case "A":
+        return {
+          headline: "Klare Richtung — Packaging kann stärker werden",
+          explanation:
+            "Dein Kanal hat Substanz aufgebaut. " +
+            "Die Richtung stimmt — aber dein visuelles System " +
+            "transportiert diese Stärke noch nicht vollständig.",
+          ctaText:
+            "Lass uns ein Thumbnail-System entwickeln, das zu deinem Level passt.",
+        };
+      case "B":
+        return {
+          headline: "Gute Basis — aber noch kein klares System",
+          explanation:
+            "Du veröffentlichst regelmäßig und baust Reichweite auf. " +
+            "Was fehlt, ist eine wiederholbare visuelle Linie, " +
+            "die deinen Kanal erkennbar macht.",
+          ctaText:
+            "Lass uns eine visuelle Linie entwickeln, die du jede Woche wiederholen kannst.",
+        };
+      case "C":
+        return {
+          headline: "Strategie zuerst — dann Design",
+          explanation:
+            "Dein Kanal hat bereits eine Basis. " +
+            "Bevor das Packaging stärker wird, sollte klar sein, " +
+            "welche Botschaft es transportieren soll.",
+          ctaText: "Lass uns zuerst deine Kanalrichtung schärfen.",
+        };
+      default:
+        return {
+          headline: "Gute Basis — Packaging kann stärker werden",
+          explanation: "Dein Kanal hat Substanz. Jetzt lohnt sich ein klares System.",
+          ctaText: "Lass uns dein Packaging systematisch aufbauen.",
+        };
+    }
+  }
+
+  switch (category) {
+    case "A":
+      return {
+        headline: "Klar, aber schwach verpackt",
+        explanation:
+          "Deine Richtung steht — aber deine Verpackung transportiert sie noch nicht. " +
+          "Hier lohnt sich ein klares Thumbnail-System.",
+        ctaText: "Lass uns aus deinem klaren Kanal ein klares Thumbnail-System machen.",
+      };
+    case "B":
+      return {
+        headline: "Potenzial da — aber kein wiederholbares System",
+        explanation:
+          "Du veröffentlichst genug, aber dein Kanal hat noch keine wiederholbare " +
+          "visuelle Linie. Wiedererkennung entsteht durch einen konsequenten Stil.",
+        ctaText:
+          "Lass uns eine visuelle Linie entwickeln, die du jede Woche wiederholen kannst.",
+      };
+    case "C":
+      return {
+        headline: "Strategie vor Design",
+        explanation:
+          "Dein Engpass liegt nicht beim Bild, sondern davor — " +
+          "bei Richtung, Idee und Titel. Bevor wir gestalten, " +
+          "muss klar sein, was eigentlich verpackt werden soll.",
+        ctaText: "Lass uns zuerst deine Kanalrichtung und dein Packaging schärfen.",
+      };
+    case "D":
+    default:
+      return {
+        headline: "Guter Moment — noch früh genug, es richtig aufzusetzen",
+        explanation:
+          "Du bist noch früh genug, um deinen Kanal von Anfang an sauber zu " +
+          "verpacken, bevor sich ein uneinheitlicher Stil einschleift.",
+        ctaText: "Lass uns deinen Start visuell klar aufsetzen.",
+      };
+  }
+}
+
 export const categories: Record<ResultCategoryId, ResultCategory> = {
   A: {
     id: "A",

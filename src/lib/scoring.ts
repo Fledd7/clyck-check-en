@@ -52,7 +52,6 @@ const supportScore: Record<string, number> = {
   strategie: 20,
   audit: 18,
   retainer: 20,
-  einzelne: 5,
   unklar: 2,
 };
 

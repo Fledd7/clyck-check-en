@@ -12,9 +12,9 @@ import {
   buildDiagnosis,
   buildInsights,
   buildLevers,
-  categories,
   channelDataNote,
   clarityLevel,
+  getCategoryContent,
   selectCategory,
 } from "./lib/results";
 import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
@@ -135,7 +135,10 @@ export default function App() {
     () => applyMaturityOverride(quizCategoryId, maturity, answers),
     [quizCategoryId, maturity, answers]
   );
-  const category = categories[categoryId];
+  const category = useMemo(
+    () => getCategoryContent(categoryId, maturity),
+    [categoryId, maturity]
+  );
   const previewScore = useMemo(
     () => computeScore(answers, channelData, undefined),
     [answers, channelData]
@@ -299,7 +302,7 @@ export default function App() {
         result: {
           categoryId,
           categoryHeadline: category.headline,
-          categoryText: category.text,
+          categoryText: category.explanation,
           score,
           leadClass,
           insights,
@@ -413,7 +416,7 @@ export default function App() {
             Geteilte Einschätzung
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">
-            {categories[step.payload.cat].headline}
+            {getCategoryContent(step.payload.cat, null).headline}
           </h1>
           <p className="mt-2">
             <span className="inline-flex items-center rounded-full border border-line px-3 py-1 text-xs font-medium text-ink/70">
@@ -421,7 +424,7 @@ export default function App() {
             </span>
           </p>
           <p className="mt-4 text-base leading-relaxed text-ink/80">
-            {categories[step.payload.cat].text}
+            {getCategoryContent(step.payload.cat, null).explanation}
           </p>
           <p className="mt-6 text-sm text-ink/60">
             Das ist eine geteilte Einschätzung. Mach deinen eigenen Check:

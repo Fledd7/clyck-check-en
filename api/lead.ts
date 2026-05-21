@@ -85,7 +85,6 @@ const optionLabels: Record<string, string> = {
   strategie: "Strategie für Ideen, Titel & Thumbnails",
   audit: "Ein Audit meines aktuellen Kanals",
   retainer: "Laufende Betreuung pro Monat",
-  einzelne: "Bessere einzelne Thumbnails",
 };
 
 const leadClassLabel: Record<LeadClass, string> = {
