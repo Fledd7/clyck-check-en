@@ -71,3 +71,17 @@ export type ResultCategory = {
 };
 
 export type LeadClass = "top" | "good" | "mid" | "weak";
+
+export type TitleRating = "hoch" | "mittel" | "niedrig";
+
+export type TitleAnalysisItem = {
+  videoId: string;
+  title: string;
+  rating: TitleRating;
+  reason: string;
+};
+
+export type TitleAnalysisResult = {
+  items: TitleAnalysisItem[];
+  summary: string;
+};
