@@ -437,7 +437,7 @@ export default function App() {
             }}
             className="btn-primary mt-4"
           >
-            Klarheitscheck starten
+            Clyck Check starten
           </button>
         </section>
       )}
@@ -449,7 +449,7 @@ export default function App() {
       {step.kind === "done" && <ConfirmationScreen />}
 
       <footer className="container-narrow mt-12 text-xs text-ink/50">
-        <p>© {new Date().getFullYear()} · YouTube Klarheitscheck</p>
+        <p>© {new Date().getFullYear()} · Clyck Check</p>
       </footer>
     </main>
   );

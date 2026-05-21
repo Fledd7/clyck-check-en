@@ -201,7 +201,7 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
 
   return `
   <div style="font-family:Inter,Helvetica,Arial,sans-serif;color:#111;max-width:680px">
-    <h2 style="margin:0 0 8px">Neuer Klarheitscheck-Lead</h2>
+    <h2 style="margin:0 0 8px">Neuer Clyck Check-Lead</h2>
     ${lineBlock("Name", body.name ?? "")}
     ${lineBlock("E-Mail", body.email ?? "")}
     ${lineBlock("Score", String(score))}
@@ -242,7 +242,7 @@ function buildUserHtml(
   return `
   <div style="font-family:Inter,Helvetica,Arial,sans-serif;color:#111;max-width:600px">
     <p>Hallo ${escape(name)},</p>
-    <p>danke für deinen Klarheitscheck. Hier ist deine erste Einschätzung:</p>
+    <p>danke für deinen Clyck Check. Hier ist deine erste Einschätzung:</p>
     <h2 style="margin:24px 0 8px">DEIN ERGEBNIS</h2>
     <p><strong>${escape(categoryHeadline)}</strong></p>
     <p>${escape(categoryText)}</p>
@@ -256,7 +256,7 @@ function buildUserHtml(
     </p>
     <hr style="margin:32px 0;border:none;border-top:1px solid #e6e2da" />
     <p style="font-size:12px;color:#888">
-      Diese E-Mail wurde automatisch nach deinem Klarheitscheck versendet.
+      Diese E-Mail wurde automatisch nach deinem Clyck Check versendet.
     </p>
   </div>
   `;
@@ -293,7 +293,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const lc = body.result?.leadClass ?? "mid";
   const categoryId = body.result?.categoryId ?? "?";
-  const subject = `Klarheitscheck · ${leadClassLabel[lc as LeadClass] ?? "Lead"} · Kategorie ${categoryId} · ${name}`;
+  const subject = `Clyck Check · ${leadClassLabel[lc as LeadClass] ?? "Lead"} · Kategorie ${categoryId} · ${name}`;
   const internalHtml = buildInternalHtml({ ...body, name, email });
 
   // Send internal lead email
@@ -332,7 +332,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         from,
         to: [email],
-        subject: "Dein YouTube Klarheitscheck — Erste Einschätzung",
+        subject: "Dein Clyck Check — Erste Einschätzung",
         html: userHtml,
       }),
     });
