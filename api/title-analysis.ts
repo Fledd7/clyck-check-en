@@ -85,8 +85,31 @@ function clampScore(n: unknown): AnalysisScore {
   return 3;
 }
 
+const MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "gemini-2.5-flash-preview-05-20",
+];
+
+async function getWorkingModel(ai: GoogleGenAI): Promise<string> {
+  for (const modelName of MODELS) {
+    try {
+      await ai.models.generateContent({
+        model: modelName,
+        contents: [{ role: "user", parts: [{ text: "test" }] }],
+      });
+      console.log(`title-analysis: using model ${modelName}`);
+      return modelName;
+    } catch {
+      console.log(`title-analysis: model ${modelName} not available`);
+    }
+  }
+  throw new Error("No working model found");
+}
+
 async function analyzeVideo(
   ai: GoogleGenAI,
+  model: string,
   video: VideoInput
 ): Promise<ResultItem | null> {
   try {
@@ -97,7 +120,7 @@ async function analyzeVideo(
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model,
       contents: [
         {
           role: "user",
@@ -165,9 +188,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const ai = new GoogleGenAI({ apiKey: key });
 
+  let model: string;
+  try {
+    model = await getWorkingModel(ai);
+  } catch (err) {
+    console.error("title-analysis: no working model", err);
+    res.status(200).json({ ok: false, reason: "no_model" });
+    return;
+  }
+
   const videoSubset = videos.slice(0, 5);
   const settled = await Promise.allSettled(
-    videoSubset.map((video) => analyzeVideo(ai, video))
+    videoSubset.map((video) => analyzeVideo(ai, model, video))
   );
   const results: ResultItem[] = settled
     .filter(
