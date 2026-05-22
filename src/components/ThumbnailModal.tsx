@@ -25,17 +25,23 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
 
   useEffect(() => {
     closeBtnRef.current?.focus();
-    function onKey(e: KeyboardEvent) {
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prev;
     };
-  }, [onClose]);
+  }, []);
 
   const recommendation = analysis ? getThumbnailRecommendation(analysis) : null;
 
@@ -45,7 +51,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
       aria-modal="true"
       aria-label="Thumbnail-Analyse"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:items-center"
+      className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/60 p-4 sm:items-center"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -56,7 +62,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           type="button"
           onClick={onClose}
           aria-label="Schließen"
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full text-ink/60 hover:bg-line/50 hover:text-ink"
+          className="absolute right-3 top-3 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-black/20 text-base text-white transition hover:bg-black/40 focus:outline-none focus:ring-2 focus:ring-ink/60"
         >
           ✕
         </button>
