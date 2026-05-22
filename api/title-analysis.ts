@@ -156,7 +156,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const genAI = new GoogleGenerativeAI(key);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const videoSubset = videos.slice(0, 5);
   const settled = await Promise.allSettled(
