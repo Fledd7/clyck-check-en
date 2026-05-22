@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export const maxDuration = 60;
 
@@ -86,7 +86,7 @@ function clampScore(n: unknown): AnalysisScore {
 }
 
 async function analyzeVideo(
-  model: GenerativeModel,
+  ai: GoogleGenAI,
   video: VideoInput
 ): Promise<ResultItem | null> {
   try {
@@ -96,12 +96,20 @@ async function analyzeVideo(
       return null;
     }
 
-    const result = await model.generateContent([
-      { inlineData: { mimeType: image.mimeType, data: image.data } },
-      { text: buildPrompt(video.title) },
-    ]);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: image.mimeType, data: image.data } },
+            { text: buildPrompt(video.title) },
+          ],
+        },
+      ],
+    });
 
-    const text = result.response.text().trim();
+    const text = (response.text ?? "").trim();
     const clean = text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean) as {
       score?: number;
@@ -155,12 +163,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const genAI = new GoogleGenerativeAI(key);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const ai = new GoogleGenAI({ apiKey: key });
 
   const videoSubset = videos.slice(0, 5);
   const settled = await Promise.allSettled(
-    videoSubset.map((video) => analyzeVideo(model, video))
+    videoSubset.map((video) => analyzeVideo(ai, video))
   );
   const results: ResultItem[] = settled
     .filter(
