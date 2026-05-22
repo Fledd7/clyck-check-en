@@ -19,6 +19,11 @@ type ResultItem = {
   thumbnail: string;
   score: AnalysisScore;
   label: AnalysisLabel;
+  format: string;
+  elementCount: number;
+  textIssue: string;
+  contrast: string;
+  branding: boolean;
   reason: string;
   strong: string;
   weak: string;
@@ -51,31 +56,100 @@ async function fetchImageAsBase64(
 }
 
 function buildPrompt(title: string): string {
-  return `Du bist ein YouTube-Stratege mit Expertise in Thumbnail-Design und Klickpsychologie.
+  return `Du bist ein YouTube-Stratege mit Expertise in Klickpsychologie und
+Thumbnail-Systematik. Deine Analyse basiert auf zwei bewährten Frameworks:
+"How To Make Effective Thumbnails" (Jay Alto) und "The Thumbnail System"
+(thumbnailsystem.com).
 
-Analysiere das Zusammenspiel aus diesem YouTube-Thumbnail und dem zugehörigen Videotitel.
+Analysiere dieses YouTube-Thumbnail gemeinsam mit dem Videotitel.
 
 Videotitel: "${title}"
 
-Bewertungskriterien:
-1. Erzeugen Bild und Titel gemeinsam eine klare Botschaft?
-2. Verstärken sie sich gegenseitig oder arbeiten sie gegeneinander?
-3. Entsteht Neugier durch die Kombination — oder reicht eines allein nicht aus?
-4. Ist das Bild konkret genug, um den Titel zu visualisieren?
+---
 
-Bewerte den Titel-Thumbnail-Fit auf einer Skala von 1 bis 5:
-1 = Kein Fit (Bild und Titel haben keine erkennbare Verbindung)
-2 = Schwacher Fit (lose Verbindung, aber keine gemeinsame Botschaft)
-3 = Mittlerer Fit (Verbindung erkennbar, aber Potenzial nicht ausgeschöpft)
-4 = Guter Fit (Bild und Titel ergänzen sich gut)
-5 = Perfekter Fit (starke Einheit, klare Botschaft, hoher Klickanreiz)
+## Schritt 1: Klick-Format erkennen
 
-Antworte NUR als JSON-Objekt. Kein weiterer Text. Kein Markdown.
+Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
+
+- Kontrovers: Provokante Aussage oder Bild das Widerspruch erzeugt
+- Extrem: Überwältigender oder schockierender Moment
+- Unlogisch: Etwas das keinen Sinn ergibt und Neugier weckt
+- Emotional: Starke Gefühlsreaktion durch Mimik oder Situation
+- Trending: Bezug zu aktuellem Ereignis oder Thema
+- Informativ: Klares Versprechen eines konkreten Nutzens
+- Keines davon: Kein erkennbares Klick-Format
+
+---
+
+## Schritt 2: Simplicity prüfen (3-Element-Regel)
+
+Zähle die visuellen Hauptelemente im Thumbnail.
+Maximal 3 Hauptinformationen sind ideal.
+Mehr als 3 bedeutet Überladung — der Blick des Zuschauers verliert sich.
+
+---
+
+## Schritt 3: Text-Regel prüfen
+
+Bewerte den Text im Thumbnail nach diesen Kriterien:
+- Kein Text ist oft besser als schlechter Text
+- Text sollte maximal 3 Wörter haben
+- Text darf den Videotitel nie 1:1 wiederholen — das ist verschenkte Fläche
+- Text ist nur sinnvoll, wenn er Aufmerksamkeit, Kontext oder den
+  Klick-Anreiz direkt verstärkt
+
+---
+
+## Schritt 4: Kontrast prüfen (Thumbnail System)
+
+Prüfe ob das Thumbnail einen der drei Kontrasttypen nutzt:
+- Luminosity: dunkles Subjekt vor hellem Hintergrund oder umgekehrt
+- Farbe: Komplementärfarben (z. B. Orange vor Blau)
+- Sättigung: gesättigtes Subjekt vor entsättigter Umgebung
+
+Ein Thumbnail ohne klaren Kontrast fällt im Feed nicht auf.
+
+---
+
+## Schritt 5: Titel-Thumbnail-Fit bewerten
+
+Bewertet wird ausschließlich das Zusammenspiel aus Bild und Titel
+im Hinblick auf Klickanreiz. Nicht der Inhalt oder die Qualität des Videos.
+
+Bewertungsskala 1–5:
+1 = Kein Fit: Bild und Titel haben keine erkennbare Verbindung
+2 = Schwacher Fit: Lose Verbindung, keine gemeinsame Botschaft
+3 = Mittlerer Fit: Verbindung erkennbar, Potenzial nicht ausgeschöpft
+4 = Guter Fit: Bild und Titel verstärken sich gegenseitig
+5 = Perfekter Fit: Starke Einheit, maximaler Klickanreiz durch Zusammenspiel
+
+Abzüge (senken den Score um 1):
+- Mehr als 3 Hauptelemente im Thumbnail
+- Text wiederholt den Titel 1:1
+- Text hat mehr als 3 Wörter ohne echten Mehrwert
+- Kein erkennbarer Kontrast (Luminosity, Farbe oder Sättigung)
+
+---
+
+## Schritt 6: Wiedererkennung prüfen
+
+Zeigt das Thumbnail Elemente eines konsistenten Kanal-Stils?
+Gemeint sind: wiederkehrendes Gesicht, Farbpalette, Schriftbild
+oder ein wiederholbarer visueller Aufbau.
+
+---
+
+Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
 {
   "score": <Zahl 1-5>,
-  "reason": "<1 Satz auf Deutsch, max. 20 Wörter, was den Score begründet>",
-  "strong": "<1 kurzer Satz was gut funktioniert, oder leer wenn score <= 2>",
-  "weak": "<1 kurzer Satz was fehlt oder stört, oder leer wenn score = 5>"
+  "format": "<eines der 7 Formate von oben>",
+  "elementCount": <Zahl — geschätzte Anzahl visueller Hauptelemente>,
+  "textIssue": "<leer wenn kein Textproblem, sonst: 'zu lang' | 'wiederholt Titel' | 'kein Mehrwert'>",
+  "contrast": "<'Luminosity' | 'Farbe' | 'Sättigung' | 'Keiner'>",
+  "branding": true | false,
+  "reason": "<1 Satz auf Deutsch, max. 15 Wörter, was den Score begründet>",
+  "strong": "<Was gut funktioniert nach dem Framework, 1 Satz — oder leerer String wenn score <= 2>",
+  "weak": "<Was das Zusammenspiel schwächt laut Framework, 1 Satz — oder leerer String wenn score = 5>"
 }`;
 }
 
@@ -136,18 +210,29 @@ async function analyzeVideo(
     const clean = text.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean) as {
       score?: number;
+      format?: string;
+      elementCount?: number;
+      textIssue?: string;
+      contrast?: string;
+      branding?: boolean;
       reason?: string;
       strong?: string;
       weak?: string;
     };
 
     const score = clampScore(parsed.score);
+    const elementCountRaw = Number(parsed.elementCount);
     return {
       id: video.id,
       title: video.title,
       thumbnail: video.thumbnail,
       score,
       label: scoreLabels[score],
+      format: typeof parsed.format === "string" ? parsed.format : "Keines davon",
+      elementCount: Number.isFinite(elementCountRaw) ? elementCountRaw : 0,
+      textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
+      contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
+      branding: parsed.branding === true,
       reason: typeof parsed.reason === "string" ? parsed.reason : "",
       strong: typeof parsed.strong === "string" ? parsed.strong : "",
       weak: typeof parsed.weak === "string" ? parsed.weak : "",

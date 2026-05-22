@@ -86,6 +86,11 @@ export type TitleAnalysisResult = {
   thumbnail?: string;
   score: TitleAnalysisScore;
   label: TitleAnalysisLabel;
+  format: string;
+  elementCount: number;
+  textIssue: string;
+  contrast: string;
+  branding: boolean;
   reason: string;
   strong: string;
   weak: string;

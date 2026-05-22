@@ -42,12 +42,23 @@ function SkeletonCard() {
   );
 }
 
+function textIssueCopy(issue: string): string {
+  if (issue === "zu lang") return "Mehr als 3 Wörter — kürzer ist stärker";
+  if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
+  return "Text verstärkt den Klick-Anreiz nicht";
+}
+
 function Summary({ results }: { results: TitleAnalysisResult[] }) {
   const total = results.length;
   const sum = results.reduce((acc, r) => acc + r.score, 0);
   const avg = sum / total;
   const weakCount = results.filter((r) => r.score <= 2).length;
   const avgFormatted = avg.toFixed(1);
+
+  const overloadedCount = results.filter((r) => r.elementCount > 3).length;
+  const textIssueCount = results.filter((r) => r.textIssue !== "").length;
+  const noContrastCount = results.filter((r) => r.contrast === "Keiner").length;
+  const brandingCount = results.filter((r) => r.branding).length;
 
   let headline = "";
   let body = "";
@@ -69,6 +80,37 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
     <div className="mt-5 rounded-xl border border-line bg-white p-4">
       <p className="font-medium text-ink">{headline}</p>
       <p className="mt-1 text-sm leading-relaxed text-ink/75">{body}</p>
+
+      {(overloadedCount > 0 ||
+        textIssueCount > 0 ||
+        noContrastCount > 0 ||
+        brandingCount > 0) && (
+        <div className="mt-3 space-y-1">
+          {overloadedCount > 0 && (
+            <p className="text-sm text-ink/70">
+              ⚠ {overloadedCount} von {total} Videos wirken visuell überladen.
+            </p>
+          )}
+          {textIssueCount > 0 && (
+            <p className="text-sm text-ink/70">
+              ⚠ Bei {textIssueCount} Videos gibt es ein Text-Problem im
+              Thumbnail.
+            </p>
+          )}
+          {noContrastCount > 0 && (
+            <p className="text-sm text-ink/70">
+              ⚠ {noContrastCount} Videos haben keinen klaren visuellen Kontrast.
+            </p>
+          )}
+          {brandingCount > 0 && (
+            <p className="text-sm text-ink/70">
+              ✓ {brandingCount} von {total} Videos zeigen einen wiederkehrenden
+              Kanal-Stil.
+            </p>
+          )}
+        </div>
+      )}
+
       <p className="mt-3 text-xs text-ink/45">
         KI-basierte Analyse. Kein Zugriff auf interne YouTube-Daten.
       </p>
@@ -80,32 +122,50 @@ function CriteriaPanel() {
   return (
     <div className="mt-3 rounded-lg border border-line bg-line/10 p-4 text-sm leading-relaxed text-ink/75">
       <p className="mb-3 text-ink/80">
-        Gemini bewertet jedes Video nach 3 Kriterien:
+        Die Analyse basiert auf zwei bewährten Frameworks: „How To Make
+        Effective Thumbnails" (Jay Alto) und „The Thumbnail System"
+        (thumbnailsystem.com).
       </p>
+      <p className="mb-3 text-ink/80">Bewertet wird nach diesen Kriterien:</p>
       <dl className="space-y-3">
         <div>
-          <dt className="font-medium text-ink">Visuelle Einheit</dt>
+          <dt className="font-medium text-ink">Klick-Format</dt>
           <dd className="text-ink/70">
-            Transportieren Bild und Titel dieselbe Kernbotschaft?
+            Nutzt das Thumbnail ein bewährtes psychologisches Format
+            (Kontrovers, Extrem, Unlogisch, Emotional, Trending, Informativ)?
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">Neugier-Hebel</dt>
+          <dt className="font-medium text-ink">3-Element-Regel</dt>
           <dd className="text-ink/70">
-            Entsteht durch die Kombination ein stärkerer Klickanreiz als durch
-            jedes Element allein?
+            Maximal 3 Hauptinformationen. Mehr bedeutet Überladung — der Blick
+            des Zuschauers verliert sich.
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">Konkretheit</dt>
+          <dt className="font-medium text-ink">Text-Regel</dt>
           <dd className="text-ink/70">
-            Ist das Bild spezifisch genug, um den Titel zu visualisieren?
+            Text erst wenn er den Klick-Anreiz direkt verstärkt. Unter 3
+            Wörter. Den Videotitel nie 1:1 wiederholen.
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Kontrast</dt>
+          <dd className="text-ink/70">
+            Luminosity (hell/dunkel), Farbe (Komplementär) oder Sättigung —
+            mindestens einer muss sitzen.
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Titel-Thumbnail-Fit</dt>
+          <dd className="text-ink/70">
+            Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
+            aneinander vorbei?
           </dd>
         </div>
       </dl>
       <p className="mt-3 text-xs text-ink/55">
-        Bewertung: 1 (Kein Fit) bis 5 (Perfekter Fit). Kein Zugriff auf
-        interne YouTube-Daten wie CTR oder Impressionen.
+        Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
       </p>
     </div>
   );
@@ -179,17 +239,45 @@ export default function TitleAnalysis({ results, loading }: Props) {
                     <p className="line-clamp-2 text-sm font-medium leading-snug">
                       {r.title}
                     </p>
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
                       <Dots score={r.score} />
                       <span className={`text-xs font-medium ${tone.text}`}>
                         {r.label}
                       </span>
+                      {r.format && r.format !== "Keines davon" && (
+                        <span className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink/65">
+                          {r.format}
+                        </span>
+                      )}
                     </div>
                     {r.reason && (
                       <p className="mt-1.5 text-xs italic text-ink/65 leading-relaxed">
                         „{r.reason}"
                       </p>
                     )}
+                    <div className="mt-1.5 space-y-0.5">
+                      {r.elementCount > 3 && (
+                        <p className="text-xs text-orange-600">
+                          ⚠ {r.elementCount} Elemente — wirkt überladen (max. 3
+                          empfohlen)
+                        </p>
+                      )}
+                      {r.textIssue && (
+                        <p className="text-xs text-orange-600">
+                          ⚠ Text: {textIssueCopy(r.textIssue)}
+                        </p>
+                      )}
+                      {r.contrast && r.contrast !== "Keiner" && (
+                        <p className="text-xs text-green-700">
+                          ✓ Kontrast: {r.contrast}
+                        </p>
+                      )}
+                      {r.contrast === "Keiner" && (
+                        <p className="text-xs text-orange-600">
+                          ⚠ Kein klarer Kontrast erkennbar
+                        </p>
+                      )}
+                    </div>
                     {r.strong && (
                       <p className="mt-1.5 text-xs text-ink/70 leading-relaxed">
                         <span className="font-medium text-green-700">✓ </span>
