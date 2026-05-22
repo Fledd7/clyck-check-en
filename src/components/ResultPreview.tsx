@@ -245,7 +245,7 @@ export default function ResultPreview({
             </div>
           )}
 
-          {(channelData.videos?.length ?? 0) >= 3 && (
+          {(titleAnalysisLoading || titleAnalysis.length > 0) && (
             <div className="mt-6 card">
               <TitleAnalysis loading={titleAnalysisLoading} results={titleAnalysis} />
             </div>

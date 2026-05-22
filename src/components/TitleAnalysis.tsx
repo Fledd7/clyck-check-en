@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { TitleAnalysisResult, TitleAnalysisScore } from "../lib/types";
 
 type Props = {
@@ -57,8 +58,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
       "Die meisten deiner Videos nutzen das Zusammenspiel aus Bild und Titel gut.";
   } else if (avg >= 3.0) {
     headline = `Ø ${avgFormatted} / 5  —  Gemischter Titel-Thumbnail-Fit`;
-    body =
-      `${weakCount} von ${total} Videos haben einen schwachen Fit. Hier verlierst du Klicks, auch wenn die einzelnen Thumbnails gut aussehen.`;
+    body = `${weakCount} von ${total} Videos haben einen schwachen Fit. Hier verlierst du Klicks, auch wenn die einzelnen Thumbnails gut aussehen.`;
   } else {
     headline = `Ø ${avgFormatted} / 5  —  Schwacher Titel-Thumbnail-Fit`;
     body =
@@ -76,8 +76,55 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   );
 }
 
+function CriteriaPanel() {
+  return (
+    <div className="mt-3 rounded-lg border border-line bg-line/10 p-4 text-sm leading-relaxed text-ink/75">
+      <p className="mb-3 text-ink/80">
+        Gemini bewertet jedes Video nach 3 Kriterien:
+      </p>
+      <dl className="space-y-3">
+        <div>
+          <dt className="font-medium text-ink">Visuelle Einheit</dt>
+          <dd className="text-ink/70">
+            Transportieren Bild und Titel dieselbe Kernbotschaft?
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Neugier-Hebel</dt>
+          <dd className="text-ink/70">
+            Entsteht durch die Kombination ein stärkerer Klickanreiz als durch
+            jedes Element allein?
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Konkretheit</dt>
+          <dd className="text-ink/70">
+            Ist das Bild spezifisch genug, um den Titel zu visualisieren?
+          </dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-xs text-ink/55">
+        Bewertung: 1 (Kein Fit) bis 5 (Perfekter Fit). Kein Zugriff auf
+        interne YouTube-Daten wie CTR oder Impressionen.
+      </p>
+    </div>
+  );
+}
+
 export default function TitleAnalysis({ results, loading }: Props) {
-  const showFallback = !loading && results.length === 0;
+  const [criteriaOpen, setCriteriaOpen] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (!loading) {
+      setTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setTimedOut(true), 15000);
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  if (!loading && results.length === 0) return null;
 
   return (
     <div>
@@ -87,14 +134,30 @@ export default function TitleAnalysis({ results, loading }: Props) {
         gemeinsam an.
       </p>
 
-      {showFallback ? (
-        <p className="mt-4 text-sm text-ink/60">Titel-Analyse wird geladen…</p>
-      ) : loading ? (
-        <div className="mt-4 grid gap-3">
-          {[1, 2, 3, 4].map((i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
+      <button
+        type="button"
+        onClick={() => setCriteriaOpen((v) => !v)}
+        aria-expanded={criteriaOpen}
+        className="mt-2 text-xs font-medium text-ink/60 underline-offset-2 hover:text-ink/80 hover:underline"
+      >
+        ⓘ Wie wird bewertet?
+      </button>
+
+      {criteriaOpen && <CriteriaPanel />}
+
+      {loading ? (
+        <>
+          <p className="mt-4 text-sm text-ink/60">
+            {timedOut
+              ? "Die KI-Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
+              : "Gemini analysiert Thumbnail und Titel …"}
+          </p>
+          <div className="mt-4 grid gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        </>
       ) : (
         <>
           <div className="mt-4 grid gap-3">

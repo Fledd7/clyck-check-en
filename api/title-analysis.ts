@@ -36,7 +36,10 @@ async function fetchImageAsBase64(
   url: string
 ): Promise<{ data: string; mimeType: string } | null> {
   try {
-    const res = await fetch(url);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
     if (!res.ok) return null;
     const buffer = await res.arrayBuffer();
     const base64 = Buffer.from(buffer).toString("base64");
@@ -165,6 +168,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     )
     .map((r) => r.value)
     .filter((v): v is ResultItem => v !== null);
+
+  console.log(`title-analysis: ${results.length}/${videoSubset.length} succeeded`);
 
   if (results.length === 0) {
     res.status(200).json({ ok: false, reason: "no_results" });
