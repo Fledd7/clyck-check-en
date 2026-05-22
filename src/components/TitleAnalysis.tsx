@@ -4,25 +4,46 @@ import type { TitleAnalysisResult, TitleAnalysisScore } from "../lib/types";
 type Props = {
   results: TitleAnalysisResult[];
   loading: boolean;
+  onSelect?: (id: string) => void;
 };
 
-function scoreTone(score: TitleAnalysisScore): {
-  dot: string;
-  text: string;
-} {
+const TOTAL_VIDEOS = 5;
+
+function scoreTone(score: TitleAnalysisScore): { dot: string; text: string } {
   if (score >= 4) return { dot: "bg-green-500", text: "text-green-700" };
   if (score === 3) return { dot: "bg-yellow-500", text: "text-yellow-700" };
   return { dot: "bg-red-500", text: "text-red-700" };
 }
 
-function Dots({ score }: { score: TitleAnalysisScore }) {
+function textIssueCopy(issue: string): string {
+  if (issue === "zu lang") return "Mehr als 3 Wörter — kürzer ist stärker";
+  if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
+  return "Text verstärkt den Klick-Anreiz nicht";
+}
+
+function AnimatedDots({ score }: { score: TitleAnalysisScore }) {
   const tone = scoreTone(score);
+  const [visible, setVisible] = useState(0);
+
+  useEffect(() => {
+    setVisible(0);
+    let current = 0;
+    const timer = setInterval(() => {
+      current += 1;
+      setVisible(current);
+      if (current >= score) clearInterval(timer);
+    }, 150);
+    return () => clearInterval(timer);
+  }, [score]);
+
   return (
     <span className="inline-flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`h-2 w-2 rounded-full ${n <= score ? tone.dot : "bg-line"}`}
+          className={`h-2 w-2 rounded-full transition-colors duration-200 ${
+            n <= visible ? tone.dot : "bg-line"
+          }`}
         />
       ))}
     </span>
@@ -42,10 +63,57 @@ function SkeletonCard() {
   );
 }
 
-function textIssueCopy(issue: string): string {
-  if (issue === "zu lang") return "Mehr als 3 Wörter — kürzer ist stärker";
-  if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
-  return "Text verstärkt den Klick-Anreiz nicht";
+function CriteriaPanel() {
+  return (
+    <div className="mt-3 rounded-lg border border-line bg-line/10 p-4 text-sm leading-relaxed text-ink/75">
+      <p className="mb-3 text-ink/80">
+        Die Analyse basiert auf zwei bewährten Frameworks: „How To Make
+        Effective Thumbnails" (Jay Alto) und „The Thumbnail System"
+        (thumbnailsystem.com).
+      </p>
+      <p className="mb-3 text-ink/80">Bewertet wird nach diesen Kriterien:</p>
+      <dl className="space-y-3">
+        <div>
+          <dt className="font-medium text-ink">Klick-Format</dt>
+          <dd className="text-ink/70">
+            Nutzt das Thumbnail ein bewährtes psychologisches Format
+            (Kontrovers, Extrem, Unlogisch, Emotional, Trending, Informativ)?
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">3-Element-Regel</dt>
+          <dd className="text-ink/70">
+            Maximal 3 Hauptinformationen. Mehr bedeutet Überladung — der Blick
+            des Zuschauers verliert sich.
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Text-Regel</dt>
+          <dd className="text-ink/70">
+            Text erst wenn er den Klick-Anreiz direkt verstärkt. Unter 3
+            Wörter. Den Videotitel nie 1:1 wiederholen.
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Kontrast</dt>
+          <dd className="text-ink/70">
+            Luminosity (hell/dunkel), Farbe (Komplementär) oder Sättigung —
+            mindestens einer muss sitzen.
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium text-ink">Titel-Thumbnail-Fit</dt>
+          <dd className="text-ink/70">
+            Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
+            aneinander vorbei?
+          </dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-xs text-ink/55">
+        Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
+      </p>
+    </div>
+  );
 }
 
 function Summary({ results }: { results: TitleAnalysisResult[] }) {
@@ -118,73 +186,31 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   );
 }
 
-function CriteriaPanel() {
-  return (
-    <div className="mt-3 rounded-lg border border-line bg-line/10 p-4 text-sm leading-relaxed text-ink/75">
-      <p className="mb-3 text-ink/80">
-        Die Analyse basiert auf zwei bewährten Frameworks: „How To Make
-        Effective Thumbnails" (Jay Alto) und „The Thumbnail System"
-        (thumbnailsystem.com).
-      </p>
-      <p className="mb-3 text-ink/80">Bewertet wird nach diesen Kriterien:</p>
-      <dl className="space-y-3">
-        <div>
-          <dt className="font-medium text-ink">Klick-Format</dt>
-          <dd className="text-ink/70">
-            Nutzt das Thumbnail ein bewährtes psychologisches Format
-            (Kontrovers, Extrem, Unlogisch, Emotional, Trending, Informativ)?
-          </dd>
-        </div>
-        <div>
-          <dt className="font-medium text-ink">3-Element-Regel</dt>
-          <dd className="text-ink/70">
-            Maximal 3 Hauptinformationen. Mehr bedeutet Überladung — der Blick
-            des Zuschauers verliert sich.
-          </dd>
-        </div>
-        <div>
-          <dt className="font-medium text-ink">Text-Regel</dt>
-          <dd className="text-ink/70">
-            Text erst wenn er den Klick-Anreiz direkt verstärkt. Unter 3
-            Wörter. Den Videotitel nie 1:1 wiederholen.
-          </dd>
-        </div>
-        <div>
-          <dt className="font-medium text-ink">Kontrast</dt>
-          <dd className="text-ink/70">
-            Luminosity (hell/dunkel), Farbe (Komplementär) oder Sättigung —
-            mindestens einer muss sitzen.
-          </dd>
-        </div>
-        <div>
-          <dt className="font-medium text-ink">Titel-Thumbnail-Fit</dt>
-          <dd className="text-ink/70">
-            Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
-            aneinander vorbei?
-          </dd>
-        </div>
-      </dl>
-      <p className="mt-3 text-xs text-ink/55">
-        Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
-      </p>
-    </div>
-  );
-}
-
-export default function TitleAnalysis({ results, loading }: Props) {
+export default function TitleAnalysis({ results, loading, onSelect }: Props) {
   const [criteriaOpen, setCriteriaOpen] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
+  const [analyzedCount, setAnalyzedCount] = useState(0);
 
   useEffect(() => {
     if (!loading) {
       setTimedOut(false);
+      setAnalyzedCount(0);
       return;
     }
-    const timer = setTimeout(() => setTimedOut(true), 15000);
-    return () => clearTimeout(timer);
+    const timeoutTimer = setTimeout(() => setTimedOut(true), 15000);
+    const progressTimer = setInterval(() => {
+      setAnalyzedCount((prev) => (prev >= TOTAL_VIDEOS - 1 ? prev : prev + 1));
+    }, 2000);
+    return () => {
+      clearTimeout(timeoutTimer);
+      clearInterval(progressTimer);
+    };
   }, [loading]);
 
   if (!loading && results.length === 0) return null;
+
+  const progressPct =
+    Math.min(analyzedCount + 1, TOTAL_VIDEOS) * (100 / TOTAL_VIDEOS);
 
   return (
     <div>
@@ -206,25 +232,34 @@ export default function TitleAnalysis({ results, loading }: Props) {
       {criteriaOpen && <CriteriaPanel />}
 
       {loading ? (
-        <>
-          <p className="mt-4 text-sm text-ink/60">
+        <div className="mt-4">
+          <p className="text-sm text-ink/60">
             {timedOut
               ? "Die KI-Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
-              : "Gemini analysiert Thumbnail und Titel …"}
+              : `Analysiere Video ${Math.min(analyzedCount + 1, TOTAL_VIDEOS)} von ${TOTAL_VIDEOS} …`}
           </p>
+          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-ink transition-all duration-700 ease-out"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
           <div className="mt-4 grid gap-3">
             {[1, 2, 3, 4].map((i) => (
               <SkeletonCard key={i} />
             ))}
           </div>
-        </>
+        </div>
       ) : (
         <>
           <div className="mt-4 grid gap-3">
             {results.map((r) => {
               const tone = scoreTone(r.score);
-              return (
-                <div key={r.id} className="card flex gap-3 p-3">
+              const cardClass = onSelect
+                ? "card flex gap-3 p-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
+                : "card flex gap-3 p-3";
+              const inner = (
+                <>
                   {r.thumbnail && (
                     <div className="h-20 w-36 flex-shrink-0 overflow-hidden rounded-md bg-line/40">
                       <img
@@ -240,7 +275,7 @@ export default function TitleAnalysis({ results, loading }: Props) {
                       {r.title}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <Dots score={r.score} />
+                      <AnimatedDots score={r.score} />
                       <span className={`text-xs font-medium ${tone.text}`}>
                         {r.label}
                       </span>
@@ -291,6 +326,15 @@ export default function TitleAnalysis({ results, loading }: Props) {
                       </p>
                     )}
                   </div>
+                </>
+              );
+              return onSelect ? (
+                <button key={r.id} type="button" className={cardClass} onClick={() => onSelect(r.id)}>
+                  {inner}
+                </button>
+              ) : (
+                <div key={r.id} className={cardClass}>
+                  {inner}
                 </div>
               );
             })}

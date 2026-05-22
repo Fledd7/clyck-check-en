@@ -13,6 +13,83 @@ import type {
   ResultCategoryId,
 } from "./types";
 
+export function getThumbnailRecommendation(result: TitleAnalysisResult): string {
+  const issues: string[] = [];
+
+  if (result.textIssue === "wiederholt Titel") {
+    issues.push(
+      "Ersetze den Text durch ein starkes Schlüsselwort oder entferne ihn — der Titel daneben macht ihn überflüssig."
+    );
+  } else if (result.textIssue === "zu lang") {
+    issues.push("Kürze den Text auf maximal 3 Wörter. Weniger Text, stärkere Wirkung.");
+  } else if (result.textIssue === "kein Mehrwert") {
+    issues.push(
+      "Der Text verstärkt den Klick-Anreiz nicht. Bau das Thumbnail erst ohne Text — und prüfe ob er wirklich nötig ist."
+    );
+  }
+
+  if (result.elementCount > 3) {
+    issues.push(
+      `${result.elementCount} Hauptelemente sind zu viel. Reduziere auf 3 — entscheide was das Wichtigste ist.`
+    );
+  }
+
+  if (result.contrast === "Keiner") {
+    issues.push(
+      "Kein klarer Kontrast erkennbar. Probier ein dunkles Subjekt vor hellem Hintergrund oder Komplementärfarben."
+    );
+  }
+
+  if (result.format === "Keines davon") {
+    issues.push(
+      "Das Thumbnail nutzt kein bewährtes Klick-Format. Frag dich: Was ist an dieser Idee remarkable?"
+    );
+  }
+
+  if (result.score <= 2) {
+    issues.push(
+      "Titel und Bild erzeugen keine gemeinsame Botschaft. Plant beide von Anfang an zusammen — nicht getrennt voneinander."
+    );
+  }
+
+  if (issues.length === 0) {
+    if (result.score >= 4) {
+      return "Starke Kombination. Halte diesen Stil als Vorlage für künftige Thumbnails.";
+    }
+    return "Solide Basis. Schärfe den Klick-Anreiz durch ein klareres Format.";
+  }
+
+  return issues.slice(0, 2).join(" ");
+}
+
+export type CheckHistory = {
+  date: string;
+  avgFitScore: number;
+  category: ResultCategoryId;
+  categoryHeadline: string;
+  clarityLevel: string;
+};
+
+const HISTORY_KEY = "clyck_last_check";
+
+export function saveCheckHistory(entry: CheckHistory): void {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entry));
+  } catch {
+    // Private mode / quota — silent
+  }
+}
+
+export function loadCheckHistory(): CheckHistory | null {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as CheckHistory;
+  } catch {
+    return null;
+  }
+}
+
 export type CategoryContent = {
   headline: string;
   explanation: string;

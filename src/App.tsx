@@ -15,6 +15,7 @@ import {
   channelDataNote,
   clarityLevel,
   getCategoryContent,
+  saveCheckHistory,
   selectCategory,
 } from "./lib/results";
 import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
@@ -324,8 +325,23 @@ export default function App() {
         "Die Anfrage konnte gerade nicht gesendet werden. Bitte noch einmal versuchen."
       );
     }
+    const avgFitScore = titleAnalysis.length > 0
+      ? titleAnalysis.reduce((s, r) => s + r.score, 0) / titleAnalysis.length
+      : 0;
+    saveCheckHistory({
+      date: new Date().toISOString(),
+      avgFitScore,
+      category: categoryId,
+      categoryHeadline: category.headline,
+      clarityLevel: clarity.level,
+    });
+
     clearProgress();
     setStep({ kind: "done" });
+  }
+
+  function goToChannelFromResult() {
+    setStep({ kind: "channel" });
   }
 
   const showProgress = step.kind === "question" || step.kind === "channel";
@@ -406,6 +422,7 @@ export default function App() {
           titleAnalysis={titleAnalysis}
           titleAnalysisLoading={titleAnalysisLoading}
           shareUrl={shareUrl}
+          onAddChannelLink={goToChannelFromResult}
           onContinue={goToLead}
         />
       )}

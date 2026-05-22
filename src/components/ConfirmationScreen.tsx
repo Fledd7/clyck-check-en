@@ -1,24 +1,44 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { loadCheckHistory } from "../lib/results";
 
 export default function ConfirmationScreen() {
   const [copied, setCopied] = useState(false);
 
+  const shareTarget = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return window.location.origin + window.location.pathname;
+  }, []);
+
+  const lastCheck = useMemo(() => loadCheckHistory(), []);
+
+  const linkedInText = useMemo(() => {
+    const lines = ["Ich habe gerade meinen YouTube-Kanal mit dem Clyck Check analysiert."];
+    if (lastCheck && lastCheck.avgFitScore > 0) {
+      lines.push(`Mein Titel-Thumbnail-Fit-Score: Ø ${lastCheck.avgFitScore.toFixed(1)} / 5`);
+    }
+    if (lastCheck?.categoryHeadline) {
+      lines.push(`Ergebnis: ${lastCheck.categoryHeadline}`);
+    }
+    lines.push(`Tool: ${shareTarget}`);
+    return lines.join("\n\n");
+  }, [lastCheck, shareTarget]);
+
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+    shareTarget
+  )}&summary=${encodeURIComponent(linkedInText)}`;
+
   function copyLink() {
-    const url = window.location.origin + window.location.pathname;
-    navigator.clipboard.writeText(url).catch(() => {});
+    navigator.clipboard.writeText(shareTarget).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
-
-  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-    typeof window !== "undefined" ? window.location.origin + window.location.pathname : ""
-  )}`;
 
   return (
     <section className="container-narrow fade-in py-16 sm:py-24">
       <h1 className="text-3xl font-semibold sm:text-4xl">Danke.</h1>
       <p className="mt-5 text-lg leading-relaxed text-ink/75">
-        Ich sehe mir deine Angaben persönlich an und melde mich mit einer konkreten Einschätzung.
+        Ich sehe mir deine Angaben persönlich an und melde mich mit einer
+        konkreten Einschätzung.
       </p>
 
       <div className="mt-12 border-t border-line pt-8">
