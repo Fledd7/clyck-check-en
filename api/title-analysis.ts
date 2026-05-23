@@ -21,6 +21,7 @@ type ResultItem = {
   label: AnalysisLabel;
   format: string;
   elementCount: number;
+  overloaded: boolean;
   textIssue: string;
   contrast: string;
   styleAge: "zeitgemäß" | "veraltet" | "neutral";
@@ -82,17 +83,23 @@ Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
 
 ---
 
-## Schritt 2: Simplicity prüfen (3-Element-Regel)
+## Schritt 2: Visuelle Überladung prüfen
 
-Bewerte ob das Thumbnail visuell überladen wirkt.
-Nicht die rohe Anzahl von Objekten zählen, sondern beurteilen:
-Wirkt das Bild auf den ersten Blick klar und fokussiert,
-oder verliert sich der Blick des Zuschauers?
-Ein Thumbnail mit Gesicht + Hintergrundszene + Text kann
-klar sein. Ein Thumbnail mit 3 unverbundenen Elementen
-ohne Hierarchie wirkt überladen.
-Setze elementCount nur dann auf > 3 wenn das Thumbnail
-tatsächlich visuell unruhig und schwer zu erfassen ist.
+Zähle die visuellen HAUPT-Elemente. Definiere Elemente so:
+- Eine Person / ein Gesicht = 1 Element
+- Text im Thumbnail (egal wie viele Wörter) = 1 Element
+- Ein Logo oder Brand-Element = 1 Element
+- Ein dominantes Objekt (Auto, Gebäude, Produkt) = 1 Element
+- Der Hintergrund zählt NICHT als Element
+
+Bewerte dann: Wirkt die Komposition überladen?
+Ein Thumbnail mit Person + Text + Logo = 3 Elemente = optimal.
+Ein Thumbnail mit Person + Text + Logo + Objekt + weiterer Text
+= 5 Elemente = überladen.
+
+Setze elementCount auf die Anzahl der Haupt-Elemente.
+Setze overloaded: true nur wenn elementCount > 3 UND
+die Komposition tatsächlich unruhig und schwer erfassbar wirkt.
 
 ---
 
@@ -131,9 +138,15 @@ Beispiele: 'GEHEIM', 'DAY 28', '$0', 'NEVER AGAIN'
 ## Schritt 4: Kontrast prüfen (Thumbnail System)
 
 Prüfe ob das Thumbnail einen der drei Kontrasttypen nutzt:
-- Luminosity: dunkles Subjekt vor hellem Hintergrund oder umgekehrt
-- Farbe: Komplementärfarben (z. B. Orange vor Blau)
+- Hell/Dunkel: dunkles Subjekt vor hellem Hintergrund oder umgekehrt
+- Komplementärfarben: z. B. Orange vor Blau, Rot vor Grün
 - Sättigung: gesättigtes Subjekt vor entsättigter Umgebung
+
+Benenne den Kontrast mit diesen Begriffen:
+- "Hell/Dunkel" (nicht "Luminosity")
+- "Komplementärfarben" (nicht "Farbe" oder "Colors")
+- "Sättigung" (bleibt gleich)
+- "Keiner" (wenn kein klarer Kontrast)
 
 Ein Thumbnail ohne klaren Kontrast fällt im Feed nicht auf.
 
@@ -186,7 +199,7 @@ Abzüge (senken den Score um 1):
 - Mehr als 3 Hauptelemente im Thumbnail
 - Text wiederholt den Titel 1:1
 - Text hat mehr als 5 bedeutungstragende Wörter ohne echten Mehrwert
-- Kein erkennbarer Kontrast (Luminosity, Farbe oder Sättigung)
+- Kein erkennbarer Kontrast (Hell/Dunkel, Komplementärfarben oder Sättigung)
 
 ---
 
@@ -202,14 +215,15 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
 {
   "score": <Zahl 1-5>,
   "format": "<eines der 7 Formate von oben>",
-  "elementCount": <Zahl — geschätzte Anzahl visueller Hauptelemente>,
+  "elementCount": <Zahl — Anzahl visueller Haupt-Elemente>,
+  "overloaded": true | false,
   "textIssue": "<leer wenn kein Textproblem, sonst: 'zu lang' | 'wiederholt Titel' | 'kein Mehrwert'>",
-  "contrast": "<'Luminosity' | 'Farbe' | 'Sättigung' | 'Keiner'>",
+  "contrast": "<'Hell/Dunkel' | 'Komplementärfarben' | 'Sättigung' | 'Keiner'>",
   "styleAge": "<'zeitgemäß' | 'veraltet' | 'neutral'>",
   "branding": true | false,
-  "reason": "<1 Satz auf Deutsch, max. 15 Wörter, konkret und direkt — kein 'könnte', 'wirkt etwas', 'hat gewisse Schwächen'>",
-  "strong": "<Was gut funktioniert nach dem Framework, 1 Satz — oder leerer String wenn score <= 2>",
-  "weak": "<Was das Zusammenspiel schwächt laut Framework, 1 Satz — oder leerer String wenn score = 5>"
+  "reason": "<1 Satz auf Deutsch, max. 15 Wörter, konkret und direkt — keine Fachbegriffe, keine englischen Wörter, kein 'könnte', 'wirkt etwas', 'hat gewisse Schwächen'>",
+  "strong": "<Was gut funktioniert, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score <= 2>",
+  "weak": "<Was das Zusammenspiel schwächt, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score = 5>"
 }`;
 }
 
@@ -255,6 +269,11 @@ async function analyzeVideo(
 
     const response = await ai.models.generateContent({
       model,
+      config: {
+        temperature: 0,
+        topP: 1,
+        topK: 1,
+      },
       contents: [
         {
           role: "user",
@@ -272,6 +291,7 @@ async function analyzeVideo(
       score?: number;
       format?: string;
       elementCount?: number;
+      overloaded?: boolean;
       textIssue?: string;
       contrast?: string;
       styleAge?: string;
@@ -304,6 +324,7 @@ async function analyzeVideo(
       label: scoreLabels[score],
       format: typeof parsed.format === "string" ? parsed.format : "Keines davon",
       elementCount: Number.isFinite(elementCountRaw) ? elementCountRaw : 0,
+      overloaded: parsed.overloaded ?? (Number.isFinite(elementCountRaw) && elementCountRaw > 3),
       textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
       styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",

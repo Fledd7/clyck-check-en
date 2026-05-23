@@ -26,6 +26,7 @@ export type VideoItem = {
   id: string;
   title: string;
   thumbnail: string;
+  duration?: string;
   views: number;
   publishedAt: string;
 };
@@ -82,6 +83,7 @@ export type TitleAnalysisResult = {
   label: TitleAnalysisLabel;
   format: string;
   elementCount: number;
+  overloaded: boolean;
   textIssue: string;
   contrast: string;
   styleAge: "zeitgemäß" | "veraltet" | "neutral";

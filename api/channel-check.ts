@@ -4,6 +4,7 @@ type VideoItem = {
   id: string;
   title: string;
   thumbnail: string;
+  duration?: string;
   views: number;
   publishedAt: string;
 };
@@ -250,13 +251,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const longforms = orderedDetails.filter(isLongform).slice(0, 12);
 
     const videos: VideoItem[] = longforms
-      .map((v) => {
+      .map((v): VideoItem | null => {
         const thumb = pickThumbFromVideo(v);
         if (!thumb) return null;
         return {
           id: v.id,
           title: v.snippet?.title ?? "",
           thumbnail: thumb,
+          duration: v.contentDetails?.duration,
           views: Number(v.statistics?.viewCount ?? 0),
           publishedAt: v.snippet?.publishedAt ?? "",
         };

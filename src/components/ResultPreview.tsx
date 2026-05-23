@@ -88,7 +88,7 @@ export default function ResultPreview({
       const v = videos.find((x) => x.id === openVideoId);
       if (!v) return null;
       return {
-        video: { id: v.id, title: v.title, thumbnail: v.thumbnail },
+        video: { id: v.id, title: v.title, thumbnail: v.thumbnail, duration: v.duration },
         analysis: analysisById[v.id] ?? null,
       };
     })();

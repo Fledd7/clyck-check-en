@@ -3,7 +3,7 @@ import type { TitleAnalysisResult } from "../lib/types";
 import { getThumbnailRecommendation } from "../lib/results";
 
 type Props = {
-  video: { id: string; title: string; thumbnail: string };
+  video: { id: string; title: string; thumbnail: string; duration?: string };
   analysis: TitleAnalysisResult | null;
   onClose: () => void;
 };
@@ -19,6 +19,26 @@ function scoreColor(score: number): string {
   if (score === 3) return "bg-amber-400";
   return "bg-accent";
 }
+
+function parseDuration(iso: string): string {
+  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return "";
+  const h = parseInt(match[1] ?? "0");
+  const m = parseInt(match[2] ?? "0");
+  const s = parseInt(match[3] ?? "0");
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+const formatExplanations: Record<string, string> = {
+  Kontrovers: "Provokante Aussage die Widerspruch erzeugt und zum Klicken zwingt.",
+  Extrem: "Überwältigender oder schockierender Moment der Aufmerksamkeit erzwingt.",
+  Unlogisch: "Etwas das keinen Sinn ergibt und Neugier weckt.",
+  Emotional: "Starke Gefühlsreaktion durch Mimik oder Situation.",
+  Trending: "Bezug zu einem aktuellen Ereignis oder Thema.",
+  Informativ: "Klares Versprechen eines konkreten Nutzens oder Wissens.",
+  "Keines davon": "Kein eindeutiges psychologisches Klick-Format erkennbar.",
+};
 
 function RuleOfThirdsGrid() {
   const lines = (
@@ -52,6 +72,7 @@ function RuleOfThirdsGrid() {
 export default function ThumbnailModal({ video, analysis, onClose }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [showGrid, setShowGrid] = useState(false);
+  const [showFormatInfo, setShowFormatInfo] = useState(false);
   const [localAnalysis, setLocalAnalysis] = useState<TitleAnalysisResult | null>(
     analysis ?? null
   );
@@ -98,7 +119,15 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showFormatInfo) return;
+    const handler = () => setShowFormatInfo(false);
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [showFormatInfo]);
+
   const recommendation = localAnalysis ? getThumbnailRecommendation(localAnalysis) : null;
+  const durationStr = video.duration ? parseDuration(video.duration) : "";
 
   return (
     <div
@@ -117,7 +146,24 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           type="button"
           onClick={onClose}
           aria-label="Schließen"
-          className="absolute right-3 top-3 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-black/10 text-sm text-ink transition hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-ink/60"
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            zIndex: 50,
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            background: "rgba(0,0,0,0.6)",
+            border: "1.5px solid rgba(255,255,255,0.3)",
+            color: "#ffffff",
+            fontSize: "18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            backdropFilter: "blur(4px)",
+          }}
         >
           ✕
         </button>
@@ -128,6 +174,24 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             alt=""
             className="h-full w-full object-cover"
           />
+          {durationStr && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "8px",
+                right: "8px",
+                background: "rgba(0,0,0,0.8)",
+                color: "#ffffff",
+                fontSize: "12px",
+                fontWeight: 600,
+                padding: "2px 6px",
+                borderRadius: "4px",
+                letterSpacing: "0.02em",
+              }}
+            >
+              {durationStr}
+            </div>
+          )}
           {showGrid && <RuleOfThirdsGrid />}
         </div>
 
@@ -173,9 +237,36 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                 {localAnalysis.label}
               </span>
               {localAnalysis.format && localAnalysis.format !== "Keines davon" && (
-                <span className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]">
-                  {localAnalysis.format}
-                </span>
+                <div className="relative inline-block">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setShowFormatInfo((v) => !v); }}
+                    className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]"
+                  >
+                    {localAnalysis.format} ⓘ
+                  </button>
+                  {showFormatInfo && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: 0,
+                        marginTop: "6px",
+                        background: "#161616",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        padding: "8px 12px",
+                        borderRadius: "8px",
+                        maxWidth: "240px",
+                        zIndex: 10,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {formatExplanations[localAnalysis.format] ?? "Klick-Format aus der Thumbnail-Theorie."}
+                    </div>
+                  )}
+                </div>
               )}
               {localAnalysis.contrast && localAnalysis.contrast !== "Keiner" && (
                 <span className="text-xs font-medium text-green-600">
@@ -203,11 +294,11 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               </p>
             )}
 
-            {(localAnalysis.elementCount > 3 ||
+            {(localAnalysis.overloaded ||
               localAnalysis.textIssue ||
               localAnalysis.contrast === "Keiner") && (
               <div className="mt-3 space-y-1">
-                {localAnalysis.elementCount > 3 && (
+                {localAnalysis.overloaded && (
                   <p className="text-xs text-accent">
                     ⚠ {localAnalysis.elementCount} Elemente — wirkt überladen (max. 3
                     empfohlen)

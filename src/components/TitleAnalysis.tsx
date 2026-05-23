@@ -97,7 +97,7 @@ function CriteriaPanel() {
         <div>
           <dt className="font-semibold text-ink">Kontrast</dt>
           <dd>
-            Luminosity (hell/dunkel), Farbe (Komplementär) oder Sättigung —
+            Hell/Dunkel, Komplementärfarben oder Sättigung —
             mindestens einer muss sitzen.
           </dd>
         </div>
@@ -123,7 +123,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   const weakCount = results.filter((r) => r.score <= 2).length;
   const avgFormatted = avg.toFixed(1);
 
-  const overloadedCount = results.filter((r) => r.elementCount > 3).length;
+  const overloadedCount = results.filter((r) => r.overloaded).length;
   const textIssueCount = results.filter((r) => r.textIssue !== "").length;
   const noContrastCount = results.filter((r) => r.contrast === "Keiner").length;
   const brandingCount = results.filter((r) => r.branding).length;
@@ -206,6 +206,9 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
   const [criteriaOpen, setCriteriaOpen] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const [analyzedCount, setAnalyzedCount] = useState(0);
+  const [language, setLanguage] = useState<"de" | "en">("de");
+  const [translating, setTranslating] = useState(false);
+  const [translatedResults, setTranslatedResults] = useState<TitleAnalysisResult[] | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -223,14 +226,68 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
     };
   }, [loading]);
 
+  async function translateResults() {
+    if (translating) return;
+    if (language === "en") {
+      setTranslatedResults(null);
+      setLanguage("de");
+      return;
+    }
+    setTranslating(true);
+    const textsToTranslate = results.flatMap((r) =>
+      [r.reason, r.strong, r.weak].filter(Boolean)
+    );
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texts: textsToTranslate, targetLang: "en" }),
+      });
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.translations)) {
+        let i = 0;
+        const translated = results.map((r) => ({
+          ...r,
+          reason: r.reason ? (data.translations[i++] as string) : r.reason,
+          strong: r.strong ? (data.translations[i++] as string) : r.strong,
+          weak: r.weak ? (data.translations[i++] as string) : r.weak,
+        }));
+        setTranslatedResults(translated);
+        setLanguage("en");
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   if (!loading && results.length === 0) return null;
+
+  const displayResults = translatedResults ?? results;
 
   const progressPct =
     Math.min(analyzedCount + 1, TOTAL_VIDEOS) * (100 / TOTAL_VIDEOS);
 
   return (
     <div>
-      <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
+        {!loading && results.length > 0 && (
+          <button
+            type="button"
+            onClick={translateResults}
+            disabled={translating}
+            className="rounded-full border border-line px-3 py-1 text-xs text-gray1 transition hover:bg-bg disabled:opacity-50"
+          >
+            {translating
+              ? "Wird übersetzt..."
+              : language === "de"
+              ? "Show in English"
+              : "Auf Deutsch anzeigen"}
+          </button>
+        )}
+      </div>
       <p className="mt-1 text-sm text-gray1 leading-relaxed">
         Deine Thumbnails werden nach Klickpsychologie und
         Thumbnail-Systematik analysiert.
@@ -269,7 +326,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
       ) : (
         <>
           <div className="mt-4 grid gap-3">
-            {results.map((r) => {
+            {displayResults.map((r) => {
               const tone = scoreTone(r.score);
               const cardClass = onSelect
                 ? "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
@@ -307,7 +364,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                       </p>
                     )}
                     <div className="mt-1.5 space-y-0.5">
-                      {r.elementCount > 3 && (
+                      {r.overloaded && (
                         <p className="text-xs text-accent">
                           ⚠ {r.elementCount} Elemente — wirkt überladen (max. 3
                           empfohlen)
