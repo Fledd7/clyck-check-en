@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #161616;
+  --color-accent: #CC001B;
+  --color-light: #ffffff;
+  --color-gray1: #6B6B6B;
+  --color-gray2: #E5E5E5;
+  --color-gray3: #F5F5F5;
+}
+
 @layer base {
   html,
   body,
@@ -9,8 +18,10 @@
     height: 100%;
   }
   body {
-    @apply bg-bg text-ink font-sans antialiased;
-    font-feature-settings: "ss01", "cv11";
+    background-color: #F5F5F5;
+    color: #161616;
+    font-family: "Sora", sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
   :focus-visible {
     @apply outline-none ring-2 ring-ink/70 ring-offset-2 ring-offset-bg;
@@ -22,25 +33,25 @@
     @apply mx-auto w-full max-w-xl px-5;
   }
   .card {
-    @apply rounded-2xl border border-line bg-white p-6 shadow-card;
+    @apply rounded-2xl border border-line bg-white p-5 shadow-card;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-ink px-5 py-3 text-base font-medium text-white transition hover:bg-ink/90 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center rounded-xl bg-ink px-8 py-4 text-[15px] font-semibold text-white transition-colors duration-200 hover:bg-accent disabled:bg-line disabled:text-gray1 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-xl border border-line bg-white px-5 py-3 text-base font-medium text-ink transition hover:bg-line/40 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center rounded-xl border border-line bg-white px-5 py-3 text-base font-medium text-ink transition hover:bg-bg disabled:opacity-50 disabled:cursor-not-allowed;
   }
   .option-card {
-    @apply flex w-full items-start gap-3 rounded-xl border border-line bg-white p-4 text-left text-base transition hover:border-ink/40 hover:bg-white;
+    @apply flex w-full items-start gap-3 rounded-xl border-[1.5px] border-line bg-bg p-3.5 text-left text-sm font-medium text-ink transition-all duration-150 cursor-pointer hover:border-ink;
   }
   .option-card[aria-pressed="true"] {
-    @apply border-ink ring-2 ring-ink/10;
+    @apply border-ink bg-ink text-white;
   }
   .input {
-    @apply w-full rounded-xl border border-line bg-white px-4 py-3 text-base text-ink placeholder:text-ink/40;
+    @apply w-full rounded-[10px] border-[1.5px] border-line bg-white px-4 py-3 text-sm text-ink placeholder:text-gray1/50 focus:border-ink focus:outline-none;
   }
   .label {
-    @apply mb-1 block text-sm font-medium text-ink/80;
+    @apply mb-1.5 block text-[13px] font-medium text-ink;
   }
 }
 

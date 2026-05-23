@@ -5,24 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: "#FAF8F4",
-        ink: "#111111",
-        accent: "#E85A1A",
-        line: "#E6E2DA",
+        ink: "#161616",
+        accent: "#CC001B",
+        line: "#E5E5E5",
+        bg: "#F5F5F5",
+        gray1: "#6B6B6B",
+        clyck: {
+          primary: "#161616",
+          accent: "#CC001B",
+          light: "#ffffff",
+          gray1: "#6B6B6B",
+          gray2: "#E5E5E5",
+          gray3: "#F5F5F5",
+        },
       },
       fontFamily: {
-        sans: [
-          "Inter",
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "Roboto",
-          "sans-serif",
-        ],
+        sans: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 2px rgba(17,17,17,0.04), 0 8px 24px rgba(17,17,17,0.06)",
+        card: "0 1px 3px rgba(0,0,0,0.08)",
       },
     },
   },

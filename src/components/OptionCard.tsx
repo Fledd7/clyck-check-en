@@ -17,13 +17,13 @@ export default function OptionCard({ label, selected, disabled, multi, onSelect 
     >
       <span
         aria-hidden
-        className={`mt-1 inline-flex flex-shrink-0 items-center justify-center ${
+        className={`mt-0.5 inline-flex flex-shrink-0 items-center justify-center ${
           multi
-            ? `h-4 w-4 rounded border ${
-                selected ? "border-ink bg-ink" : "border-line bg-white"
+            ? `h-4 w-4 rounded border-[1.5px] ${
+                selected ? "border-white bg-white" : "border-line bg-white"
               }`
-            : `h-4 w-4 rounded-full border ${
-                selected ? "border-ink bg-ink" : "border-line bg-white"
+            : `h-4 w-4 rounded-full border-[1.5px] ${
+                selected ? "border-white bg-white" : "border-line bg-white"
               }`
         }`}
       >
@@ -31,15 +31,15 @@ export default function OptionCard({ label, selected, disabled, multi, onSelect 
           <svg
             viewBox="0 0 12 12"
             fill="none"
-            className="h-2.5 w-2.5 text-white"
+            className="h-2.5 w-2.5 text-accent"
             stroke="currentColor"
-            strokeWidth={2}
+            strokeWidth={2.5}
           >
             <path d="M2 6l3 3 5-5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         )}
       </span>
-      <span className="text-ink">{label}</span>
+      <span>{label}</span>
     </button>
   );
 }

@@ -12,14 +12,14 @@ export default function ChannelLinkStep({ initialUrl, onSubmitWithUrl, onSkip, o
   const trimmed = url.trim();
   return (
     <section className="container-narrow fade-in py-8">
-      <h1 className="text-2xl font-semibold leading-snug sm:text-3xl">
+      <h1 className="text-[22px] font-bold leading-snug sm:text-[28px]">
         Möchtest du deinen Kanal verlinken?
       </h1>
-      <p className="mt-4 text-base leading-relaxed text-ink/75">
+      <p className="mt-4 text-[15px] leading-relaxed text-gray1">
         Mit Link kann die Einschätzung um öffentliche Kanaldaten und deine letzten Thumbnails ergänzt werden.
         Ohne Link bekommst du eine reine Selbsteinschätzung.
       </p>
-      <p className="mt-3 text-sm text-ink/55">
+      <p className="mt-3 text-sm text-gray1">
         Ich sehe nur öffentliche Daten — keine internen Analytics, keine Klickrate, keine privaten Zahlen.
       </p>
 
@@ -54,7 +54,7 @@ export default function ChannelLinkStep({ initialUrl, onSubmitWithUrl, onSkip, o
       </div>
 
       <div className="mt-6">
-        <button type="button" onClick={onBack} className="text-sm text-ink/60 underline-offset-4 hover:underline">
+        <button type="button" onClick={onBack} className="text-[13px] text-gray1 underline-offset-4 hover:underline">
           Zurück
         </button>
       </div>

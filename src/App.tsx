@@ -393,11 +393,11 @@ export default function App() {
 
       {step.kind === "loading" && (
         <section className="container-narrow fade-in py-16">
-          <p className="text-sm font-medium uppercase tracking-wide text-ink/60">Einen Moment</p>
-          <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">Einen Moment</p>
+          <h1 className="mt-3 text-[22px] font-bold sm:text-[28px]">
             Öffentliche Kanaldaten werden geladen …
           </h1>
-          <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div className="mt-6 h-[3px] w-full overflow-hidden rounded-full bg-line">
             <div className="h-full w-1/3 animate-pulse bg-ink" />
           </div>
         </section>

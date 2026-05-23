@@ -31,7 +31,6 @@ type Props = {
   onAddChannelLink: () => void;
 };
 
-
 export default function ResultPreview({
   category,
   channelData,
@@ -112,14 +111,13 @@ export default function ResultPreview({
   }
   const summaryLine = summaryParts.join(" · ");
 
-  // Delta (only show if last check is ≥ 7 days old and we have an avg score)
   const deltaInfo = (() => {
     if (!lastCheck || avgScore === null || lastCheck.avgFitScore <= 0) return null;
     if (daysSinceLastCheck === null || daysSinceLastCheck < 7) return null;
     const delta = avgScore - lastCheck.avgFitScore;
-    let tone = "text-ink/60";
+    let tone = "text-gray1";
     if (delta > 0.2) tone = "text-green-700";
-    else if (delta < -0.2) tone = "text-red-700";
+    else if (delta < -0.2) tone = "text-accent";
     const sign = delta > 0 ? "+" : "";
     return {
       tone,
@@ -131,62 +129,62 @@ export default function ResultPreview({
 
   return (
     <section className="container-narrow fade-in py-8">
-      <p className="text-sm font-medium uppercase tracking-wide text-ink/60">Erste Einschätzung</p>
-      <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">{category.headline}</h1>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">
+        Erste Einschätzung
+      </p>
+      <h1 className="mt-3 text-[28px] font-bold leading-snug sm:text-[34px]">
+        {category.headline}
+      </h1>
       <p className="mt-2">
         <span
-          className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
             clarityLevel === "Sehr hoch"
-              ? "bg-ink text-white border-ink"
-              : clarityLevel === "Hoch"
-              ? "border-ink/70 text-ink bg-white"
-              : clarityLevel === "Mittel"
-              ? "border-ink/40 text-ink bg-white"
-              : "border-line text-ink/60 bg-white"
+              ? "bg-accent text-white"
+              : "bg-ink text-white"
           }`}
         >
           {clarityLabel}
         </span>
       </p>
-      <p className="mt-1 text-xs text-ink/55">
+      <p className="mt-1 text-xs text-gray1">
         Basierend auf deinen Antworten und öffentlichen Kanaldaten.
       </p>
 
-      {/* Tab bar — always visible; "Kanal-Analyse" is the default landing tab */}
-      <div className="mt-6 flex gap-1 border-b border-line">
+      {/* Tab bar */}
+      <div className="mt-6 flex gap-8 border-b border-line mb-6">
         <button
           type="button"
           onClick={() => setTab("analysis")}
-          className={`pb-2 px-3 text-sm font-medium transition-colors ${
+          className={`pb-3 text-sm font-medium transition-colors ${
             tab === "analysis"
-              ? "border-b-2 border-ink text-ink"
-              : "text-ink/50 hover:text-ink/80"
+              ? "border-b-2 border-accent text-ink"
+              : "text-gray1 hover:text-ink"
           }`}
         >
           Kanal-Analyse
           {titleAnalysisLoading && (
-            <span className="ml-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-ink/40" />
+            <span className="ml-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-gray1" />
           )}
         </button>
         <button
           type="button"
           onClick={() => setTab("assessment")}
-          className={`pb-2 px-3 text-sm font-medium transition-colors ${
+          className={`pb-3 text-sm font-medium transition-colors ${
             tab === "assessment"
-              ? "border-b-2 border-ink text-ink"
-              : "text-ink/50 hover:text-ink/80"
+              ? "border-b-2 border-accent text-ink"
+              : "text-gray1 hover:text-ink"
           }`}
         >
           Einschätzung
         </button>
       </div>
 
-      {/* ── Tab 1 (default): Kanal-Analyse ── */}
+      {/* Tab 1: Kanal-Analyse */}
       {tab === "analysis" && (
         <>
           {!channelData ? (
-            <div className="mt-6 card">
-              <p className="text-sm leading-relaxed text-ink/75">
+            <div className="card">
+              <p className="text-sm leading-relaxed text-gray1">
                 Du hast keinen Kanal-Link eingegeben. Die Einschätzung basiert
                 auf deinen Antworten. Mit Link bekommst du eine detailliertere
                 Analyse.
@@ -201,41 +199,57 @@ export default function ResultPreview({
             </div>
           ) : (
             <>
-              <div className="mt-6 card">
-                <h2 className="text-base font-semibold">
+              {/* Channel snapshot */}
+              <div className="card">
+                <h2 className="text-[17px] font-bold">
                   {channelData.title ?? "Dein Kanal"}
                   {channelData.handle ? (
-                    <span className="ml-2 text-ink/55">@{channelData.handle}</span>
+                    <span className="ml-2 text-[13px] font-normal text-gray1">@{channelData.handle}</span>
                   ) : null}
                 </h2>
-                <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-ink/70 sm:grid-cols-3">
+                <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
                   {typeof channelData.subscriberCount === "number" && (
-                    <li>Abonnenten: {channelData.subscriberCount.toLocaleString("de-DE")}</li>
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Abonnenten</p>
+                      <p className="text-base font-semibold">{channelData.subscriberCount.toLocaleString("de-DE")}</p>
+                    </div>
                   )}
                   {typeof channelData.videoCount === "number" && (
-                    <li>Videos: {channelData.videoCount.toLocaleString("de-DE")}</li>
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Videos</p>
+                      <p className="text-base font-semibold">{channelData.videoCount.toLocaleString("de-DE")}</p>
+                    </div>
                   )}
                   {typeof channelData.uploadCadenceDays === "number" &&
                     channelData.uploadCadenceDays > 0 && (
-                      <li>Ø Upload-Abstand: ca. {channelData.uploadCadenceDays} Tage</li>
-                    )}
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Upload-Abstand</p>
+                      <p className="text-base font-semibold">ca. {channelData.uploadCadenceDays} Tage</p>
+                    </div>
+                  )}
                   {typeof channelData.medianViews === "number" && (
-                    <li>Median-Views: {channelData.medianViews.toLocaleString("de-DE")}</li>
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Median-Views</p>
+                      <p className="text-base font-semibold">{channelData.medianViews.toLocaleString("de-DE")}</p>
+                    </div>
                   )}
                   {typeof channelData.longformCount === "number" && (
-                    <li>Longform-Videos: {channelData.longformCount}</li>
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Longform</p>
+                      <p className="text-base font-semibold">{channelData.longformCount}</p>
+                    </div>
                   )}
-                </ul>
+                </div>
                 {typeof channelData.subscriberCount === "number" && (
-                  <p className="mt-3 text-sm text-ink/65 leading-relaxed">
+                  <p className="mt-3 border-t border-line pt-3 text-[13px] text-gray1 leading-relaxed">
                     {getBenchmarkText(channelData.subscriberCount)}
                   </p>
                 )}
               </div>
 
               {hasLongform && (
-                <div className="mt-6 card">
-                  <p className="text-sm font-medium text-ink/70">
+                <div className="mt-4 card">
+                  <p className="text-sm font-medium text-gray1">
                     Deine letzten Longform-Thumbnails
                   </p>
                   <div className="mt-3">
@@ -248,7 +262,7 @@ export default function ResultPreview({
                       }
                     />
                   </div>
-                  <p className="mt-2 text-xs text-ink/55">
+                  <p className="mt-2 text-xs text-gray1">
                     Nur Longform-Videos werden analysiert. Shorts werden bewusst
                     ausgelassen.
                     {videos.length > 0 && titleAnalysis.length > 0 && (
@@ -259,7 +273,7 @@ export default function ResultPreview({
               )}
 
               {(titleAnalysisLoading || titleAnalysis.length > 0) && (
-                <div className="mt-6 card">
+                <div className="mt-4 card">
                   <TitleAnalysis
                     loading={titleAnalysisLoading}
                     results={titleAnalysis}
@@ -274,7 +288,7 @@ export default function ResultPreview({
             <button
               type="button"
               onClick={() => setTab("assessment")}
-              className="text-sm text-ink/60 underline-offset-4 hover:underline"
+              className="text-sm text-gray1 underline-offset-4 hover:underline"
             >
               Zur Einschätzung →
             </button>
@@ -282,7 +296,7 @@ export default function ResultPreview({
         </>
       )}
 
-      {/* ── Tab 2: Einschätzung ── */}
+      {/* Tab 2: Einschätzung */}
       {tab === "assessment" && (
         <>
           {deltaInfo && (
@@ -295,40 +309,40 @@ export default function ResultPreview({
             <button
               type="button"
               onClick={() => setTab("analysis")}
-              className="mt-3 text-left text-xs text-ink/55 underline-offset-2 hover:text-ink/80 hover:underline"
+              className="mt-3 text-left text-xs text-gray1 underline-offset-2 hover:text-ink hover:underline"
             >
               {summaryLine}
             </button>
           )}
 
-          <p className="mt-6 text-base leading-relaxed text-ink/80">{category.explanation}</p>
+          <p className="mt-6 text-[15px] leading-relaxed text-gray1">{category.explanation}</p>
 
-          {channelNote && <p className="mt-5 text-sm italic text-ink/70">{channelNote}</p>}
+          {channelNote && <p className="mt-5 text-sm italic text-gray1">{channelNote}</p>}
 
           <div className="mt-10">
-            <h2 className="text-lg font-semibold">Was bei dir auffällt</h2>
+            <h2 className="text-lg font-bold">Was bei dir auffällt</h2>
             <div className="mt-4 grid gap-3">
               {insights.map((ins, i) => (
                 <div key={i} className="card">
-                  <h3 className="text-base font-semibold">{ins.headline}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-ink/75">{ins.text}</p>
+                  <h3 className="text-[15px] font-bold">{ins.headline}</h3>
+                  <p className="mt-1.5 text-sm text-gray1 leading-relaxed">{ins.text}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="mt-10">
-            <h2 className="text-lg font-semibold">Deine nächsten 3 Hebel</h2>
+            <h2 className="text-lg font-bold">Deine nächsten 3 Hebel</h2>
             <ol className="mt-4 grid gap-3">
               {levers.map((lv, i) => (
                 <li key={i} className="card">
                   <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-ink text-sm font-medium text-white">
+                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-ink text-[13px] font-bold text-white">
                       {i + 1}
                     </span>
                     <div>
-                      <h3 className="text-base font-semibold">{lv.headline}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-ink/75">{lv.text}</p>
+                      <h3 className="text-[15px] font-semibold">{lv.headline}</h3>
+                      <p className="mt-1 text-[13px] text-gray1 leading-relaxed">{lv.text}</p>
                     </div>
                   </div>
                 </li>
@@ -336,26 +350,31 @@ export default function ResultPreview({
             </ol>
           </div>
 
-          <div className="mt-10 card">
-            <h2 className="text-lg font-semibold">Willst du wissen, was ich konkret ändern würde?</h2>
-            <p className="mt-3 text-base leading-relaxed text-ink/80">
+          {/* CTA card */}
+          <div className="mt-10 rounded-[20px] bg-ink p-7">
+            <h2 className="text-[20px] font-bold text-white">Willst du wissen, was ich konkret ändern würde?</h2>
+            <p className="mt-2 text-sm text-white/65">
               Die automatische Einschätzung zeigt dir die Richtung. Für eine
               echte Bewertung muss ich mir Kanal, Titel und Thumbnails manuell
               ansehen.
             </p>
-            <ul className="mt-4 grid gap-1 text-sm text-ink/70">
-              <li>· Kanalwirkung auf den ersten Blick</li>
-              <li>· Zusammenspiel aus Titel, Idee und Thumbnail</li>
-              <li>· ob Audit, System oder laufende Unterstützung sinnvoller ist</li>
+            <ul className="mt-4 grid gap-1 text-[13px] text-white/65">
+              <li>✓ Kanalwirkung auf den ersten Blick</li>
+              <li>✓ Zusammenspiel aus Titel, Idee und Thumbnail</li>
+              <li>✓ ob Audit, System oder laufende Unterstützung sinnvoller ist</li>
             </ul>
-            <button type="button" onClick={onContinue} className="btn-primary mt-6">
+            <button
+              type="button"
+              onClick={onContinue}
+              className="mt-6 w-full rounded-[10px] bg-accent px-7 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#AA0015]"
+            >
               Persönliche Einschätzung anfragen
             </button>
           </div>
 
           <div className="mt-8 flex items-center gap-2">
             <button type="button" onClick={copyShareUrl} className="btn-secondary text-sm">
-              {linkCopied ? "Kopiert!" : "🔗 Ergebnis-Link kopieren"}
+              {linkCopied ? "Kopiert!" : "Ergebnis-Link kopieren"}
             </button>
           </div>
         </>

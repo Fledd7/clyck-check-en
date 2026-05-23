@@ -15,7 +15,7 @@ export default function ThumbnailGrid({ thumbnails, onSelect }: Props) {
             type="button"
             onClick={() => onSelect?.(i)}
             aria-label={`Thumbnail ${i + 1} öffnen`}
-            className="group relative aspect-video overflow-hidden rounded-md border border-line bg-line/40 transition hover:border-ink/40"
+            className="group relative aspect-video overflow-hidden rounded-xl border border-line bg-line transition hover:border-ink/40"
           >
             <img
               src={src}
@@ -24,15 +24,15 @@ export default function ThumbnailGrid({ thumbnails, onSelect }: Props) {
               className="h-full w-full object-cover transition group-hover:opacity-80"
             />
             <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition group-hover:bg-black/30 group-hover:opacity-100">
-              <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-ink">
-                🔍 Details
+              <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink">
+                Details
               </span>
             </span>
           </button>
         ) : (
           <div
             key={i}
-            className="aspect-video overflow-hidden rounded-md border border-line bg-line/40"
+            className="aspect-video overflow-hidden rounded-xl border border-line bg-line"
           >
             <img
               src={src}

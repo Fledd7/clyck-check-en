@@ -16,8 +16,8 @@ function textIssueCopy(issue: string): string {
 
 function scoreColor(score: number): string {
   if (score >= 4) return "bg-green-500";
-  if (score === 3) return "bg-yellow-500";
-  return "bg-red-500";
+  if (score === 3) return "bg-amber-400";
+  return "bg-accent";
 }
 
 function RuleOfThirdsGrid() {
@@ -106,23 +106,23 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
       aria-modal="true"
       aria-label="Thumbnail-Analyse"
       onClick={onClose}
-      className="fixed inset-0 z-40 overflow-y-auto bg-black/60 py-8"
+      className="fixed inset-0 z-40 overflow-y-auto bg-black/70 py-8"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
+        className="relative mx-auto w-full max-w-[520px] max-h-[90vh] overflow-y-auto rounded-[20px] bg-white p-5 shadow-xl"
       >
         <button
           ref={closeBtnRef}
           type="button"
           onClick={onClose}
           aria-label="Schließen"
-          className="absolute right-3 top-3 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-black/20 text-base text-white transition hover:bg-black/40 focus:outline-none focus:ring-2 focus:ring-ink/60"
+          className="absolute right-3 top-3 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-black/10 text-sm text-ink transition hover:bg-black/20 focus:outline-none focus:ring-2 focus:ring-ink/60"
         >
           ✕
         </button>
 
-        <div className="relative aspect-video w-full overflow-hidden rounded-md bg-line/40">
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-line">
           <img
             src={video.thumbnail}
             alt=""
@@ -134,19 +134,19 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
         <button
           type="button"
           onClick={() => setShowGrid((v) => !v)}
-          className="mt-1 mb-3 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
+          className="mt-1 mb-3 text-xs text-gray1 hover:underline"
         >
           {showGrid ? "✕ Grid ausblenden" : "⊞ Rule of Thirds"}
         </button>
 
         {showGrid && (
-          <p className="mb-3 text-[11px] leading-relaxed text-gray-400">
+          <p className="mb-3 text-[11px] leading-relaxed text-gray1">
             Die Schnittpunkte (●) markieren die stärksten Positionen für Gesichter,
             Text und Hauptmotive.
           </p>
         )}
 
-        <h3 className="text-base font-semibold leading-snug">{video.title}</h3>
+        <h3 className="text-base font-bold leading-snug">{video.title}</h3>
 
         {localAnalysis ? (
           <>
@@ -155,50 +155,50 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                 {[1, 2, 3, 4, 5].map((n) => (
                   <span
                     key={n}
-                    className={`h-2 w-2 rounded-full ${
+                    className={`h-2.5 w-2.5 rounded-full ${
                       n <= localAnalysis.score ? scoreColor(localAnalysis.score) : "bg-line"
                     }`}
                   />
                 ))}
               </span>
               <span
-                className={`text-xs font-medium ${
+                className={`text-xs font-semibold ${
                   localAnalysis.score >= 4
                     ? "text-green-700"
                     : localAnalysis.score === 3
-                    ? "text-yellow-700"
-                    : "text-red-700"
+                    ? "text-amber-600"
+                    : "text-accent"
                 }`}
               >
                 {localAnalysis.label}
               </span>
               {localAnalysis.format && localAnalysis.format !== "Keines davon" && (
-                <span className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink/65">
+                <span className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]">
                   {localAnalysis.format}
                 </span>
               )}
               {localAnalysis.contrast && localAnalysis.contrast !== "Keiner" && (
-                <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-800">
+                <span className="text-xs font-medium text-green-600">
                   Kontrast: {localAnalysis.contrast}
                 </span>
               )}
             </div>
 
             {localAnalysis.reason && (
-              <p className="mt-3 text-sm italic leading-relaxed text-ink/70">
+              <p className="mt-3 text-sm italic leading-relaxed text-gray1">
                 „{localAnalysis.reason}"
               </p>
             )}
 
             {localAnalysis.strong && (
-              <p className="mt-3 text-sm leading-relaxed text-ink/80">
-                <span className="font-medium text-green-700">✓ Was funktioniert: </span>
+              <p className="mt-3 text-sm leading-relaxed text-gray1">
+                <span className="font-semibold text-green-700">✓ Was funktioniert: </span>
                 {localAnalysis.strong}
               </p>
             )}
             {localAnalysis.weak && (
-              <p className="mt-2 text-sm leading-relaxed text-ink/80">
-                <span className="font-medium text-red-700">✗ Was fehlt: </span>
+              <p className="mt-2 text-sm leading-relaxed text-gray1">
+                <span className="font-semibold text-accent">✗ Was fehlt: </span>
                 {localAnalysis.weak}
               </p>
             )}
@@ -208,18 +208,18 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               localAnalysis.contrast === "Keiner") && (
               <div className="mt-3 space-y-1">
                 {localAnalysis.elementCount > 3 && (
-                  <p className="text-xs text-orange-600">
+                  <p className="text-xs text-accent">
                     ⚠ {localAnalysis.elementCount} Elemente — wirkt überladen (max. 3
                     empfohlen)
                   </p>
                 )}
                 {localAnalysis.textIssue && (
-                  <p className="text-xs text-orange-600">
+                  <p className="text-xs text-accent">
                     ⚠ Text: {textIssueCopy(localAnalysis.textIssue)}
                   </p>
                 )}
                 {localAnalysis.contrast === "Keiner" && (
-                  <p className="text-xs text-orange-600">
+                  <p className="text-xs text-accent">
                     ⚠ Kein klarer Kontrast erkennbar
                   </p>
                 )}
@@ -227,11 +227,11 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             )}
 
             {localAnalysis.styleAge === "veraltet" && (
-              <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
-                <p className="text-xs font-medium text-amber-700">
+              <div className="mt-2 rounded-xl border border-orange-200 bg-[#FFF8F0] p-3">
+                <p className="text-xs font-semibold text-orange-700">
                   Stilrichtung: Ältere Thumbnail-Ästhetik
                 </p>
-                <p className="mt-0.5 text-xs text-amber-600">
+                <p className="mt-0.5 text-xs text-orange-800">
                   Dieser Stil war 2018–2022 weit verbreitet.
                   Klarere, bildstärkere Thumbnails performen
                   in den meisten Nischen heute oft besser.
@@ -245,11 +245,11 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             )}
 
             {recommendation && (
-              <div className="mt-4 rounded-lg border border-line bg-line/10 p-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-ink/55">
+              <div className="mt-4 rounded-[10px] bg-bg p-3.5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray1">
                   Empfehlung
                 </p>
-                <p className="mt-1 text-sm leading-relaxed text-ink/80">{recommendation}</p>
+                <p className="mt-1 text-[13px] font-medium">{recommendation}</p>
               </div>
             )}
           </>
@@ -259,13 +259,13 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               <button
                 type="button"
                 onClick={analyzeNow}
-                className="mt-3 w-full rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+                className="mt-3 w-full rounded-xl border border-line px-4 py-2 text-sm text-gray1 transition-colors hover:bg-bg"
               >
                 Dieses Thumbnail jetzt analysieren
               </button>
             )}
             {analyzing && (
-              <p className="mt-3 text-sm text-gray-400">
+              <p className="mt-3 text-sm text-gray1">
                 Analysiere Thumbnail und Titel...
               </p>
             )}

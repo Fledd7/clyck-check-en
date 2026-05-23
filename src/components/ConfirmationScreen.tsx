@@ -35,14 +35,14 @@ export default function ConfirmationScreen() {
 
   return (
     <section className="container-narrow fade-in py-16 sm:py-24">
-      <h1 className="text-3xl font-semibold sm:text-4xl">Danke.</h1>
-      <p className="mt-5 text-lg leading-relaxed text-ink/75">
+      <h1 className="text-[32px] font-bold sm:text-[38px]">Danke.</h1>
+      <p className="mt-5 text-lg leading-relaxed text-gray1">
         Ich sehe mir deine Angaben persönlich an und melde mich mit einer
         konkreten Einschätzung.
       </p>
 
       <div className="mt-12 border-t border-line pt-8">
-        <p className="text-sm text-ink/70">
+        <p className="text-sm text-gray1">
           Kennst du jemanden, dem dieser Check helfen könnte?
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">

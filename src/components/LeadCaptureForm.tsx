@@ -49,10 +49,10 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
 
   return (
     <section className="container-narrow fade-in py-8">
-      <h1 className="text-2xl font-semibold leading-snug sm:text-3xl">
+      <h1 className="text-[22px] font-bold leading-snug sm:text-[28px]">
         Persönliche Einschätzung anfragen
       </h1>
-      <p className="mt-4 text-base leading-relaxed text-ink/75">
+      <p className="mt-4 text-[15px] leading-relaxed text-gray1">
         Das war die kurze Einschätzung. Wenn du möchtest, schaue ich mir deine Angaben persönlich an
         und melde mich mit einer konkreteren Rückmeldung. Kostenlos und unverbindlich.
       </p>
@@ -93,12 +93,12 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
             className="input resize-y"
           />
         </div>
-        <label className="flex items-start gap-3 text-sm text-ink/75">
+        <label className="flex items-start gap-3 text-sm text-gray1">
           <input
             type="checkbox"
             checked={consent}
             onChange={(e) => setConsent(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-line"
+            className="mt-1 h-4 w-4 rounded border-line accent-ink"
             required
           />
           <span>
@@ -108,13 +108,13 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
         </label>
 
         {error && (
-          <div className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+          <div className="rounded-xl border border-accent/30 bg-accent/5 p-3 text-sm text-accent">
             {error}
           </div>
         )}
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button type="submit" disabled={!canSubmit} className="btn-primary">
+          <button type="submit" disabled={!canSubmit} className="btn-primary w-full">
             {submitting ? "Wird gesendet …" : "Einschätzung anfragen"}
           </button>
           <button type="button" onClick={onBack} className="btn-secondary">

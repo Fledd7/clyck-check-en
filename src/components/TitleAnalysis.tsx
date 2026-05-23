@@ -11,8 +11,8 @@ const TOTAL_VIDEOS = 5;
 
 function scoreTone(score: TitleAnalysisScore): { dot: string; text: string } {
   if (score >= 4) return { dot: "bg-green-500", text: "text-green-700" };
-  if (score === 3) return { dot: "bg-yellow-500", text: "text-yellow-700" };
-  return { dot: "bg-red-500", text: "text-red-700" };
+  if (score === 3) return { dot: "bg-amber-400", text: "text-amber-600" };
+  return { dot: "bg-accent", text: "text-accent" };
 }
 
 function textIssueCopy(issue: string): string {
@@ -41,7 +41,7 @@ function AnimatedDots({ score }: { score: TitleAnalysisScore }) {
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={`h-2 w-2 rounded-full transition-colors duration-200 ${
+          className={`h-2.5 w-2.5 rounded-full transition-colors duration-200 ${
             n <= visible ? tone.dot : "bg-line"
           }`}
         />
@@ -53,7 +53,7 @@ function AnimatedDots({ score }: { score: TitleAnalysisScore }) {
 function SkeletonCard() {
   return (
     <div className="card flex gap-3 p-3 animate-pulse">
-      <div className="h-20 w-36 flex-shrink-0 rounded-md bg-line/70" />
+      <div className="h-20 w-36 flex-shrink-0 rounded-lg bg-line" />
       <div className="flex-1 space-y-2">
         <div className="h-3.5 w-3/4 rounded bg-line" />
         <div className="h-3 w-1/2 rounded bg-line/60" />
@@ -65,51 +65,51 @@ function SkeletonCard() {
 
 function CriteriaPanel() {
   return (
-    <div className="mt-3 rounded-lg border border-line bg-line/10 p-4 text-sm leading-relaxed text-ink/75">
-      <p className="mb-3 text-ink/80">
+    <div className="mt-3 rounded-2xl border border-line bg-bg p-4 text-sm leading-relaxed text-gray1">
+      <p className="mb-3">
         Die Analyse basiert auf zwei bewährten Frameworks: „How To Make
         Effective Thumbnails" (Jay Alto) und „The Thumbnail System"
         (thumbnailsystem.com).
       </p>
-      <p className="mb-3 text-ink/80">Bewertet wird nach diesen Kriterien:</p>
+      <p className="mb-3">Bewertet wird nach diesen Kriterien:</p>
       <dl className="space-y-3">
         <div>
-          <dt className="font-medium text-ink">Klick-Format</dt>
-          <dd className="text-ink/70">
+          <dt className="font-semibold text-ink">Klick-Format</dt>
+          <dd>
             Nutzt das Thumbnail ein bewährtes psychologisches Format
             (Kontrovers, Extrem, Unlogisch, Emotional, Trending, Informativ)?
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">3-Element-Regel</dt>
-          <dd className="text-ink/70">
+          <dt className="font-semibold text-ink">3-Element-Regel</dt>
+          <dd>
             Maximal 3 Hauptinformationen. Mehr bedeutet Überladung — der Blick
             des Zuschauers verliert sich.
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">Text-Regel</dt>
-          <dd className="text-ink/70">
+          <dt className="font-semibold text-ink">Text-Regel</dt>
+          <dd>
             Text erst wenn er den Klick-Anreiz direkt verstärkt. Unter 3
             Wörter. Den Videotitel nie 1:1 wiederholen.
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">Kontrast</dt>
-          <dd className="text-ink/70">
+          <dt className="font-semibold text-ink">Kontrast</dt>
+          <dd>
             Luminosity (hell/dunkel), Farbe (Komplementär) oder Sättigung —
             mindestens einer muss sitzen.
           </dd>
         </div>
         <div>
-          <dt className="font-medium text-ink">Titel-Thumbnail-Fit</dt>
-          <dd className="text-ink/70">
+          <dt className="font-semibold text-ink">Titel-Thumbnail-Fit</dt>
+          <dd>
             Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
             aneinander vorbei?
           </dd>
         </div>
       </dl>
-      <p className="mt-3 text-xs text-ink/55">
+      <p className="mt-3 text-xs text-gray1">
         Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
       </p>
     </div>
@@ -147,9 +147,9 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   }
 
   return (
-    <div className="mt-5 rounded-xl border border-line bg-white p-4">
-      <p className="font-medium text-ink">{headline}</p>
-      <p className="mt-1 text-sm leading-relaxed text-ink/75">{body}</p>
+    <div className="mt-5 rounded-2xl border border-line bg-white p-4">
+      <p className="font-bold">{headline}</p>
+      <p className="mt-1 text-sm leading-relaxed text-gray1">{body}</p>
 
       {(overloadedCount > 0 ||
         textIssueCount > 0 ||
@@ -159,23 +159,23 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
         modernCount >= total * 0.7) && (
         <div className="mt-3 space-y-1">
           {overloadedCount > 0 && (
-            <p className="text-sm text-ink/70">
+            <p className="text-sm text-gray1">
               ⚠ {overloadedCount} von {total} Videos wirken visuell überladen.
             </p>
           )}
           {textIssueCount > 0 && (
-            <p className="text-sm text-ink/70">
+            <p className="text-sm text-gray1">
               ⚠ Bei {textIssueCount} Videos gibt es ein Text-Problem im
               Thumbnail.
             </p>
           )}
           {noContrastCount > 0 && (
-            <p className="text-sm text-ink/70">
+            <p className="text-sm text-gray1">
               ⚠ {noContrastCount} Videos haben keinen klaren visuellen Kontrast.
             </p>
           )}
           {brandingCount > 0 && (
-            <p className="text-sm text-ink/70">
+            <p className="text-sm text-gray1">
               ✓ {brandingCount} von {total} Videos zeigen einen wiederkehrenden
               Kanal-Stil.
             </p>
@@ -195,7 +195,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
         </div>
       )}
 
-      <p className="mt-3 text-xs text-ink/45">
+      <p className="mt-3 text-xs text-gray1">
         KI-basierte Analyse. Kein Zugriff auf interne YouTube-Daten.
       </p>
     </div>
@@ -230,8 +230,8 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
 
   return (
     <div>
-      <h3 className="text-base font-semibold">Titel-Thumbnail-Fit</h3>
-      <p className="mt-1 text-sm text-ink/55 leading-relaxed">
+      <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
+      <p className="mt-1 text-sm text-gray1 leading-relaxed">
         Deine Thumbnails werden nach Klickpsychologie und
         Thumbnail-Systematik analysiert.
       </p>
@@ -240,7 +240,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
         type="button"
         onClick={() => setCriteriaOpen((v) => !v)}
         aria-expanded={criteriaOpen}
-        className="mt-2 text-xs font-medium text-ink/60 underline-offset-2 hover:text-ink/80 hover:underline"
+        className="mt-2 text-xs font-medium text-gray1 underline-offset-2 hover:text-ink hover:underline"
       >
         ⓘ Wie wird bewertet?
       </button>
@@ -249,12 +249,12 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
 
       {loading ? (
         <div className="mt-4">
-          <p className="text-sm text-ink/60">
+          <p className="text-sm text-gray1">
             {timedOut
               ? "Die KI-Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
               : `Analysiere Video ${Math.min(analyzedCount + 1, TOTAL_VIDEOS)} von ${TOTAL_VIDEOS} …`}
           </p>
-          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
+          <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-line">
             <div
               className="h-full rounded-full bg-ink transition-all duration-700 ease-out"
               style={{ width: `${progressPct}%` }}
@@ -272,12 +272,12 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
             {results.map((r) => {
               const tone = scoreTone(r.score);
               const cardClass = onSelect
-                ? "card flex gap-3 p-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
-                : "card flex gap-3 p-3";
+                ? "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
+                : "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3";
               const inner = (
                 <>
                   {r.thumbnail && (
-                    <div className="h-20 w-36 flex-shrink-0 overflow-hidden rounded-md bg-line/40">
+                    <div className="h-20 w-36 flex-shrink-0 overflow-hidden rounded-lg bg-line">
                       <img
                         src={r.thumbnail}
                         alt=""
@@ -292,49 +292,49 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <AnimatedDots score={r.score} />
-                      <span className={`text-xs font-medium ${tone.text}`}>
+                      <span className={`text-xs font-semibold ${tone.text}`}>
                         {r.label}
                       </span>
                       {r.format && r.format !== "Keines davon" && (
-                        <span className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink/65">
+                        <span className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]">
                           {r.format}
                         </span>
                       )}
                     </div>
                     {r.reason && (
-                      <p className="mt-1.5 text-xs italic text-ink/65 leading-relaxed">
+                      <p className="mt-1.5 text-xs italic text-gray1 leading-relaxed">
                         „{r.reason}"
                       </p>
                     )}
                     <div className="mt-1.5 space-y-0.5">
                       {r.elementCount > 3 && (
-                        <p className="text-xs text-orange-600">
+                        <p className="text-xs text-accent">
                           ⚠ {r.elementCount} Elemente — wirkt überladen (max. 3
                           empfohlen)
                         </p>
                       )}
                       {r.textIssue && (
-                        <p className="text-xs text-orange-600">
+                        <p className="text-xs text-accent">
                           ⚠ Text: {textIssueCopy(r.textIssue)}
                         </p>
                       )}
                       {r.contrast && r.contrast !== "Keiner" && (
-                        <p className="text-xs text-green-700">
+                        <p className="text-xs text-green-600">
                           ✓ Kontrast: {r.contrast}
                         </p>
                       )}
                       {r.contrast === "Keiner" && (
-                        <p className="text-xs text-orange-600">
+                        <p className="text-xs text-accent">
                           ⚠ Kein klarer Kontrast erkennbar
                         </p>
                       )}
                     </div>
                     {r.styleAge === "veraltet" && (
-                      <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
-                        <p className="text-xs font-medium text-amber-700">
+                      <div className="mt-2 rounded-xl border border-orange-200 bg-[#FFF8F0] p-3">
+                        <p className="text-xs font-semibold text-orange-700">
                           Stilrichtung: Ältere Thumbnail-Ästhetik
                         </p>
-                        <p className="mt-0.5 text-xs text-amber-600">
+                        <p className="mt-0.5 text-xs text-orange-800">
                           Dieser Stil war 2018–2022 weit verbreitet.
                           Klarere, bildstärkere Thumbnails performen
                           in den meisten Nischen heute oft besser.
@@ -347,14 +347,14 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                       </p>
                     )}
                     {r.strong && (
-                      <p className="mt-1.5 text-xs text-ink/70 leading-relaxed">
-                        <span className="font-medium text-green-700">✓ </span>
+                      <p className="mt-1.5 text-xs text-gray1 leading-relaxed">
+                        <span className="font-semibold text-green-700">✓ </span>
                         {r.strong}
                       </p>
                     )}
                     {r.weak && (
-                      <p className="mt-0.5 text-xs text-ink/70 leading-relaxed">
-                        <span className="font-medium text-red-700">✗ </span>
+                      <p className="mt-0.5 text-xs text-gray1 leading-relaxed">
+                        <span className="font-semibold text-accent">✗ </span>
                         {r.weak}
                       </p>
                     )}
