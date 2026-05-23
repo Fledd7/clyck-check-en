@@ -16,7 +16,7 @@ function scoreTone(score: TitleAnalysisScore): { dot: string; text: string } {
 }
 
 function textIssueCopy(issue: string): string {
-  if (issue === "zu lang") return "Mehr als 3 Wörter — kürzer ist stärker";
+  if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
   if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
   return "Text verstärkt den Klick-Anreiz nicht";
 }

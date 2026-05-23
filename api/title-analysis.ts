@@ -97,12 +97,20 @@ tatsächlich visuell unruhig und schwer zu erfassen ist.
 
 ## Schritt 3: Text-Regel prüfen
 
-Bewerte den Text im Thumbnail nach diesen Kriterien:
-- Kein Text ist oft besser als schlechter Text
-- Text sollte maximal 3 Wörter haben
-- Text darf den Videotitel nie 1:1 wiederholen — das ist verschenkte Fläche
-- Text ist nur sinnvoll, wenn er Aufmerksamkeit, Kontext oder den
-  Klick-Anreiz direkt verstärkt
+Zähle die bedeutungstragenden Wörter im Text —
+ignoriere dabei Satzzeichen, Sterne (*), Emojis und
+Sonderzeichen komplett.
+Text ist nur ein Problem wenn:
+- mehr als 5 bedeutungstragende Wörter vorhanden sind
+  (nicht 3, weil kurze kraftvolle Sätze wie
+  'It's F*cking Simple' oder 'I Lost Everything'
+  bewusst eingesetzt sind)
+- Text den Videotitel wortwörtlich wiederholt
+- Text keinen erkennbaren Beitrag zum Klick-Anreiz leistet
+
+Setze textIssue nur dann auf einen Wert wenn
+mindestens eines dieser drei Kriterien eindeutig zutrifft.
+Im Zweifelsfall: leerer String.
 
 ---
 
@@ -132,7 +140,7 @@ Bewertungsskala 1–5:
 Abzüge (senken den Score um 1):
 - Mehr als 3 Hauptelemente im Thumbnail
 - Text wiederholt den Titel 1:1
-- Text hat mehr als 3 Wörter ohne echten Mehrwert
+- Text hat mehr als 5 bedeutungstragende Wörter ohne echten Mehrwert
 - Kein erkennbarer Kontrast (Luminosity, Farbe oder Sättigung)
 
 ---

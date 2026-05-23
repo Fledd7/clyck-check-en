@@ -21,7 +21,7 @@ export function getThumbnailRecommendation(result: TitleAnalysisResult): string 
       "Ersetze den Text durch ein starkes Schlüsselwort oder entferne ihn — der Titel daneben macht ihn überflüssig."
     );
   } else if (result.textIssue === "zu lang") {
-    issues.push("Kürze den Text auf maximal 3 Wörter. Weniger Text, stärkere Wirkung.");
+    issues.push("Kürze den Text auf maximal 5 Wörter. Weniger Text, stärkere Wirkung.");
   } else if (result.textIssue === "kein Mehrwert") {
     issues.push(
       "Der Text verstärkt den Klick-Anreiz nicht. Bau das Thumbnail erst ohne Text — und prüfe ob er wirklich nötig ist."

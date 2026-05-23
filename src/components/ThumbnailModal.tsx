@@ -9,7 +9,7 @@ type Props = {
 };
 
 function textIssueCopy(issue: string): string {
-  if (issue === "zu lang") return "Mehr als 3 Wörter — kürzer ist stärker";
+  if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
   if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
   return "Text verstärkt den Klick-Anreiz nicht";
 }
@@ -81,11 +81,11 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
       aria-modal="true"
       aria-label="Thumbnail-Analyse"
       onClick={onClose}
-      className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/60 p-4 sm:items-center"
+      className="fixed inset-0 z-40 overflow-y-auto bg-black/60 py-8"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg rounded-xl bg-white p-5 shadow-xl"
+        className="relative mx-auto w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-5 shadow-xl"
       >
         <button
           ref={closeBtnRef}
