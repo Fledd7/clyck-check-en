@@ -85,29 +85,32 @@ Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
 
 ## Schritt 2: Visuelle Überladung prüfen
 
-STRIKTE Definition — ein Element ist immer:
-- Alle Texte zusammen = MAXIMAL 1 Element
-  (egal ob 1 Wort oder 5 Wörter an verschiedenen Stellen —
-  der gesamte Text im Bild zählt als 1 Element)
-- Eine Person / ein Gesicht = 1 Element
-- Ein Logo = 1 Element
+Zähle visuelle GRUPPEN — nicht einzelne Objekte.
+Alles was zusammengehört zählt als EIN Element.
+
+ZÄHLREGELN:
+- Alle Texte im Bild zusammen = 1 Element
+  (egal ob ein Wort oder fünf Textblöcke)
+- Alle Personen zusammen = 1 Element
+  (1 Person, 2 Personen, Gruppe = immer 1 Element)
+- Alle Logos zusammen = 1 Element
+  (1 Logo oder 3 Logos = immer 1 Element)
 - Ein dominantes Objekt (Auto, Produkt, Tier) = 1 Element
 - Ein grafisches Element (Pfeil, Rahmen, Icon) = 1 Element
-- Der Hintergrund zählt NIE als Element
-- Eine Komposition aus mehreren Personen = 1 Element
+- Hintergrund = KEIN Element, wird nie gezählt
 
-WICHTIG: Addiere diese Kategorien.
-Maximal 3 = optimal.
-4 = leicht überladen.
-5+ = überladen.
+BEISPIELE:
+Person + Text + Pfeil = 3 Elemente → optimal
+Person + Text + Logo = 3 Elemente → optimal
+Vorher-Nachher-Fotos + Text + Pfeil = 3 Elemente → optimal
+Person + Text + Logo + Gebäude = 4 Elemente → leicht überladen
+Person + Text + Logo + Objekt + weiterer grafischer Rahmen
+= 5 Elemente → überladen
 
-Beispiel korrekte Zählung:
-Vorher-Nachher-Foto (2 Personen) + Text + Pfeil = 3 Elemente.
-Person + Text + Logo + Gebäude = 4 Elemente.
-
+WICHTIG: Im Zweifel WENIGER Elemente zählen.
 Setze overloaded: true NUR wenn elementCount >= 5
-ODER wenn die Komposition bei elementCount 4 tatsächlich
-visuell unruhig und kaum erfassbar wirkt.
+UND das Bild wirklich schwer auf einen Blick erfassbar ist.
+Bei elementCount 4: overloaded nur true wenn deutlich unruhig.
 Bei elementCount <= 3: overloaded immer false.
 
 ---

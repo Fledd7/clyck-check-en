@@ -66,20 +66,8 @@ function SkeletonCard() {
 function CriteriaPanel() {
   return (
     <div className="mt-3 rounded-2xl border border-line bg-bg p-4 text-sm leading-relaxed text-gray1">
-      <p className="mb-3">
-        Die Analyse basiert auf zwei bewährten Frameworks: „How To Make
-        Effective Thumbnails" (Jay Alto) und „The Thumbnail System"
-        (thumbnailsystem.com).
-      </p>
       <p className="mb-3">Bewertet wird nach diesen Kriterien:</p>
       <dl className="space-y-3">
-        <div>
-          <dt className="font-semibold text-ink">Klick-Format</dt>
-          <dd>
-            Nutzt das Thumbnail ein bewährtes psychologisches Format
-            (Kontrovers, Extrem, Unlogisch, Emotional, Trending, Informativ)?
-          </dd>
-        </div>
         <div>
           <dt className="font-semibold text-ink">3-Element-Regel</dt>
           <dd>
@@ -361,8 +349,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                     <div className="mt-1.5 space-y-0.5">
                       {r.overloaded && (
                         <p className="text-xs text-accent">
-                          ⚠ {r.elementCount} Elemente — wirkt überladen (max. 3
-                          empfohlen)
+                          ⚠ Visuell überladen — zu viele Elemente auf einmal
                         </p>
                       )}
                       {r.textIssue && (

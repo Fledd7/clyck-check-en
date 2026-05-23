@@ -251,8 +251,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               <div className="mt-3 space-y-1">
                 {localAnalysis.overloaded && (
                   <p className="text-xs text-accent">
-                    ⚠ {localAnalysis.elementCount} Elemente — wirkt überladen (max. 3
-                    empfohlen)
+                    ⚠ Visuell überladen — zu viele Elemente auf einmal
                   </p>
                 )}
                 {localAnalysis.textIssue && (
