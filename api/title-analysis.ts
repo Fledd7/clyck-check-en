@@ -96,22 +96,35 @@ tatsächlich visuell unruhig und schwer zu erfassen ist.
 
 ---
 
-## Schritt 3: Text-Regel prüfen
+## Schritt 3: Text im Thumbnail bewerten
 
-Zähle die bedeutungstragenden Wörter im Text —
-ignoriere dabei Satzzeichen, Sterne (*), Emojis und
-Sonderzeichen komplett.
-Text ist nur ein Problem wenn:
-- mehr als 5 bedeutungstragende Wörter vorhanden sind
-  (nicht 3, weil kurze kraftvolle Sätze wie
-  'It's F*cking Simple' oder 'I Lost Everything'
-  bewusst eingesetzt sind)
-- Text den Videotitel wortwörtlich wiederholt
-- Text keinen erkennbaren Beitrag zum Klick-Anreiz leistet
+Text auf Thumbnails ist 2026 oft ein Zeichen von
+schwachem Bild-Konzept — wenn das Bild allein nicht
+stark genug ist, wird Text als Krücke eingesetzt.
 
-Setze textIssue nur dann auf einen Wert wenn
-mindestens eines dieser drei Kriterien eindeutig zutrifft.
-Im Zweifelsfall: leerer String.
+Bewerte Text nach diesen Kriterien:
+
+PROBLEM: Text wiederholt den Videotitel sinngemäß
+→ textIssue: 'wiederholt Titel'
+→ Das ist verschenkte Fläche. Der Titel steht bereits
+  direkt unter dem Thumbnail. Wer ihn nochmal ins Bild
+  schreibt, hat kein stärkeres Bild-Konzept gefunden.
+
+PROBLEM: Mehr als 5 bedeutungstragende Wörter im Bild
+→ textIssue: 'zu lang'
+→ Langer Text funktioniert nicht im Feed.
+  Thumbnails werden in 1–2 Sekunden gescannt.
+  Was nicht sofort erfassbar ist, wird nicht geklickt.
+
+PROBLEM: Text ist dekorativ ohne Klick-Funktion
+→ textIssue: 'kein Mehrwert'
+→ Text der nichts zur Neugier oder zum Kontext
+  beiträgt, schadet mehr als er nützt.
+
+KEIN PROBLEM: Kurze Power-Wörter (1–3 Wörter) die
+einen Wow-Faktor oder eine Neugier-Lücke öffnen.
+Beispiele: 'GEHEIM', 'DAY 28', '$0', 'NEVER AGAIN'
+→ textIssue: '' (leer)
 
 ---
 
@@ -126,38 +139,34 @@ Ein Thumbnail ohne klaren Kontrast fällt im Feed nicht auf.
 
 ---
 
-## Schritt 5: Stilmoderne bewerten
+## Schritt 5: Ehrliche Stil-Einordnung
 
-Ordne das Thumbnail einem visuellen Stil-Zeitalter zu.
-Bewerte nicht ob das Thumbnail "gut" ist, sondern ob
-der Stil zeitgemäß wirkt für 2025/2026.
+Bewerte ob der Thumbnail-Stil zeitgemäß ist.
+Sei hier direkt und ehrlich — nicht diplomatisch.
 
-Veraltete Signale (deutet auf älteren Stil hin):
-- Roter, gelber oder grüner Farbbalken/Banner mit
-  weißer Schrift als Hauptgestaltungselement
-- Große Zahl mit €/$-Zeichen als dominantes Element
+VERALTET — setze styleAge: 'veraltet' wenn:
+- Farbbalken (rot/gelb/grün) mit weißem Text
+  als Hauptgestaltungselement sichtbar ist
+- Eine Zahl mit €/$ als dominantes visuelles Element
   ohne starkes Bild dahinter
-- Vollgepackte Komposition ohne visuelle Atmung
-  und ohne klare Blickführung
 - Mehr als 5 Wörter Text im Bild
-- Clipart-artige Elemente oder veraltete Fonts
+- Das Thumbnail wie ein Folienlayout wirkt
+  (Text + Foto nebeneinander ohne visuelle Spannung)
+- Der Stil einem typischen deutschen Coaching-/
+  Finanz-YouTube-Thumbnail 2019–2022 ähnelt
 
-Zeitgemäße Signale (2024–2026):
+ZEITGEMÄSS — setze styleAge: 'zeitgemäß' wenn:
+- Das Bild allein die Botschaft trägt
 - Klare visuelle Hierarchie mit einem dominanten Motiv
-- Wenig oder kein Text — das Bild trägt die Botschaft
+- Wenig oder kein Text
 - Cinematische oder hochwertige Bildqualität
-- Konsistente Farbpalette mit gezieltem Kontrast
-- Starkes Gesicht oder starke Situation als Hauptelement
+- Starke Emotion oder starke Situation im Vordergrund
 
-Antworte mit einem dieser drei Werte:
-- "zeitgemäß": Stil wirkt modern und aktuell
-- "veraltet": Stil trägt deutliche Merkmale älterer
-  Thumbnail-Ästhetik (2018–2022)
-- "neutral": Kein eindeutiges Signal in eine Richtung
+NEUTRAL — wenn kein eindeutiges Signal
 
-Wichtig: Ein veralteter Stil bedeutet nicht automatisch
-schlechte Performance. Aber er signalisiert oft, dass
-das Thumbnail-System überarbeitet werden könnte.
+Wichtig: 'Veraltet' bedeutet nicht 'schlecht produziert'.
+Es bedeutet: Dieser Stil wird 2025 in den meisten
+Nischen von moderneren Thumbnails überholt.
 
 ---
 
@@ -198,7 +207,7 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
   "contrast": "<'Luminosity' | 'Farbe' | 'Sättigung' | 'Keiner'>",
   "styleAge": "<'zeitgemäß' | 'veraltet' | 'neutral'>",
   "branding": true | false,
-  "reason": "<1 Satz auf Deutsch, max. 15 Wörter, was den Score begründet>",
+  "reason": "<1 Satz auf Deutsch, max. 15 Wörter, konkret und direkt — kein 'könnte', 'wirkt etwas', 'hat gewisse Schwächen'>",
   "strong": "<Was gut funktioniert nach dem Framework, 1 Satz — oder leerer String wenn score <= 2>",
   "weak": "<Was das Zusammenspiel schwächt laut Framework, 1 Satz — oder leerer String wenn score = 5>"
 }`;
