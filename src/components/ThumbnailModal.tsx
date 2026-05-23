@@ -226,6 +226,24 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               </div>
             )}
 
+            {localAnalysis.styleAge === "veraltet" && (
+              <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
+                <p className="text-xs font-medium text-amber-700">
+                  Stilrichtung: Ältere Thumbnail-Ästhetik
+                </p>
+                <p className="mt-0.5 text-xs text-amber-600">
+                  Dieser Stil war 2018–2022 weit verbreitet.
+                  Klarere, bildstärkere Thumbnails performen
+                  in den meisten Nischen heute oft besser.
+                </p>
+              </div>
+            )}
+            {localAnalysis.styleAge === "zeitgemäß" && (
+              <p className="mt-1 text-xs text-green-600">
+                ✓ Stilrichtung: Zeitgemäß
+              </p>
+            )}
+
             {recommendation && (
               <div className="mt-4 rounded-lg border border-line bg-line/10 p-3">
                 <p className="text-xs font-medium uppercase tracking-wide text-ink/55">

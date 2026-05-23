@@ -127,6 +127,8 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   const textIssueCount = results.filter((r) => r.textIssue !== "").length;
   const noContrastCount = results.filter((r) => r.contrast === "Keiner").length;
   const brandingCount = results.filter((r) => r.branding).length;
+  const outdatedCount = results.filter((r) => r.styleAge === "veraltet").length;
+  const modernCount = results.filter((r) => r.styleAge === "zeitgemäß").length;
 
   let headline = "";
   let body = "";
@@ -152,7 +154,9 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
       {(overloadedCount > 0 ||
         textIssueCount > 0 ||
         noContrastCount > 0 ||
-        brandingCount > 0) && (
+        brandingCount > 0 ||
+        (outdatedCount > 0 && outdatedCount >= total / 2) ||
+        modernCount >= total * 0.7) && (
         <div className="mt-3 space-y-1">
           {overloadedCount > 0 && (
             <p className="text-sm text-ink/70">
@@ -174,6 +178,18 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
             <p className="text-sm text-ink/70">
               ✓ {brandingCount} von {total} Videos zeigen einen wiederkehrenden
               Kanal-Stil.
+            </p>
+          )}
+          {outdatedCount > 0 && outdatedCount >= total / 2 && (
+            <p className="mt-1 text-sm text-amber-600">
+              ⚠ Mehrere Thumbnails zeigen einen älteren visuellen Stil. Ein
+              moderneres Packaging-System könnte die Klickstärke deutlich
+              verbessern.
+            </p>
+          )}
+          {modernCount >= total * 0.7 && (
+            <p className="mt-1 text-sm text-green-600">
+              ✓ Die meisten Thumbnails wirken visuell zeitgemäß.
             </p>
           )}
         </div>
@@ -313,6 +329,23 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                         </p>
                       )}
                     </div>
+                    {r.styleAge === "veraltet" && (
+                      <div className="mt-2 rounded-xl border border-amber-100 bg-amber-50 p-3">
+                        <p className="text-xs font-medium text-amber-700">
+                          Stilrichtung: Ältere Thumbnail-Ästhetik
+                        </p>
+                        <p className="mt-0.5 text-xs text-amber-600">
+                          Dieser Stil war 2018–2022 weit verbreitet.
+                          Klarere, bildstärkere Thumbnails performen
+                          in den meisten Nischen heute oft besser.
+                        </p>
+                      </div>
+                    )}
+                    {r.styleAge === "zeitgemäß" && (
+                      <p className="mt-1 text-xs text-green-600">
+                        ✓ Stilrichtung: Zeitgemäß
+                      </p>
+                    )}
                     {r.strong && (
                       <p className="mt-1.5 text-xs text-ink/70 leading-relaxed">
                         <span className="font-medium text-green-700">✓ </span>

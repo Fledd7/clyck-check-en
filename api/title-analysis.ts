@@ -23,6 +23,7 @@ type ResultItem = {
   elementCount: number;
   textIssue: string;
   contrast: string;
+  styleAge: "zeitgemäß" | "veraltet" | "neutral";
   branding: boolean;
   reason: string;
   strong: string;
@@ -125,7 +126,42 @@ Ein Thumbnail ohne klaren Kontrast fällt im Feed nicht auf.
 
 ---
 
-## Schritt 5: Titel-Thumbnail-Fit bewerten
+## Schritt 5: Stilmoderne bewerten
+
+Ordne das Thumbnail einem visuellen Stil-Zeitalter zu.
+Bewerte nicht ob das Thumbnail "gut" ist, sondern ob
+der Stil zeitgemäß wirkt für 2025/2026.
+
+Veraltete Signale (deutet auf älteren Stil hin):
+- Roter, gelber oder grüner Farbbalken/Banner mit
+  weißer Schrift als Hauptgestaltungselement
+- Große Zahl mit €/$-Zeichen als dominantes Element
+  ohne starkes Bild dahinter
+- Vollgepackte Komposition ohne visuelle Atmung
+  und ohne klare Blickführung
+- Mehr als 5 Wörter Text im Bild
+- Clipart-artige Elemente oder veraltete Fonts
+
+Zeitgemäße Signale (2024–2026):
+- Klare visuelle Hierarchie mit einem dominanten Motiv
+- Wenig oder kein Text — das Bild trägt die Botschaft
+- Cinematische oder hochwertige Bildqualität
+- Konsistente Farbpalette mit gezieltem Kontrast
+- Starkes Gesicht oder starke Situation als Hauptelement
+
+Antworte mit einem dieser drei Werte:
+- "zeitgemäß": Stil wirkt modern und aktuell
+- "veraltet": Stil trägt deutliche Merkmale älterer
+  Thumbnail-Ästhetik (2018–2022)
+- "neutral": Kein eindeutiges Signal in eine Richtung
+
+Wichtig: Ein veralteter Stil bedeutet nicht automatisch
+schlechte Performance. Aber er signalisiert oft, dass
+das Thumbnail-System überarbeitet werden könnte.
+
+---
+
+## Schritt 6: Titel-Thumbnail-Fit bewerten
 
 Bewertet wird ausschließlich das Zusammenspiel aus Bild und Titel
 im Hinblick auf Klickanreiz. Nicht der Inhalt oder die Qualität des Videos.
@@ -145,7 +181,7 @@ Abzüge (senken den Score um 1):
 
 ---
 
-## Schritt 6: Wiedererkennung prüfen
+## Schritt 7: Wiedererkennung prüfen
 
 Zeigt das Thumbnail Elemente eines konsistenten Kanal-Stils?
 Gemeint sind: wiederkehrendes Gesicht, Farbpalette, Schriftbild
@@ -160,6 +196,7 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
   "elementCount": <Zahl — geschätzte Anzahl visueller Hauptelemente>,
   "textIssue": "<leer wenn kein Textproblem, sonst: 'zu lang' | 'wiederholt Titel' | 'kein Mehrwert'>",
   "contrast": "<'Luminosity' | 'Farbe' | 'Sättigung' | 'Keiner'>",
+  "styleAge": "<'zeitgemäß' | 'veraltet' | 'neutral'>",
   "branding": true | false,
   "reason": "<1 Satz auf Deutsch, max. 15 Wörter, was den Score begründet>",
   "strong": "<Was gut funktioniert nach dem Framework, 1 Satz — oder leerer String wenn score <= 2>",
@@ -228,6 +265,7 @@ async function analyzeVideo(
       elementCount?: number;
       textIssue?: string;
       contrast?: string;
+      styleAge?: string;
       branding?: boolean;
       reason?: string;
       strong?: string;
@@ -246,6 +284,7 @@ async function analyzeVideo(
       elementCount: Number.isFinite(elementCountRaw) ? elementCountRaw : 0,
       textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
+      styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",
       branding: parsed.branding === true,
       reason: typeof parsed.reason === "string" ? parsed.reason : "",
       strong: typeof parsed.strong === "string" ? parsed.strong : "",

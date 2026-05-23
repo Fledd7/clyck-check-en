@@ -90,6 +90,7 @@ export type TitleAnalysisResult = {
   elementCount: number;
   textIssue: string;
   contrast: string;
+  styleAge: "zeitgemäß" | "veraltet" | "neutral";
   branding: boolean;
   reason: string;
   strong: string;
