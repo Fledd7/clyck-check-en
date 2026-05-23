@@ -9,19 +9,16 @@ export default function StartScreen({ onStart }: Props) {
         Clyck Check
       </p>
       <h1 className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
-        Sieh, was deine Zuschauer sehen — bevor sie wegscrollen.
+        Was hält deine Videos davon ab, mehr geklickt zu werden?
       </h1>
       <p className="mt-5 text-lg leading-relaxed text-ink/75">
-        Gib deinen Kanal ein und erhalte in wenigen Minuten eine erste Einschätzung,
-        wie klar, einheitlich und klickstark dein YouTube-Auftritt nach außen wirkt.
+        Beantworte 5 kurze Fragen und erhalte eine erste Einschätzung
+        zu Thumbnails, Titeln und der visuellen Klarheit deines Kanals.
       </p>
       <div className="mt-8">
         <button type="button" onClick={onStart} className="btn-primary w-full sm:w-auto">
           Clyck Check starten
         </button>
-        <p className="mt-3 text-sm text-ink/55">
-          5 Fragen · keine Anmeldung · keine privaten Analytics
-        </p>
       </div>
     </section>
   );

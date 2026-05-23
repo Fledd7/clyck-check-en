@@ -52,6 +52,31 @@ function RuleOfThirdsGrid() {
 export default function ThumbnailModal({ video, analysis, onClose }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [showGrid, setShowGrid] = useState(false);
+  const [localAnalysis, setLocalAnalysis] = useState<TitleAnalysisResult | null>(
+    analysis ?? null
+  );
+  const [analyzing, setAnalyzing] = useState(false);
+
+  async function analyzeNow() {
+    setAnalyzing(true);
+    try {
+      const res = await fetch("/api/title-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videos: [{ id: video.id, title: video.title, thumbnail: video.thumbnail }],
+        }),
+      });
+      const data = await res.json();
+      if (data.ok && data.results?.length > 0) {
+        setLocalAnalysis(data.results[0] as TitleAnalysisResult);
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   useEffect(() => {
     closeBtnRef.current?.focus();
@@ -73,7 +98,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
     };
   }, []);
 
-  const recommendation = analysis ? getThumbnailRecommendation(analysis) : null;
+  const recommendation = localAnalysis ? getThumbnailRecommendation(localAnalysis) : null;
 
   return (
     <div
@@ -123,7 +148,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
 
         <h3 className="text-base font-semibold leading-snug">{video.title}</h3>
 
-        {analysis ? (
+        {localAnalysis ? (
           <>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1">
@@ -131,69 +156,69 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                   <span
                     key={n}
                     className={`h-2 w-2 rounded-full ${
-                      n <= analysis.score ? scoreColor(analysis.score) : "bg-line"
+                      n <= localAnalysis.score ? scoreColor(localAnalysis.score) : "bg-line"
                     }`}
                   />
                 ))}
               </span>
               <span
                 className={`text-xs font-medium ${
-                  analysis.score >= 4
+                  localAnalysis.score >= 4
                     ? "text-green-700"
-                    : analysis.score === 3
+                    : localAnalysis.score === 3
                     ? "text-yellow-700"
                     : "text-red-700"
                 }`}
               >
-                {analysis.label}
+                {localAnalysis.label}
               </span>
-              {analysis.format && analysis.format !== "Keines davon" && (
+              {localAnalysis.format && localAnalysis.format !== "Keines davon" && (
                 <span className="inline-flex items-center rounded-full border border-line px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink/65">
-                  {analysis.format}
+                  {localAnalysis.format}
                 </span>
               )}
-              {analysis.contrast && analysis.contrast !== "Keiner" && (
+              {localAnalysis.contrast && localAnalysis.contrast !== "Keiner" && (
                 <span className="inline-flex items-center rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-800">
-                  Kontrast: {analysis.contrast}
+                  Kontrast: {localAnalysis.contrast}
                 </span>
               )}
             </div>
 
-            {analysis.reason && (
+            {localAnalysis.reason && (
               <p className="mt-3 text-sm italic leading-relaxed text-ink/70">
-                „{analysis.reason}"
+                „{localAnalysis.reason}"
               </p>
             )}
 
-            {analysis.strong && (
+            {localAnalysis.strong && (
               <p className="mt-3 text-sm leading-relaxed text-ink/80">
                 <span className="font-medium text-green-700">✓ Was funktioniert: </span>
-                {analysis.strong}
+                {localAnalysis.strong}
               </p>
             )}
-            {analysis.weak && (
+            {localAnalysis.weak && (
               <p className="mt-2 text-sm leading-relaxed text-ink/80">
                 <span className="font-medium text-red-700">✗ Was fehlt: </span>
-                {analysis.weak}
+                {localAnalysis.weak}
               </p>
             )}
 
-            {(analysis.elementCount > 3 ||
-              analysis.textIssue ||
-              analysis.contrast === "Keiner") && (
+            {(localAnalysis.elementCount > 3 ||
+              localAnalysis.textIssue ||
+              localAnalysis.contrast === "Keiner") && (
               <div className="mt-3 space-y-1">
-                {analysis.elementCount > 3 && (
+                {localAnalysis.elementCount > 3 && (
                   <p className="text-xs text-orange-600">
-                    ⚠ {analysis.elementCount} Elemente — wirkt überladen (max. 3
+                    ⚠ {localAnalysis.elementCount} Elemente — wirkt überladen (max. 3
                     empfohlen)
                   </p>
                 )}
-                {analysis.textIssue && (
+                {localAnalysis.textIssue && (
                   <p className="text-xs text-orange-600">
-                    ⚠ Text: {textIssueCopy(analysis.textIssue)}
+                    ⚠ Text: {textIssueCopy(localAnalysis.textIssue)}
                   </p>
                 )}
-                {analysis.contrast === "Keiner" && (
+                {localAnalysis.contrast === "Keiner" && (
                   <p className="text-xs text-orange-600">
                     ⚠ Kein klarer Kontrast erkennbar
                   </p>
@@ -211,9 +236,22 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             )}
           </>
         ) : (
-          <p className="mt-3 text-sm text-ink/60">
-            Für dieses Thumbnail liegt noch keine Analyse vor.
-          </p>
+          <>
+            {!analyzing && (
+              <button
+                type="button"
+                onClick={analyzeNow}
+                className="mt-3 w-full rounded-xl border border-gray-200 px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+              >
+                Dieses Thumbnail jetzt analysieren
+              </button>
+            )}
+            {analyzing && (
+              <p className="mt-3 text-sm text-gray-400">
+                Analysiere Thumbnail und Titel...
+              </p>
+            )}
+          </>
         )}
       </div>
     </div>
