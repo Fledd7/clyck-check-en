@@ -272,8 +272,21 @@ async function analyzeVideo(
       weak?: string;
     };
 
+    const rawScore = Number(parsed.score);
+    let cappedScore = rawScore;
+    let reasonSuffix = "";
+
+    if (parsed.styleAge !== "zeitgemäß") {
+      if (cappedScore > 4) {
+        cappedScore = 4;
+        reasonSuffix = " Der Stil trägt Merkmale älterer Thumbnail-Ästhetik, was das Maximum begrenzt.";
+      }
+    }
+
+    parsed.score = cappedScore;
     const score = clampScore(parsed.score);
     const elementCountRaw = Number(parsed.elementCount);
+    const baseReason = typeof parsed.reason === "string" ? parsed.reason : "";
     return {
       id: video.id,
       title: video.title,
@@ -286,7 +299,7 @@ async function analyzeVideo(
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
       styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",
       branding: parsed.branding === true,
-      reason: typeof parsed.reason === "string" ? parsed.reason : "",
+      reason: baseReason + reasonSuffix,
       strong: typeof parsed.strong === "string" ? parsed.strong : "",
       weak: typeof parsed.weak === "string" ? parsed.weak : "",
     };
