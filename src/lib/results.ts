@@ -305,10 +305,10 @@ export function channelDataNote(channel: ChannelData | null): string | null {
 }
 
 export function clarityLevel(score: number): { label: string; level: ClarityLevel } {
-  if (score >= 85) return { label: "Klarheits-Level: Sehr hoch", level: "Sehr hoch" };
-  if (score >= 65) return { label: "Klarheits-Level: Hoch", level: "Hoch" };
-  if (score >= 35) return { label: "Klarheits-Level: Mittel", level: "Mittel" };
-  return { label: "Klarheits-Level: Niedrig", level: "Niedrig" };
+  if (score >= 85) return { label: "Clyck-Score: Sehr hoch", level: "Sehr hoch" };
+  if (score >= 65) return { label: "Clyck-Score: Hoch", level: "Hoch" };
+  if (score >= 35) return { label: "Clyck-Score: Mittel", level: "Mittel" };
+  return { label: "Clyck-Score: Niedrig", level: "Niedrig" };
 }
 
 export function applyMaturityOverride(

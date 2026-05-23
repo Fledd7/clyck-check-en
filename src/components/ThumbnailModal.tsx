@@ -106,23 +106,22 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           {showGrid && <RuleOfThirdsGrid />}
         </div>
 
-        <div className="mt-2 flex items-center justify-between">
-          <h3 className="text-base font-semibold leading-snug">{video.title}</h3>
-          <button
-            type="button"
-            onClick={() => setShowGrid((v) => !v)}
-            className="flex-shrink-0 text-xs font-medium text-ink/60 underline-offset-2 hover:text-ink/80 hover:underline"
-          >
-            {showGrid ? "✕ Grid ausblenden" : "⊞ Rule of Thirds"}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowGrid((v) => !v)}
+          className="mt-1 mb-3 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600"
+        >
+          {showGrid ? "✕ Grid ausblenden" : "⊞ Rule of Thirds"}
+        </button>
 
         {showGrid && (
-          <p className="mt-1 text-[11px] leading-relaxed text-ink/50">
-            Die Schnittpunkte (●) sind die stärksten Positionen für Gesichter,
+          <p className="mb-3 text-[11px] leading-relaxed text-gray-400">
+            Die Schnittpunkte (●) markieren die stärksten Positionen für Gesichter,
             Text und Hauptmotive.
           </p>
         )}
+
+        <h3 className="text-base font-semibold leading-snug">{video.title}</h3>
 
         {analysis ? (
           <>
