@@ -352,11 +352,6 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                       <span className={`text-xs font-semibold ${tone.text}`}>
                         {r.label}
                       </span>
-                      {r.format && r.format !== "Keines davon" && (
-                        <span className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]">
-                          {r.format}
-                        </span>
-                      )}
                     </div>
                     {r.reason && (
                       <p className="mt-1.5 text-xs italic text-gray1 leading-relaxed">

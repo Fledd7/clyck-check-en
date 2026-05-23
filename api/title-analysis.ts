@@ -85,21 +85,30 @@ Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
 
 ## Schritt 2: Visuelle Überladung prüfen
 
-Zähle die visuellen HAUPT-Elemente. Definiere Elemente so:
+STRIKTE Definition — ein Element ist immer:
+- Alle Texte zusammen = MAXIMAL 1 Element
+  (egal ob 1 Wort oder 5 Wörter an verschiedenen Stellen —
+  der gesamte Text im Bild zählt als 1 Element)
 - Eine Person / ein Gesicht = 1 Element
-- Text im Thumbnail (egal wie viele Wörter) = 1 Element
-- Ein Logo oder Brand-Element = 1 Element
-- Ein dominantes Objekt (Auto, Gebäude, Produkt) = 1 Element
-- Der Hintergrund zählt NICHT als Element
+- Ein Logo = 1 Element
+- Ein dominantes Objekt (Auto, Produkt, Tier) = 1 Element
+- Ein grafisches Element (Pfeil, Rahmen, Icon) = 1 Element
+- Der Hintergrund zählt NIE als Element
+- Eine Komposition aus mehreren Personen = 1 Element
 
-Bewerte dann: Wirkt die Komposition überladen?
-Ein Thumbnail mit Person + Text + Logo = 3 Elemente = optimal.
-Ein Thumbnail mit Person + Text + Logo + Objekt + weiterer Text
-= 5 Elemente = überladen.
+WICHTIG: Addiere diese Kategorien.
+Maximal 3 = optimal.
+4 = leicht überladen.
+5+ = überladen.
 
-Setze elementCount auf die Anzahl der Haupt-Elemente.
-Setze overloaded: true nur wenn elementCount > 3 UND
-die Komposition tatsächlich unruhig und schwer erfassbar wirkt.
+Beispiel korrekte Zählung:
+Vorher-Nachher-Foto (2 Personen) + Text + Pfeil = 3 Elemente.
+Person + Text + Logo + Gebäude = 4 Elemente.
+
+Setze overloaded: true NUR wenn elementCount >= 5
+ODER wenn die Komposition bei elementCount 4 tatsächlich
+visuell unruhig und kaum erfassbar wirkt.
+Bei elementCount <= 3: overloaded immer false.
 
 ---
 

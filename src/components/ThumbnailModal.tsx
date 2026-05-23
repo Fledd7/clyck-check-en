@@ -30,15 +30,6 @@ function parseDuration(iso: string): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-const formatExplanations: Record<string, string> = {
-  Kontrovers: "Provokante Aussage die Widerspruch erzeugt und zum Klicken zwingt.",
-  Extrem: "Überwältigender oder schockierender Moment der Aufmerksamkeit erzwingt.",
-  Unlogisch: "Etwas das keinen Sinn ergibt und Neugier weckt.",
-  Emotional: "Starke Gefühlsreaktion durch Mimik oder Situation.",
-  Trending: "Bezug zu einem aktuellen Ereignis oder Thema.",
-  Informativ: "Klares Versprechen eines konkreten Nutzens oder Wissens.",
-  "Keines davon": "Kein eindeutiges psychologisches Klick-Format erkennbar.",
-};
 
 function RuleOfThirdsGrid() {
   const lines = (
@@ -72,7 +63,6 @@ function RuleOfThirdsGrid() {
 export default function ThumbnailModal({ video, analysis, onClose }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [showGrid, setShowGrid] = useState(false);
-  const [showFormatInfo, setShowFormatInfo] = useState(false);
   const [localAnalysis, setLocalAnalysis] = useState<TitleAnalysisResult | null>(
     analysis ?? null
   );
@@ -118,13 +108,6 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
       document.body.style.overflow = prev;
     };
   }, []);
-
-  useEffect(() => {
-    if (!showFormatInfo) return;
-    const handler = () => setShowFormatInfo(false);
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
-  }, [showFormatInfo]);
 
   const recommendation = localAnalysis ? getThumbnailRecommendation(localAnalysis) : null;
   const durationStr = video.duration ? parseDuration(video.duration) : "";
@@ -236,38 +219,6 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               >
                 {localAnalysis.label}
               </span>
-              {localAnalysis.format && localAnalysis.format !== "Keines davon" && (
-                <div className="relative inline-block">
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setShowFormatInfo((v) => !v); }}
-                    className="inline-flex items-center rounded-full border border-line bg-bg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em]"
-                  >
-                    {localAnalysis.format} ⓘ
-                  </button>
-                  {showFormatInfo && (
-                    <div
-                      onClick={(e) => e.stopPropagation()}
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        marginTop: "6px",
-                        background: "#161616",
-                        color: "#ffffff",
-                        fontSize: "12px",
-                        padding: "8px 12px",
-                        borderRadius: "8px",
-                        maxWidth: "240px",
-                        zIndex: 10,
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {formatExplanations[localAnalysis.format] ?? "Klick-Format aus der Thumbnail-Theorie."}
-                    </div>
-                  )}
-                </div>
-              )}
               {localAnalysis.contrast && localAnalysis.contrast !== "Keiner" && (
                 <span className="text-xs font-medium text-green-600">
                   Kontrast: {localAnalysis.contrast}
