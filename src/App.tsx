@@ -9,7 +9,6 @@ import ConfirmationScreen from "./components/ConfirmationScreen";
 import { questions } from "./lib/questions";
 import {
   applyMaturityOverride,
-  buildDiagnosis,
   buildInsights,
   buildLevers,
   channelDataNote,
@@ -149,10 +148,6 @@ export default function App() {
     [categoryId, answers, channelData, maturity, titleAnalysis]
   );
   const levers = useMemo(() => buildLevers(categoryId), [categoryId]);
-  const diagnosis = useMemo(
-    () => buildDiagnosis(answers, channelData, maturity),
-    [answers, channelData, maturity]
-  );
 
   const shareUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
@@ -309,7 +304,6 @@ export default function App() {
           leadClass,
           insights,
           levers,
-          diagnosis,
         },
       }),
     });
@@ -418,7 +412,6 @@ export default function App() {
           clarityLevel={clarity.level}
           insights={insights}
           levers={levers}
-          diagnosis={diagnosis}
           titleAnalysis={titleAnalysis}
           titleAnalysisLoading={titleAnalysisLoading}
           shareUrl={shareUrl}

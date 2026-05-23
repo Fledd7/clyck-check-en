@@ -51,12 +51,6 @@ export type ChannelData = {
 
 export type Insight = { headline: string; text: string };
 export type Lever = { headline: string; text: string };
-export type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
-export type Diagnosis = {
-  direction: DiagnosisLevel;
-  system: DiagnosisLevel;
-  cadence: DiagnosisLevel;
-};
 
 export type ChannelMaturity = "early" | "growing" | "established" | "strong" | "authority";
 export type ClarityLevel = "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch";

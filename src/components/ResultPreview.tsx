@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import type {
   ChannelData,
   ClarityLevel,
-  Diagnosis,
   Insight,
   Lever,
   TitleAnalysisResult,
@@ -25,7 +24,6 @@ type Props = {
   clarityLevel: ClarityLevel;
   insights: Insight[];
   levers: Lever[];
-  diagnosis: Diagnosis;
   titleAnalysis: TitleAnalysisResult[];
   titleAnalysisLoading: boolean;
   shareUrl: string;
@@ -33,27 +31,6 @@ type Props = {
   onAddChannelLink: () => void;
 };
 
-const levelLabel: Record<Diagnosis["direction"], string> = {
-  niedrig: "Niedrig",
-  mittel: "Mittel",
-  hoch: "Hoch",
-};
-
-function DiagBadge({ level }: { level: Diagnosis["direction"] }) {
-  const tone =
-    level === "hoch"
-      ? "bg-ink text-white border-ink"
-      : level === "mittel"
-      ? "bg-white text-ink border-ink/40"
-      : "bg-white text-ink/60 border-line";
-  return (
-    <span
-      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${tone}`}
-    >
-      {levelLabel[level]}
-    </span>
-  );
-}
 
 export default function ResultPreview({
   category,
@@ -63,7 +40,6 @@ export default function ResultPreview({
   clarityLevel,
   insights,
   levers,
-  diagnosis,
   titleAnalysis,
   titleAnalysisLoading,
   shareUrl,
@@ -291,26 +267,6 @@ export default function ResultPreview({
                   />
                 </div>
               )}
-
-              <div className="mt-6 card">
-                <h3 className="text-base font-semibold">Packaging-Diagnose</h3>
-                <div className="mt-4 grid gap-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-ink/80">Kanalrichtung</span>
-                    <DiagBadge level={diagnosis.direction} />
-                  </div>
-                  <div className="h-px bg-line" />
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-ink/80">Thumbnail-System</span>
-                    <DiagBadge level={diagnosis.system} />
-                  </div>
-                  <div className="h-px bg-line" />
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm text-ink/80">Upload-Rhythmus</span>
-                    <DiagBadge level={diagnosis.cadence} />
-                  </div>
-                </div>
-              </div>
             </>
           )}
 

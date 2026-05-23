@@ -3,8 +3,6 @@ import type {
   ChannelData,
   ChannelMaturity,
   ClarityLevel,
-  Diagnosis,
-  DiagnosisLevel,
   Insight,
   Lever,
   Option,
@@ -615,58 +613,3 @@ export function buildLevers(category: ResultCategoryId): Lever[] {
   return leversByCategory[category];
 }
 
-export function buildDiagnosis(
-  answers: Answers,
-  channel: ChannelData | null,
-  maturity: ChannelMaturity | null
-): Diagnosis {
-  const goal = answers.goal ?? [];
-  const problem = answers.problem ?? [];
-
-  const direction: DiagnosisLevel = (() => {
-    if (maturity === "authority" || maturity === "strong") return "hoch";
-    if (maturity === "established") {
-      return goal.includes("unklar") ? "mittel" : "hoch";
-    }
-    if (goal.includes("unklar") || problem.includes("keine_richtung")) return "niedrig";
-    if (goal.includes("kundenanfragen") || goal.includes("expertenstatus")) return "hoch";
-    return "mittel";
-  })();
-
-  const system: DiagnosisLevel = (() => {
-    if (
-      (maturity === "authority" || maturity === "strong") &&
-      answers.thumbnails === "einheitlich"
-    ) {
-      return "hoch";
-    }
-    switch (answers.thumbnails) {
-      case "einheitlich":
-        return "hoch";
-      case "teilweise_gut":
-      case "sehr_unterschiedlich":
-        return "mittel";
-      default:
-        return "niedrig";
-    }
-  })();
-
-  const cadence: DiagnosisLevel = (() => {
-    const c = channel?.uploadCadenceDays;
-    if (typeof c === "number" && c > 0) {
-      if (c <= 7) return "hoch";
-      if (c <= 14) return "mittel";
-      return "niedrig";
-    }
-    switch (answers.status) {
-      case "regelmaessig":
-        return "hoch";
-      case "unregelmaessig":
-        return "mittel";
-      default:
-        return "niedrig";
-    }
-  })();
-
-  return { direction, system, cadence };
-}
