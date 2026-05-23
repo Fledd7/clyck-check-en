@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TitleAnalysisResult } from "../lib/types";
 import { getThumbnailRecommendation } from "../lib/results";
 
@@ -20,8 +20,38 @@ function scoreColor(score: number): string {
   return "bg-red-500";
 }
 
+function RuleOfThirdsGrid() {
+  const lines = (
+    <>
+      <div className="absolute left-[33.33%] top-0 h-full w-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute left-[66.66%] top-0 h-full w-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute top-[33.33%] left-0 w-full h-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute top-[66.66%] left-0 w-full h-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+    </>
+  );
+  const points = [
+    { top: "33.33%", left: "33.33%" },
+    { top: "33.33%", left: "66.66%" },
+    { top: "66.66%", left: "33.33%" },
+    { top: "66.66%", left: "66.66%" },
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      {lines}
+      {points.map((p, i) => (
+        <div
+          key={i}
+          className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ top: p.top, left: p.left, background: "rgba(255,255,255,0.9)", boxShadow: "0 0 3px rgba(0,0,0,0.6)" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ThumbnailModal({ video, analysis, onClose }: Props) {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const [showGrid, setShowGrid] = useState(false);
 
   useEffect(() => {
     closeBtnRef.current?.focus();
@@ -67,15 +97,32 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           ✕
         </button>
 
-        <div className="aspect-video w-full overflow-hidden rounded-md bg-line/40">
+        <div className="relative aspect-video w-full overflow-hidden rounded-md bg-line/40">
           <img
             src={video.thumbnail}
             alt=""
             className="h-full w-full object-cover"
           />
+          {showGrid && <RuleOfThirdsGrid />}
         </div>
 
-        <h3 className="mt-4 text-base font-semibold leading-snug">{video.title}</h3>
+        <div className="mt-2 flex items-center justify-between">
+          <h3 className="text-base font-semibold leading-snug">{video.title}</h3>
+          <button
+            type="button"
+            onClick={() => setShowGrid((v) => !v)}
+            className="flex-shrink-0 text-xs font-medium text-ink/60 underline-offset-2 hover:text-ink/80 hover:underline"
+          >
+            {showGrid ? "✕ Grid ausblenden" : "⊞ Rule of Thirds"}
+          </button>
+        </div>
+
+        {showGrid && (
+          <p className="mt-1 text-[11px] leading-relaxed text-ink/50">
+            Die Schnittpunkte (●) sind die stärksten Positionen für Gesichter,
+            Text und Hauptmotive.
+          </p>
+        )}
 
         {analysis ? (
           <>

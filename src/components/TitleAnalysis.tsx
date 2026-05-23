@@ -216,8 +216,8 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
     <div>
       <h3 className="text-base font-semibold">Titel-Thumbnail-Fit</h3>
       <p className="mt-1 text-sm text-ink/55 leading-relaxed">
-        Bewertet durch KI-Analyse — Gemini schaut sich Thumbnail und Titel
-        gemeinsam an.
+        Deine Thumbnails werden nach Klickpsychologie und
+        Thumbnail-Systematik analysiert.
       </p>
 
       <button

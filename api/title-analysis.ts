@@ -83,9 +83,15 @@ Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
 
 ## Schritt 2: Simplicity prüfen (3-Element-Regel)
 
-Zähle die visuellen Hauptelemente im Thumbnail.
-Maximal 3 Hauptinformationen sind ideal.
-Mehr als 3 bedeutet Überladung — der Blick des Zuschauers verliert sich.
+Bewerte ob das Thumbnail visuell überladen wirkt.
+Nicht die rohe Anzahl von Objekten zählen, sondern beurteilen:
+Wirkt das Bild auf den ersten Blick klar und fokussiert,
+oder verliert sich der Blick des Zuschauers?
+Ein Thumbnail mit Gesicht + Hintergrundszene + Text kann
+klar sein. Ein Thumbnail mit 3 unverbundenen Elementen
+ohne Hierarchie wirkt überladen.
+Setze elementCount nur dann auf > 3 wenn das Thumbnail
+tatsächlich visuell unruhig und schwer zu erfassen ist.
 
 ---
 
