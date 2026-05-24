@@ -37,6 +37,12 @@ function timeAgo(iso: string): string {
   return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
 }
 
+function isHighPerformer(views: number | undefined, publishedAt: string | undefined, score: number): boolean {
+  if (!views || !publishedAt || score > 2) return false;
+  const ageInDays = Math.max(1, (Date.now() - new Date(publishedAt).getTime()) / 86400000);
+  return views / ageInDays > 10_000;
+}
+
 function textIssueCopy(issue: string): string {
   if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
   if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
@@ -373,6 +379,11 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                         <span>{timeAgo(r.publishedAt)}</span>
                       )}
                     </p>
+                  )}
+                  {isHighPerformer(r.views, r.publishedAt, r.score) && (
+                    <div className="mx-3 mt-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs leading-relaxed text-sky-700">
+                      ℹ Hohe Aufrufe trotz schwachem Thumbnail-Design deuten darauf hin, dass hier das Thema die Klicks antreibt — nicht die Verpackung.
+                    </div>
                   )}
                   <div className="px-4 pb-4 pt-2">
                     <p className="text-sm font-semibold leading-snug">

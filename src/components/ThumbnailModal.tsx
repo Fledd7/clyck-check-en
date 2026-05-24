@@ -34,6 +34,12 @@ function timeAgo(iso: string): string {
   return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
 }
 
+function isHighPerformer(views: number | undefined, publishedAt: string | undefined, score: number | undefined): boolean {
+  if (!views || !publishedAt || !score || score > 2) return false;
+  const ageInDays = Math.max(1, (Date.now() - new Date(publishedAt).getTime()) / 86400000);
+  return views / ageInDays > 10_000;
+}
+
 function scoreColor(score: number): string {
   if (score >= 4) return "bg-green-500";
   if (score === 3) return "bg-amber-400";
@@ -224,6 +230,12 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               <span>· {timeAgo(video.publishedAt)}</span>
             )}
           </p>
+        )}
+
+        {isHighPerformer(video.views, video.publishedAt, localAnalysis?.score) && (
+          <div className="mt-2 mb-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs leading-relaxed text-sky-700">
+            ℹ Hohe Aufrufe trotz schwachem Thumbnail-Design deuten darauf hin, dass hier das Thema die Klicks antreibt — nicht die Verpackung.
+          </div>
         )}
 
         {localAnalysis ? (
