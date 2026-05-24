@@ -223,6 +223,20 @@ oder ein wiederholbarer visueller Aufbau.
 
 ---
 
+SCORE-REGELN (zwingend einhalten):
+- Rotes/gelbes Textbanner als Hauptgestaltungselement
+  → score maximal 3
+- Text wiederholt den Videotitel sinngemäß
+  → score maximal 3
+- styleAge ist 'veraltet'
+  → score maximal 3
+- Mehrere dieser Probleme gleichzeitig
+  → score maximal 2
+- Score 5 ist nur möglich wenn:
+  Kein Textproblem + zeitgemäßer Stil + kein Overloading
+
+---
+
 Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
 {
   "score": <Zahl 1-5>,
@@ -315,13 +329,19 @@ async function analyzeVideo(
 
     const rawScore = Number(parsed.score);
     let cappedScore = rawScore;
-    let reasonSuffix = "";
 
-    if (parsed.styleAge !== "zeitgemäß") {
-      if (cappedScore > 4) {
-        cappedScore = 4;
-        reasonSuffix = " Der Stil trägt Merkmale älterer Thumbnail-Ästhetik, was das Maximum begrenzt.";
-      }
+    const isVeraltet = parsed.styleAge === "veraltet";
+    const hasTextIssue = typeof parsed.textIssue === "string" && parsed.textIssue !== "";
+    const isOverloaded = parsed.overloaded === true;
+
+    const problemCount = [isVeraltet, hasTextIssue, isOverloaded].filter(Boolean).length;
+
+    if (problemCount >= 2) {
+      cappedScore = Math.min(cappedScore, 2);
+    } else if (isVeraltet || parsed.textIssue === "wiederholt Titel" || isOverloaded) {
+      cappedScore = Math.min(cappedScore, 3);
+    } else if (parsed.styleAge !== "zeitgemäß") {
+      cappedScore = Math.min(cappedScore, 4);
     }
 
     parsed.score = cappedScore;
@@ -341,7 +361,7 @@ async function analyzeVideo(
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
       styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",
       branding: parsed.branding === true,
-      reason: baseReason + reasonSuffix,
+      reason: baseReason,
       strong: typeof parsed.strong === "string" ? parsed.strong : "",
       weak: typeof parsed.weak === "string" ? parsed.weak : "",
     };
