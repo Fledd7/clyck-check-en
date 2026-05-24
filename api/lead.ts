@@ -44,6 +44,12 @@ type Body = {
     categoryText?: string;
     score?: number;
     leadClass?: LeadClass;
+    scoreBreakdown?: {
+      channelStrength?: number;
+      uploadConsistency?: number;
+      analysisQuality?: number;
+      penalties?: number;
+    };
     insights?: InsightOrLever[];
     levers?: InsightOrLever[];
     diagnosis?: {
@@ -204,8 +210,14 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
     <h2 style="margin:0 0 8px">Neuer Clyck Check-Lead</h2>
     ${lineBlock("Name", body.name ?? "")}
     ${lineBlock("E-Mail", body.email ?? "")}
-    ${lineBlock("Score", String(score))}
+    ${lineBlock("Clyck-Score", `${score} / 100`)}
     ${lineBlock("Lead-Klasse", leadClassLabel[lc])}
+    ${body.result?.scoreBreakdown ? `
+    ${lineBlock("Kanal-Stärke", `${body.result.scoreBreakdown.channelStrength} / 40`)}
+    ${lineBlock("Upload-Konsistenz", `${body.result.scoreBreakdown.uploadConsistency} / 20`)}
+    ${lineBlock("Analyse-Qualität", `${body.result.scoreBreakdown.analysisQuality} / 40`)}
+    ${lineBlock("Abzüge", String(body.result.scoreBreakdown.penalties))}
+    ` : ""}
     ${lineBlock("Ergebnis-Kategorie", `Kategorie ${String(cat)}`)}
     ${
       body.message

@@ -22,6 +22,7 @@ type Props = {
   channelNote: string | null;
   clarityLabel: string;
   clarityLevel: ClarityLevel;
+  hasEnoughData: boolean;
   insights: Insight[];
   levers: Lever[];
   titleAnalysis: TitleAnalysisResult[];
@@ -37,6 +38,7 @@ export default function ResultPreview({
   channelNote,
   clarityLabel,
   clarityLevel,
+  hasEnoughData,
   insights,
   levers,
   titleAnalysis,
@@ -135,20 +137,28 @@ export default function ResultPreview({
       <h1 className="mt-3 text-[28px] font-bold leading-snug sm:text-[34px]">
         {category.headline}
       </h1>
-      <p className="mt-2">
-        <span
-          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-            clarityLevel === "Sehr hoch"
-              ? "bg-accent text-white"
-              : "bg-ink text-white"
-          }`}
-        >
-          {clarityLabel}
-        </span>
-      </p>
-      <p className="mt-1 text-xs text-gray1">
-        Basierend auf deinen Antworten und öffentlichen Kanaldaten.
-      </p>
+      {hasEnoughData && clarityLabel ? (
+        <>
+          <p className="mt-2">
+            <span
+              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                clarityLevel === "Sehr hoch"
+                  ? "bg-accent text-white"
+                  : "bg-ink text-white"
+              }`}
+            >
+              {titleAnalysisLoading ? "Clyck-Score: wird berechnet..." : clarityLabel}
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-gray1">
+            Basierend auf öffentlichen Kanaldaten und Thumbnail-Analyse.
+          </p>
+        </>
+      ) : (
+        <p className="mt-2 text-xs text-gray1">
+          Für einen Clyck-Score bitte Kanal verlinken.
+        </p>
+      )}
 
       {/* Tab bar */}
       <div className="mt-6 flex gap-8 border-b border-line mb-6">

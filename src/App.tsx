@@ -12,12 +12,11 @@ import {
   buildInsights,
   buildLevers,
   channelDataNote,
-  clarityLevel,
   getCategoryContent,
   saveCheckHistory,
   selectCategory,
 } from "./lib/results";
-import { computeScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
+import { calculateClyckScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
 import type { Answers, ChannelData, QuestionId, TitleAnalysisResult } from "./lib/types";
 
 // ── localStorage ──────────────────────────────────────────────────────────────
@@ -138,11 +137,16 @@ export default function App() {
     () => getCategoryContent(categoryId, maturity),
     [categoryId, maturity]
   );
-  const previewScore = useMemo(
-    () => computeScore(answers, channelData, undefined),
-    [answers, channelData]
+  const clyckScore = useMemo(
+    () => calculateClyckScore(channelData, titleAnalysis),
+    [channelData, titleAnalysis]
   );
-  const clarity = useMemo(() => clarityLevel(previewScore), [previewScore]);
+  const clarity = useMemo(() => {
+    if (!clyckScore.hasEnoughData || !clyckScore.clarityLevel) {
+      return { label: "", level: "Niedrig" as const };
+    }
+    return { label: `Clyck-Score: ${clyckScore.clarityLevel}`, level: clyckScore.clarityLevel };
+  }, [clyckScore]);
   const insights = useMemo(
     () => buildInsights(categoryId, answers, channelData, maturity, titleAnalysis),
     [categoryId, answers, channelData, maturity, titleAnalysis]
@@ -151,8 +155,8 @@ export default function App() {
 
   const shareUrl = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return buildShareUrl({ cat: categoryId, score: previewScore, cl: clarity.level });
-  }, [categoryId, previewScore, clarity.level]);
+    return buildShareUrl({ cat: categoryId, score: clyckScore.score, cl: clarity.level });
+  }, [categoryId, clyckScore.score, clarity.level]);
 
   // Push share URL when entering result step
   useEffect(() => {
@@ -287,7 +291,7 @@ export default function App() {
   }
 
   async function submitLead(values: LeadFormValues) {
-    const score = computeScore(answers, channelData, values.message);
+    const score = clyckScore.score;
     const leadClass = leadClassFromScore(score);
     const res = await fetch("/api/lead", {
       method: "POST",
@@ -307,6 +311,7 @@ export default function App() {
           categoryText: category.explanation,
           score,
           leadClass,
+          scoreBreakdown: clyckScore.breakdown,
           insights,
           levers,
         },
@@ -415,6 +420,7 @@ export default function App() {
           channelNote={channelDataNote(channelData)}
           clarityLabel={clarity.label}
           clarityLevel={clarity.level}
+          hasEnoughData={clyckScore.hasEnoughData}
           insights={insights}
           levers={levers}
           titleAnalysis={titleAnalysis}

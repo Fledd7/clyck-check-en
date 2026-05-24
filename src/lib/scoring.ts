@@ -1,4 +1,4 @@
-import type { Answers, ChannelData, ChannelMaturity, LeadClass } from "./types";
+import type { ChannelData, ChannelMaturity, LeadClass, TitleAnalysisResult } from "./types";
 
 export function getChannelMaturity(channel: ChannelData | null): ChannelMaturity | null {
   if (!channel) return null;
@@ -12,104 +12,93 @@ export function getChannelMaturity(channel: ChannelData | null): ChannelMaturity
   return "early";
 }
 
-const statusScore: Record<string, number> = {
-  regelmaessig: 15,
-  unregelmaessig: 10,
-  kaum_aktiv: 5,
-  plant_start: 3,
+export type ClyckScoreBreakdown = {
+  channelStrength: number;
+  uploadConsistency: number;
+  analysisQuality: number;
+  penalties: number;
 };
 
-const goalScore: Record<string, number> = {
-  kundenanfragen: 15,
-  expertenstatus: 15,
-  reichweite: 8,
-  community: 8,
-  monetarisieren: 6,
-  unklar: 0,
+export type ClyckScoreResult = {
+  score: number;
+  clarityLevel: "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch" | null;
+  hasEnoughData: boolean;
+  breakdown: ClyckScoreBreakdown;
 };
 
-const problemScore: Record<string, number> = {
-  wenig_klicks: 10,
-  unprofessionell: 10,
-  uneinheitlich: 10,
-  kein_thumbnail_konzept: 8,
-  titel_thumbnail_mismatch: 10,
-  ideen_visualisieren: 6,
-  keine_richtung: 4,
-};
-
-const thumbnailsScore: Record<string, number> = {
-  einheitlich: 4,
-  teilweise_gut: 15,
-  sehr_unterschiedlich: 12,
-  schnell_gebaut: 10,
-  keine_eigenen: 5,
-  unsicher: 3,
-};
-
-const supportScore: Record<string, number> = {
-  system: 20,
-  strategie: 20,
-  audit: 18,
-  retainer: 20,
-  unklar: 2,
-};
-
-function scoreMultiSelect(values: string[] | undefined, scores: Record<string, number>): number {
-  if (!values || values.length === 0) return 0;
-  const nums = values.map((v) => scores[v] ?? 0).sort((a, b) => b - a);
-  const highest = nums[0];
-  if (nums.length === 1) return highest;
-  const bonus = nums.slice(1).reduce((sum, s) => sum + s * 0.4, 0);
-  return Math.min(highest + bonus, highest * 1.4);
-}
-
-export function computeScore(
-  answers: Answers,
-  channel: ChannelData | null,
-  message: string | undefined
-): number {
-  let score = 0;
-  score += statusScore[answers.status ?? ""] ?? 0;
-  score += scoreMultiSelect(answers.goal, goalScore);
-  score += scoreMultiSelect(answers.problem, problemScore);
-  score += thumbnailsScore[answers.thumbnails ?? ""] ?? 0;
-  score += scoreMultiSelect(answers.support, supportScore);
-
-  if (channel) {
-    score += 5;
-    if (
-      typeof channel.uploadCadenceDays === "number" &&
-      channel.uploadCadenceDays > 0 &&
-      channel.uploadCadenceDays <= 21
-    ) {
-      score += 5;
-    }
-
-    const subs = channel.subscriberCount;
-    if (typeof subs === "number") {
-      if (subs > 1_000_000) score += 20;
-      else if (subs > 100_000) score += 12;
-      else if (subs > 10_000) score += 5;
-    }
-
-    const medianViews = channel.medianViews;
-    if (typeof medianViews === "number") {
-      if (medianViews > 1_000_000) score += 25;
-      else if (medianViews > 100_000) score += 15;
-      else if (medianViews > 10_000) score += 8;
-    }
-
-    const videos = channel.videoCount;
-    if (typeof videos === "number") {
-      if (videos > 200) score += 10;
-      else if (videos > 50) score += 5;
-    }
+export function calculateClyckScore(
+  channelData: ChannelData | null,
+  titleAnalysis: TitleAnalysisResult[]
+): ClyckScoreResult {
+  if (!channelData) {
+    return {
+      score: 0,
+      clarityLevel: null,
+      hasEnoughData: false,
+      breakdown: { channelStrength: 0, uploadConsistency: 0, analysisQuality: 0, penalties: 0 },
+    };
   }
 
-  if (message && message.trim().length > 20) score += 2;
+  const hasAnalysis = titleAnalysis.length >= 2;
 
-  return Math.min(100, score);
+  let channelStrength = 0;
+  const subs = channelData.subscriberCount;
+  if (typeof subs === "number") {
+    if (subs >= 1_000_000) channelStrength = 40;
+    else if (subs >= 100_000) channelStrength = 30;
+    else if (subs >= 10_000) channelStrength = 20;
+    else if (subs >= 1_000) channelStrength = 10;
+    else channelStrength = 5;
+  }
+
+  let uploadConsistency = 0;
+  const cadence = channelData.uploadCadenceDays;
+  if (typeof cadence === "number" && cadence > 0) {
+    if (cadence <= 7) uploadConsistency = 20;
+    else if (cadence <= 14) uploadConsistency = 12;
+    else if (cadence <= 30) uploadConsistency = 5;
+  }
+
+  let analysisQuality = 0;
+  if (hasAnalysis) {
+    const avgFitScore =
+      titleAnalysis.reduce((sum, r) => sum + r.score, 0) / titleAnalysis.length;
+    analysisQuality = Math.round(avgFitScore * 8);
+  }
+
+  let penalties = 0;
+  if (hasAnalysis) {
+    const total = titleAnalysis.length;
+    const outdatedCount = titleAnalysis.filter((r) => r.styleAge === "veraltet").length;
+    const textIssueCount = titleAnalysis.filter((r) => r.textIssue !== "").length;
+    const overloadedCount = titleAnalysis.filter((r) => r.overloaded === true).length;
+
+    if (outdatedCount / total > 0.5) penalties -= 10;
+    if (textIssueCount / total > 0.5) penalties -= 8;
+    if (overloadedCount / total > 0.5) penalties -= 8;
+  }
+
+  const rawScore = channelStrength + uploadConsistency + analysisQuality + penalties;
+  const score = Math.max(0, Math.min(100, rawScore));
+
+  let clarityLevel: ClyckScoreResult["clarityLevel"];
+  if (!hasAnalysis) {
+    if (score >= 55) clarityLevel = "Hoch";
+    else if (score >= 35) clarityLevel = "Mittel";
+    else clarityLevel = "Niedrig";
+  } else {
+    if (score >= 80) clarityLevel = "Sehr hoch";
+    else if (score >= 60) clarityLevel = "Hoch";
+    else if (score >= 35) clarityLevel = "Mittel";
+    else clarityLevel = "Niedrig";
+  }
+
+  return {
+    score,
+    clarityLevel,
+    hasEnoughData: true,
+    breakdown: { channelStrength, uploadConsistency, analysisQuality, penalties },
+  };
 }
 
 export function leadClassFromScore(score: number): LeadClass {

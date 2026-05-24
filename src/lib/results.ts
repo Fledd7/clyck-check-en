@@ -2,7 +2,7 @@ import type {
   Answers,
   ChannelData,
   ChannelMaturity,
-  ClarityLevel,
+
   Insight,
   Lever,
   Option,
@@ -302,12 +302,6 @@ export function channelDataNote(channel: ChannelData | null): string | null {
   return null;
 }
 
-export function clarityLevel(score: number): { label: string; level: ClarityLevel } {
-  if (score >= 85) return { label: "Clyck-Score: Sehr hoch", level: "Sehr hoch" };
-  if (score >= 65) return { label: "Clyck-Score: Hoch", level: "Hoch" };
-  if (score >= 35) return { label: "Clyck-Score: Mittel", level: "Mittel" };
-  return { label: "Clyck-Score: Niedrig", level: "Niedrig" };
-}
 
 export function applyMaturityOverride(
   quizCategory: ResultCategoryId,
