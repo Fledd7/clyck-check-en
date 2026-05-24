@@ -25,6 +25,9 @@ type ResultItem = {
   textIssue: string;
   contrast: string;
   styleAge: "zeitgemäß" | "veraltet" | "neutral";
+  colorDominant: boolean;
+  colorHarmony: "harmonisch" | "neutral" | "chaotisch";
+  colorImpact: "stark" | "mittel" | "schwach";
   branding: boolean;
   reason: string;
   strong: string;
@@ -86,32 +89,43 @@ Ordne das Thumbnail einem dieser bewährten Klick-Formate zu:
 
 ## Schritt 2: Visuelle Überladung prüfen
 
-Zähle visuelle GRUPPEN — nicht einzelne Objekte.
-Alles was zusammengehört zählt als EIN Element.
+Zähle visuelle HAUPTGRUPPEN — nicht einzelne Objekte.
+Alles was zusammengehört oder eine Einheit bildet
+zählt als EIN Element.
 
-ZÄHLREGELN:
-- Alle Texte im Bild zusammen = 1 Element
-  (egal ob ein Wort oder fünf Textblöcke)
+ZÄHLREGELN (strikt einhalten):
 - Alle Personen zusammen = 1 Element
   (1 Person, 2 Personen, Gruppe = immer 1 Element)
+- Der gesamte Text im Bild = 1 Element
+  (egal ob 1 Wort, 3 Textblöcke oder ein Banner)
 - Alle Logos zusammen = 1 Element
-  (1 Logo oder 3 Logos = immer 1 Element)
-- Ein dominantes Objekt (Auto, Produkt, Tier) = 1 Element
-- Ein grafisches Element (Pfeil, Rahmen, Icon) = 1 Element
-- Hintergrund = KEIN Element, wird nie gezählt
+- Ein dominantes Objekt = 1 Element
+  (Auto, Produkt, Tier, Fahrzeug)
+- Ein grafisches Element = 1 Element
+  (Pfeil, Rahmen, Icon, Badge, Ortsangabe)
+- Hintergrundszene oder Hintergrundlandschaft
+  = kein eigenes Element, gehört zur Komposition
 
-BEISPIELE:
-Person + Text + Pfeil = 3 Elemente → optimal
-Person + Text + Logo = 3 Elemente → optimal
-Vorher-Nachher-Fotos + Text + Pfeil = 3 Elemente → optimal
-Person + Text + Logo + Gebäude = 4 Elemente → leicht überladen
-Person + Text + Logo + Objekt + weiterer grafischer Rahmen
-= 5 Elemente → überladen
+WICHTIG — Grenzfälle:
+- Eine Ortsangabe oder Location-Badge ist Teil
+  des grafischen Elements oder des Hintergrunds —
+  kein separates Element
+- Ein Skispringer im Hintergrund ist Teil der
+  Hintergrundszene — kein separates Element
+- Mehrere Objekte die thematisch zusammengehören
+  (z.B. Ski + Skifahrer) = 1 Element
 
-WICHTIG: Im Zweifel WENIGER Elemente zählen.
+BEISPIELE (korrekte Zählung):
+Person + Hintergrundszene + Ortsangabe-Badge = 3 Elemente
+Person + Text-Banner + Logo = 3 Elemente
+Person + dynamische Hintergrundszene = 2 Elemente
+Zwei Personen + Text + Pfeil = 3 Elemente
+Person + Objekt + Text + Logo = 4 Elemente
+
+Im Zweifel WENIGER zählen.
 Setze overloaded: true NUR wenn elementCount >= 5
-UND das Bild wirklich schwer auf einen Blick erfassbar ist.
-Bei elementCount 4: overloaded nur true wenn deutlich unruhig.
+ODER die Komposition bei elementCount 4 wirklich
+schwer auf einen Blick erfassbar ist.
 Bei elementCount <= 3: overloaded immer false.
 
 ---
@@ -165,7 +179,34 @@ Ein Thumbnail ohne klaren Kontrast fällt im Feed nicht auf.
 
 ---
 
-## Schritt 5: Ehrliche Stil-Einordnung
+## Schritt 5: Farbwirkung bewerten
+
+Bewerte die Farbgestaltung des Thumbnails nach
+drei Kriterien:
+
+A) Dominante Farbe
+Gibt es eine klar erkennbare Hauptfarbe die sofort
+auffällt und das Thumbnail im Feed hervorhebt?
+Ja / Nein
+
+B) Farbharmonie
+Wirken die verwendeten Farben zusammen harmonisch
+oder chaotisch und unruhig?
+- harmonisch: Farben ergänzen sich, klare Palette
+- neutral: weder besonders harmonisch noch störend
+- chaotisch: zu viele unverbundene Farben, unruhig
+
+C) Feed-Auffälligkeit durch Farbe
+Würde dieses Thumbnail durch seine Farbgebung
+in einem grauen oder bunten YouTube-Feed
+sofort auffallen?
+- stark: klarer Farbakzent der heraussticht
+- mittel: durchschnittlich auffällig
+- schwach: geht im Feed unter
+
+---
+
+## Schritt 6: Ehrliche Stil-Einordnung
 
 Bewerte ob der Thumbnail-Stil zeitgemäß ist.
 Sei hier direkt und ehrlich — nicht diplomatisch.
@@ -196,7 +237,7 @@ Nischen von moderneren Thumbnails überholt.
 
 ---
 
-## Schritt 6: Titel-Thumbnail-Fit bewerten
+## Schritt 7: Titel-Thumbnail-Fit bewerten
 
 Bewertet wird ausschließlich das Zusammenspiel aus Bild und Titel
 im Hinblick auf Klickanreiz. Nicht der Inhalt oder die Qualität des Videos.
@@ -216,7 +257,7 @@ Abzüge (senken den Score um 1):
 
 ---
 
-## Schritt 7: Wiedererkennung prüfen
+## Schritt 8: Wiedererkennung prüfen
 
 Zeigt das Thumbnail Elemente eines konsistenten Kanal-Stils?
 Gemeint sind: wiederkehrendes Gesicht, Farbpalette, Schriftbild
@@ -247,6 +288,9 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
   "textIssue": "<leer wenn kein Textproblem, sonst: 'zu lang' | 'wiederholt Titel' | 'kein Mehrwert'>",
   "contrast": "<'Hell/Dunkel' | 'Komplementärfarben' | 'Sättigung' | 'Keiner'>",
   "styleAge": "<'zeitgemäß' | 'veraltet' | 'neutral'>",
+  "colorDominant": true | false,
+  "colorHarmony": "<'harmonisch' | 'neutral' | 'chaotisch'>",
+  "colorImpact": "<'stark' | 'mittel' | 'schwach'>",
   "branding": true | false,
   "reason": "<1 Satz auf Deutsch, max. 15 Wörter, konkret und direkt — keine Fachbegriffe, keine englischen Wörter, kein 'könnte', 'wirkt etwas', 'hat gewisse Schwächen'>",
   "strong": "<Was gut funktioniert, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score <= 2>",
@@ -323,6 +367,9 @@ async function analyzeVideo(
       textIssue?: string;
       contrast?: string;
       styleAge?: string;
+      colorDominant?: boolean;
+      colorHarmony?: string;
+      colorImpact?: string;
       branding?: boolean;
       reason?: string;
       strong?: string;
@@ -336,15 +383,20 @@ async function analyzeVideo(
     const isVeraltet = parsed.styleAge === "veraltet";
     const hasTextIssue = typeof parsed.textIssue === "string" && parsed.textIssue !== "";
     const isOverloaded = parsed.overloaded === true;
+    const isChaotic = parsed.colorHarmony === "chaotisch";
 
-    const problemCount = [isVeraltet, hasTextIssue, isOverloaded].filter(Boolean).length;
+    const problemCount = [isVeraltet, hasTextIssue, isOverloaded, isChaotic].filter(Boolean).length;
 
     if (problemCount >= 2) {
       cappedScore = Math.min(cappedScore, 2);
-    } else if (isVeraltet || parsed.textIssue === "wiederholt Titel" || isOverloaded) {
+    } else if (isVeraltet || parsed.textIssue === "wiederholt Titel" || isOverloaded || isChaotic) {
       cappedScore = Math.min(cappedScore, 3);
     } else if (parsed.styleAge !== "zeitgemäß") {
       cappedScore = Math.min(cappedScore, 4);
+    }
+
+    if (parsed.colorImpact === "schwach" && isVeraltet) {
+      cappedScore = Math.min(cappedScore, 2);
     }
 
     parsed.score = cappedScore;
@@ -363,6 +415,9 @@ async function analyzeVideo(
       textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
       styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",
+      colorDominant: parsed.colorDominant ?? false,
+      colorHarmony: (parsed.colorHarmony === "harmonisch" || parsed.colorHarmony === "chaotisch") ? parsed.colorHarmony : "neutral",
+      colorImpact: (parsed.colorImpact === "stark" || parsed.colorImpact === "schwach") ? parsed.colorImpact : "mittel",
       branding: parsed.branding === true,
       reason: baseReason,
       strong: typeof parsed.strong === "string" ? parsed.strong : "",

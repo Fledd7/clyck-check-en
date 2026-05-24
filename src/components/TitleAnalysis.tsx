@@ -118,6 +118,14 @@ function CriteriaPanel() {
           </dd>
         </div>
         <div>
+          <dt className="font-semibold text-ink">Farbwirkung</dt>
+          <dd>
+            Gibt es eine dominante Farbe die im Feed auffällt?
+            Wirken die Farben harmonisch oder chaotisch?
+            Sticht das Thumbnail durch seine Farbgebung heraus?
+          </dd>
+        </div>
+        <div>
           <dt className="font-semibold text-ink">Titel-Thumbnail-Fit</dt>
           <dd>
             Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
@@ -419,6 +427,21 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                       {r.contrast === "Keiner" && (
                         <p className="text-xs text-accent">
                           ⚠ Kein klarer Kontrast erkennbar
+                        </p>
+                      )}
+                      {r.colorImpact === "stark" && r.colorDominant && (
+                        <p className="text-xs text-green-600">
+                          ✓ Starke Farbwirkung im Feed
+                        </p>
+                      )}
+                      {r.colorHarmony === "chaotisch" && (
+                        <p className="text-xs text-accent">
+                          ⚠ Farbpalette wirkt unruhig
+                        </p>
+                      )}
+                      {r.colorImpact === "schwach" && (
+                        <p className="text-xs text-accent">
+                          ⚠ Schwache Farbwirkung — geht im Feed unter
                         </p>
                       )}
                     </div>

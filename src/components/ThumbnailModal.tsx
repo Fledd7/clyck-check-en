@@ -307,6 +307,21 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                     ⚠ Kein klarer Kontrast erkennbar
                   </p>
                 )}
+                {localAnalysis.colorImpact === "stark" && localAnalysis.colorDominant && (
+                  <p className="text-xs text-green-600">
+                    ✓ Starke Farbwirkung im Feed
+                  </p>
+                )}
+                {localAnalysis.colorHarmony === "chaotisch" && (
+                  <p className="text-xs text-accent">
+                    ⚠ Farbpalette wirkt unruhig
+                  </p>
+                )}
+                {localAnalysis.colorImpact === "schwach" && (
+                  <p className="text-xs text-accent">
+                    ⚠ Schwache Farbwirkung — geht im Feed unter
+                  </p>
+                )}
               </div>
             )}
 

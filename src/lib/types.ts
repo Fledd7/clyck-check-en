@@ -89,6 +89,9 @@ export type TitleAnalysisResult = {
   textIssue: string;
   contrast: string;
   styleAge: "zeitgemäß" | "veraltet" | "neutral";
+  colorDominant: boolean;
+  colorHarmony: "harmonisch" | "neutral" | "chaotisch";
+  colorImpact: "stark" | "mittel" | "schwach";
   branding: boolean;
   reason: string;
   strong: string;
