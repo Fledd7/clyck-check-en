@@ -253,7 +253,12 @@ export default function App() {
         });
         const taData = await taRes.json();
         if (taData?.ok && Array.isArray(taData.results)) {
-          setTitleAnalysis(taData.results);
+          const enriched = (taData.results as TitleAnalysisResult[]).map((r) => {
+            const v = videos.find((x) => x.id === r.id);
+            if (!v) return r;
+            return { ...r, views: v.views, publishedAt: v.publishedAt };
+          });
+          setTitleAnalysis(enriched);
         }
       } catch {
         // Silent fallback — section is just hidden

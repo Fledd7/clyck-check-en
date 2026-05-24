@@ -82,13 +82,13 @@ export default function ResultPreview({
     if (v) setOpenVideoId(v.id);
   }
 
-  const openVideo: { video: { id: string; title: string; thumbnail: string }; analysis: TitleAnalysisResult | null } | null =
+  const openVideo: { video: { id: string; title: string; thumbnail: string; duration?: string; views?: number; publishedAt?: string }; analysis: TitleAnalysisResult | null } | null =
     (() => {
       if (!openVideoId) return null;
       const v = videos.find((x) => x.id === openVideoId);
       if (!v) return null;
       return {
-        video: { id: v.id, title: v.title, thumbnail: v.thumbnail, duration: v.duration },
+        video: { id: v.id, title: v.title, thumbnail: v.thumbnail, duration: v.duration, views: v.views, publishedAt: v.publishedAt },
         analysis: analysisById[v.id] ?? null,
       };
     })();

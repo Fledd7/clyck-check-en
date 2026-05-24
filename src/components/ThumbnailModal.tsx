@@ -3,7 +3,7 @@ import type { TitleAnalysisResult } from "../lib/types";
 import { getThumbnailRecommendation } from "../lib/results";
 
 type Props = {
-  video: { id: string; title: string; thumbnail: string; duration?: string };
+  video: { id: string; title: string; thumbnail: string; duration?: string; views?: number; publishedAt?: string };
   analysis: TitleAnalysisResult | null;
   onClose: () => void;
 };
@@ -12,6 +12,23 @@ function textIssueCopy(issue: string): string {
   if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
   if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
   return "Text verstärkt den Klick-Anreiz nicht";
+}
+
+function formatViews(views: number): string {
+  if (views >= 1_000_000) return (views / 1_000_000).toFixed(1).replace(".0", "") + "M";
+  if (views >= 1_000) return Math.round(views / 1_000) + "K";
+  return views.toString();
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "heute";
+  if (days === 1) return "gestern";
+  if (days < 7) return `vor ${days} Tagen`;
+  if (days < 30) return `vor ${Math.floor(days / 7)} Wochen`;
+  if (days < 365) return `vor ${Math.floor(days / 30)} Monaten`;
+  return `vor ${Math.floor(days / 365)} Jahren`;
 }
 
 function scoreColor(score: number): string {
@@ -194,6 +211,17 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
         )}
 
         <h3 className="text-base font-bold leading-snug">{video.title}</h3>
+
+        {(video.views !== undefined || video.publishedAt) && (
+          <p className="mt-1 mb-3 flex items-center gap-2 text-xs text-gray1">
+            {video.views !== undefined && (
+              <span>{formatViews(video.views)} Views</span>
+            )}
+            {video.publishedAt && (
+              <span>· {timeAgo(video.publishedAt)}</span>
+            )}
+          </p>
+        )}
 
         {localAnalysis ? (
           <>

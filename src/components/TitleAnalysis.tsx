@@ -15,6 +15,23 @@ function scoreTone(score: TitleAnalysisScore): { dot: string; text: string } {
   return { dot: "bg-accent", text: "text-accent" };
 }
 
+function formatViews(views: number): string {
+  if (views >= 1_000_000) return (views / 1_000_000).toFixed(1).replace(".0", "") + "M";
+  if (views >= 1_000) return Math.round(views / 1_000) + "K";
+  return views.toString();
+}
+
+function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "heute";
+  if (days === 1) return "gestern";
+  if (days < 7) return `vor ${days} Tagen`;
+  if (days < 30) return `vor ${Math.floor(days / 7)} Wochen`;
+  if (days < 365) return `vor ${Math.floor(days / 30)} Monaten`;
+  return `vor ${Math.floor(days / 365)} Jahren`;
+}
+
 function textIssueCopy(issue: string): string {
   if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
   if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
@@ -194,9 +211,6 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
   const [criteriaOpen, setCriteriaOpen] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
   const [analyzedCount, setAnalyzedCount] = useState(0);
-  const [language, setLanguage] = useState<"de" | "en">("de");
-  const [translating, setTranslating] = useState(false);
-  const [translatedResults, setTranslatedResults] = useState<TitleAnalysisResult[] | null>(null);
 
   useEffect(() => {
     if (!loading) {
@@ -214,68 +228,14 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
     };
   }, [loading]);
 
-  async function translateResults() {
-    if (translating) return;
-    if (language === "en") {
-      setTranslatedResults(null);
-      setLanguage("de");
-      return;
-    }
-    setTranslating(true);
-    const textsToTranslate = results.flatMap((r) =>
-      [r.reason, r.strong, r.weak].filter(Boolean)
-    );
-    try {
-      const res = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texts: textsToTranslate, targetLang: "en" }),
-      });
-      const data = await res.json();
-      if (data.ok && Array.isArray(data.translations)) {
-        let i = 0;
-        const translated = results.map((r) => ({
-          ...r,
-          reason: r.reason ? (data.translations[i++] as string) : r.reason,
-          strong: r.strong ? (data.translations[i++] as string) : r.strong,
-          weak: r.weak ? (data.translations[i++] as string) : r.weak,
-        }));
-        setTranslatedResults(translated);
-        setLanguage("en");
-      }
-    } catch {
-      // silent fail
-    } finally {
-      setTranslating(false);
-    }
-  }
-
   if (!loading && results.length === 0) return null;
-
-  const displayResults = translatedResults ?? results;
 
   const progressPct =
     Math.min(analyzedCount + 1, TOTAL_VIDEOS) * (100 / TOTAL_VIDEOS);
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
-        {!loading && results.length > 0 && (
-          <button
-            type="button"
-            onClick={translateResults}
-            disabled={translating}
-            className="rounded-full border border-line px-3 py-1 text-xs text-gray1 transition hover:bg-bg disabled:opacity-50"
-          >
-            {translating
-              ? "Wird übersetzt..."
-              : language === "de"
-              ? "Show in English"
-              : "Auf Deutsch anzeigen"}
-          </button>
-        )}
-      </div>
+      <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
       <p className="mt-1 text-sm text-gray1 leading-relaxed">
         Deine Thumbnails werden nach Klickpsychologie und
         Thumbnail-Systematik analysiert.
@@ -314,7 +274,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
       ) : (
         <>
           <div className="mt-4 grid gap-3">
-            {displayResults.map((r) => {
+            {results.map((r) => {
               const tone = scoreTone(r.score);
               const cardClass = onSelect
                 ? "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
@@ -341,6 +301,16 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                         {r.label}
                       </span>
                     </div>
+                    {(r.views !== undefined || r.publishedAt) && (
+                      <p className="mt-1 flex gap-2 text-[11px] text-gray1">
+                        {r.views !== undefined && (
+                          <span>{formatViews(r.views)} Views</span>
+                        )}
+                        {r.publishedAt && (
+                          <span>· {timeAgo(r.publishedAt)}</span>
+                        )}
+                      </p>
+                    )}
                     {r.reason && (
                       <p className="mt-1.5 text-xs italic text-gray1 leading-relaxed">
                         „{r.reason}"

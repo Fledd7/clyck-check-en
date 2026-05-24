@@ -79,6 +79,8 @@ export type TitleAnalysisResult = {
   id: string;
   title: string;
   thumbnail?: string;
+  views?: number;
+  publishedAt?: string;
   score: TitleAnalysisScore;
   label: TitleAnalysisLabel;
   format: string;
