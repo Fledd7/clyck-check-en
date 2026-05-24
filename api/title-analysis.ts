@@ -24,7 +24,7 @@ type ResultItem = {
   overloaded: boolean;
   textIssue: string;
   contrast: string;
-  styleAge: "zeitgemäß" | "veraltet" | "neutral";
+  styleAge: "zeitgemäß" | "veraltet" | "überladen" | "neutral";
   colorDominant: boolean;
   colorHarmony: "harmonisch" | "neutral" | "chaotisch";
   colorImpact: "stark" | "mittel" | "schwach";
@@ -132,33 +132,31 @@ Bei elementCount <= 3: overloaded immer false.
 
 ## Schritt 3: Text im Thumbnail bewerten
 
-Text auf Thumbnails ist 2026 oft ein Zeichen von
-schwachem Bild-Konzept — wenn das Bild allein nicht
-stark genug ist, wird Text als Krücke eingesetzt.
+Zähle NUR bedeutungstragende Wörter.
+NICHT zählen:
+- Zahlen (10.000€, 100K etc.) = 1 Token, kein Wort
+- Sonderzeichen, Emojis, Symbole
+- Wörter unter 2 Buchstaben (€, &, /, %)
+- Eigennamen von Orten/Marken als Logo-Teil
 
-Bewerte Text nach diesen Kriterien:
+Beispiele korrekte Zählung:
+"PADEL TURNIER" = 2 Wörter
+"10.000€ PADEL TURNIER" = 2 Wörter (Zahl zählt nicht)
+"Lohnt sich Leasing für privat?" = 5 Wörter
+"SPEAKER BEI PORSCHE?" = 3 Wörter
 
-PROBLEM: Text wiederholt den Videotitel sinngemäß
-→ textIssue: 'wiederholt Titel'
-→ Das ist verschenkte Fläche. Der Titel steht bereits
-  direkt unter dem Thumbnail. Wer ihn nochmal ins Bild
-  schreibt, hat kein stärkeres Bild-Konzept gefunden.
+PROBLEM: mehr als 5 bedeutungstragende Wörter
+→ textIssue: "zu lang"
 
-PROBLEM: Mehr als 5 bedeutungstragende Wörter im Bild
-→ textIssue: 'zu lang'
-→ Langer Text funktioniert nicht im Feed.
-  Thumbnails werden in 1–2 Sekunden gescannt.
-  Was nicht sofort erfassbar ist, wird nicht geklickt.
+PROBLEM: Text wiederholt Videotitel sinngemäß
+→ textIssue: "wiederholt Titel"
 
-PROBLEM: Text ist dekorativ ohne Klick-Funktion
-→ textIssue: 'kein Mehrwert'
-→ Text der nichts zur Neugier oder zum Kontext
-  beiträgt, schadet mehr als er nützt.
+PROBLEM: Text ohne erkennbaren Klick-Mehrwert
+→ textIssue: "kein Mehrwert"
 
-KEIN PROBLEM: Kurze Power-Wörter (1–3 Wörter) die
-einen Wow-Faktor oder eine Neugier-Lücke öffnen.
-Beispiele: 'GEHEIM', 'DAY 28', '$0', 'NEVER AGAIN'
-→ textIssue: '' (leer)
+KEIN PROBLEM: 5 oder weniger bedeutungstragende Wörter
+die den Klick-Anreiz verstärken
+→ textIssue: "" (leer)
 
 ---
 
@@ -208,32 +206,43 @@ sofort auffallen?
 
 ## Schritt 6: Ehrliche Stil-Einordnung
 
-Bewerte ob der Thumbnail-Stil zeitgemäß ist.
-Sei hier direkt und ehrlich — nicht diplomatisch.
+Ordne das Thumbnail einer von vier Kategorien zu.
+Sei direkt — nicht diplomatisch.
 
-VERALTET — setze styleAge: 'veraltet' wenn:
-- Farbbalken (rot/gelb/grün) mit weißem Text
-  als Hauptgestaltungselement sichtbar ist
-- Eine Zahl mit €/$ als dominantes visuelles Element
-  ohne starkes Bild dahinter
-- Mehr als 5 Wörter Text im Bild
-- Das Thumbnail wie ein Folienlayout wirkt
-  (Text + Foto nebeneinander ohne visuelle Spannung)
-- Der Stil einem typischen deutschen Coaching-/
-  Finanz-YouTube-Thumbnail 2019–2022 ähnelt
+"veraltet" — wenn MINDESTENS ZWEI dieser Signale zutreffen:
+- Roter, gelber oder grüner Farbbalken mit weißer Schrift
+  als dominantes Gestaltungselement
+- Folienlayout: Text links oder rechts, Foto daneben,
+  ohne echte Bildkomposition
+- Mehr als 6 bedeutungstragende Wörter im Bild
+- Das Thumbnail wirkt wie ein PowerPoint-Slide
+- Clipart-artige Elemente oder Stockfoto-Stil
+- Kein erkennbarer Compositing-Aufwand
 
-ZEITGEMÄSS — setze styleAge: 'zeitgemäß' wenn:
-- Das Bild allein die Botschaft trägt
+"überladen" — wenn ALLE dieser Punkte zutreffen:
+- Der Stil ist zeitgemäß: hochwertige Bildbearbeitung,
+  modernes Composite, erkennbarer Designaufwand
+- Aber: zu viele Elemente gleichzeitig —
+  das Auge weiß nicht wo es zuerst hinschauen soll
+- Oder: zu viel Text der die Komposition erdrückt
+- Das Thumbnail hat Energie aber keine klare Hierarchie
+
+"zeitgemäß" — wenn:
 - Klare visuelle Hierarchie mit einem dominanten Motiv
-- Wenig oder kein Text
-- Cinematische oder hochwertige Bildqualität
+- Wenig oder kein Text — das Bild trägt die Botschaft
+- Hochwertige Bildsprache, modernes Composite
 - Starke Emotion oder starke Situation im Vordergrund
+- Der Blick wird sofort geführt
 
-NEUTRAL — wenn kein eindeutiges Signal
+"neutral" — wenn kein eindeutiges Signal
 
-Wichtig: 'Veraltet' bedeutet nicht 'schlecht produziert'.
-Es bedeutet: Dieser Stil wird 2025 in den meisten
-Nischen von moderneren Thumbnails überholt.
+WICHTIG:
+"veraltet" und "überladen" sind verschiedene Probleme:
+- veraltet = das Designkonzept ist überholt
+- überladen = das Konzept ist modern, aber zu vollgepackt
+Nie beides gleichzeitig vergeben.
+Im Zweifel: "überladen" vor "veraltet" wählen wenn
+erkennbarer moderner Designaufwand vorhanden ist.
 
 ---
 
@@ -287,7 +296,7 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
   "overloaded": true | false,
   "textIssue": "<leer wenn kein Textproblem, sonst: 'zu lang' | 'wiederholt Titel' | 'kein Mehrwert'>",
   "contrast": "<'Hell/Dunkel' | 'Komplementärfarben' | 'Sättigung' | 'Keiner'>",
-  "styleAge": "<'zeitgemäß' | 'veraltet' | 'neutral'>",
+  "styleAge": "<'zeitgemäß' | 'veraltet' | 'überladen' | 'neutral'>",
   "colorDominant": true | false,
   "colorHarmony": "<'harmonisch' | 'neutral' | 'chaotisch'>",
   "colorImpact": "<'stark' | 'mittel' | 'schwach'>",
@@ -381,22 +390,24 @@ async function analyzeVideo(
     let cappedScore = rawScore;
 
     const isVeraltet = parsed.styleAge === "veraltet";
+    const isUeberladen = parsed.styleAge === "überladen";
     const hasTextIssue = typeof parsed.textIssue === "string" && parsed.textIssue !== "";
     const isOverloaded = parsed.overloaded === true;
     const isChaotic = parsed.colorHarmony === "chaotisch";
 
-    const problemCount = [isVeraltet, hasTextIssue, isOverloaded, isChaotic].filter(Boolean).length;
+    if (isVeraltet) cappedScore = Math.min(cappedScore, 3);
+    if (isUeberladen && isOverloaded) cappedScore = Math.min(cappedScore, 3);
+    if (isChaotic) cappedScore = Math.min(cappedScore, 3);
 
-    if (problemCount >= 2) {
-      cappedScore = Math.min(cappedScore, 2);
-    } else if (isVeraltet || parsed.textIssue === "wiederholt Titel" || isOverloaded || isChaotic) {
-      cappedScore = Math.min(cappedScore, 3);
-    } else if (parsed.styleAge !== "zeitgemäß") {
-      cappedScore = Math.min(cappedScore, 4);
-    }
+    const problemCount = [isVeraltet, hasTextIssue, isOverloaded].filter(Boolean).length;
+    if (problemCount >= 2) cappedScore = Math.min(cappedScore, 2);
 
     if (parsed.colorImpact === "schwach" && isVeraltet) {
       cappedScore = Math.min(cappedScore, 2);
+    }
+
+    if (parsed.styleAge !== "zeitgemäß" && parsed.styleAge !== "überladen") {
+      cappedScore = Math.min(cappedScore, 4);
     }
 
     parsed.score = cappedScore;
@@ -414,7 +425,7 @@ async function analyzeVideo(
       overloaded: parsed.overloaded ?? (Number.isFinite(elementCountRaw) && elementCountRaw > 3),
       textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
       contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
-      styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet") ? parsed.styleAge : "neutral",
+      styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet" || parsed.styleAge === "überladen") ? parsed.styleAge : "neutral",
       colorDominant: parsed.colorDominant ?? false,
       colorHarmony: (parsed.colorHarmony === "harmonisch" || parsed.colorHarmony === "chaotisch") ? parsed.colorHarmony : "neutral",
       colorImpact: (parsed.colorImpact === "stark" || parsed.colorImpact === "schwach") ? parsed.colorImpact : "mittel",

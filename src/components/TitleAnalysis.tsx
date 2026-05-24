@@ -218,6 +218,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   const noContrastCount = results.filter((r) => r.contrast === "Keiner").length;
   const brandingCount = results.filter((r) => r.branding).length;
   const outdatedCount = results.filter((r) => r.styleAge === "veraltet").length;
+  const overloadedModernCount = results.filter((r) => r.styleAge === "überladen").length;
   const modernCount = results.filter((r) => r.styleAge === "zeitgemäß").length;
 
   let headline = "";
@@ -245,6 +246,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
         textIssueCount > 0 ||
         noContrastCount > 0 ||
         brandingCount > 0 ||
+        overloadedModernCount > 0 ||
         (outdatedCount > 0 && outdatedCount >= total / 2) ||
         modernCount >= total * 0.7) && (
         <div className="mt-3 space-y-1">
@@ -268,6 +270,11 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
             <p className="text-sm text-gray1">
               ✓ {brandingCount} von {total} Videos zeigen einen wiederkehrenden
               Kanal-Stil.
+            </p>
+          )}
+          {overloadedModernCount > 0 && (
+            <p className="mt-1 text-sm text-orange-700">
+              ⚠ {overloadedModernCount} von {total} Thumbnails sind modern gestaltet aber visuell überladen.
             </p>
           )}
           {outdatedCount > 0 && outdatedCount >= total / 2 && (
@@ -445,12 +452,24 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                         </p>
                       )}
                     </div>
+                    {r.styleAge === "überladen" && (
+                      <div className="mt-2 rounded-lg border border-orange-200 bg-orange-50 p-2.5">
+                        <p className="text-xs font-bold text-orange-700">
+                          Visuell überladen — aber zeitgemäß
+                        </p>
+                        <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
+                          Das Thumbnail hat einen modernen Stil und erkennbaren
+                          Designaufwand — aber zu viele Elemente auf einmal.
+                          Weniger wäre hier mehr.
+                        </p>
+                      </div>
+                    )}
                     {r.styleAge === "veraltet" && (
-                      <div className="mt-2 rounded-xl border border-orange-200 bg-[#FFF8F0] p-3">
-                        <p className="text-xs font-semibold text-orange-700">
+                      <div className="mt-2 rounded-lg border border-orange-200 bg-[#FFF8F0] p-2.5">
+                        <p className="text-xs font-bold text-orange-700">
                           Stilrichtung: Ältere Thumbnail-Ästhetik
                         </p>
-                        <p className="mt-0.5 text-xs text-orange-800">
+                        <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
                           Dieser Stil war 2018–2022 weit verbreitet.
                           Klarere, bildstärkere Thumbnails performen
                           in den meisten Nischen heute oft besser.

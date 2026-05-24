@@ -88,7 +88,7 @@ export type TitleAnalysisResult = {
   overloaded: boolean;
   textIssue: string;
   contrast: string;
-  styleAge: "zeitgemäß" | "veraltet" | "neutral";
+  styleAge: "zeitgemäß" | "veraltet" | "überladen" | "neutral";
   colorDominant: boolean;
   colorHarmony: "harmonisch" | "neutral" | "chaotisch";
   colorImpact: "stark" | "mittel" | "schwach";

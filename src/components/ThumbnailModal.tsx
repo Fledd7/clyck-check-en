@@ -325,12 +325,24 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               </div>
             )}
 
+            {localAnalysis.styleAge === "überladen" && (
+              <div className="mt-2 rounded-lg border border-orange-200 bg-orange-50 p-2.5">
+                <p className="text-xs font-bold text-orange-700">
+                  Visuell überladen — aber zeitgemäß
+                </p>
+                <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
+                  Das Thumbnail hat einen modernen Stil und erkennbaren
+                  Designaufwand — aber zu viele Elemente auf einmal.
+                  Weniger wäre hier mehr.
+                </p>
+              </div>
+            )}
             {localAnalysis.styleAge === "veraltet" && (
-              <div className="mt-2 rounded-xl border border-orange-200 bg-[#FFF8F0] p-3">
-                <p className="text-xs font-semibold text-orange-700">
+              <div className="mt-2 rounded-lg border border-orange-200 bg-[#FFF8F0] p-2.5">
+                <p className="text-xs font-bold text-orange-700">
                   Stilrichtung: Ältere Thumbnail-Ästhetik
                 </p>
-                <p className="mt-0.5 text-xs text-orange-800">
+                <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
                   Dieser Stil war 2018–2022 weit verbreitet.
                   Klarere, bildstärkere Thumbnails performen
                   in den meisten Nischen heute oft besser.
