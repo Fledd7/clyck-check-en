@@ -282,13 +282,26 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
               const inner = (
                 <>
                   {r.thumbnail && (
-                    <div className="h-20 w-36 flex-shrink-0 overflow-hidden rounded-lg bg-line">
-                      <img
-                        src={r.thumbnail}
-                        alt=""
-                        loading="lazy"
-                        className="h-full w-full object-cover"
-                      />
+                    <div className="flex flex-shrink-0 flex-col gap-1">
+                      <div className="h-20 w-36 overflow-hidden rounded-lg bg-line">
+                        <img
+                          src={r.thumbnail}
+                          alt=""
+                          loading="lazy"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      {(r.views !== undefined || r.publishedAt) && (
+                        <p className="w-36 text-center text-[10px] leading-snug text-gray1">
+                          {r.views !== undefined && (
+                            <span>{formatViews(r.views)} Views</span>
+                          )}
+                          {r.views !== undefined && r.publishedAt && <br />}
+                          {r.publishedAt && (
+                            <span>{timeAgo(r.publishedAt)}</span>
+                          )}
+                        </p>
+                      )}
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
@@ -301,16 +314,6 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                         {r.label}
                       </span>
                     </div>
-                    {(r.views !== undefined || r.publishedAt) && (
-                      <p className="mt-1 flex gap-2 text-[11px] text-gray1">
-                        {r.views !== undefined && (
-                          <span>{formatViews(r.views)} Views</span>
-                        )}
-                        {r.publishedAt && (
-                          <span>· {timeAgo(r.publishedAt)}</span>
-                        )}
-                      </p>
-                    )}
                     {r.reason && (
                       <p className="mt-1.5 text-xs italic text-gray1 leading-relaxed">
                         „{r.reason}"
