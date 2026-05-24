@@ -218,7 +218,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
         {(video.views !== undefined || video.publishedAt) && (
           <p className="mt-1 mb-3 flex items-center gap-2 text-xs text-gray1">
             {video.views !== undefined && (
-              <span>{formatViews(video.views)} Views</span>
+              <span>{formatViews(video.views)} Aufrufe</span>
             )}
             {video.publishedAt && (
               <span>· {timeAgo(video.publishedAt)}</span>

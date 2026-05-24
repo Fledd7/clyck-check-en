@@ -239,7 +239,7 @@ export default function ResultPreview({
                   )}
                   {typeof channelData.medianViews === "number" && (
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Median-Views</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Median-Aufrufe</p>
                       <p className="text-base font-semibold">{channelData.medianViews.toLocaleString("de-DE")}</p>
                     </div>
                   )}

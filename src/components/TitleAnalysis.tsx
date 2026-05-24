@@ -280,38 +280,37 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
             {results.map((r) => {
               const tone = scoreTone(r.score);
               const cardClass = onSelect
-                ? "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3 text-left transition hover:border-ink/40 cursor-pointer w-full"
-                : "rounded-2xl border border-line bg-white p-3 shadow-card flex gap-3";
+                ? "overflow-hidden rounded-2xl border border-line bg-white shadow-card text-left transition hover:border-ink/40 cursor-pointer w-full"
+                : "overflow-hidden rounded-2xl border border-line bg-white shadow-card";
               const inner = (
                 <>
                   {r.thumbnail && (
-                    <div className="flex flex-shrink-0 flex-col gap-1">
-                      <div className="h-20 w-36 overflow-hidden rounded-lg bg-line">
-                        <img
-                          src={r.thumbnail}
-                          alt=""
-                          loading="lazy"
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      {(r.views !== undefined || r.publishedAt) && (
-                        <p className="w-36 text-center text-[10px] leading-snug text-gray1">
-                          {r.views !== undefined && (
-                            <span>{formatViews(r.views)} Views</span>
-                          )}
-                          {r.views !== undefined && r.publishedAt && <br />}
-                          {r.publishedAt && (
-                            <span>{timeAgo(r.publishedAt)}</span>
-                          )}
-                        </p>
-                      )}
+                    <div className="relative">
+                      <img
+                        src={r.thumbnail}
+                        alt=""
+                        loading="lazy"
+                        className="block w-full object-cover"
+                        style={{ aspectRatio: "16/9" }}
+                      />
                     </div>
                   )}
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium leading-snug">
+                  {(r.views !== undefined || r.publishedAt) && (
+                    <p className="text-center text-[11px] text-gray1 pt-1.5 pb-0.5">
+                      {r.views !== undefined && (
+                        <span>{formatViews(r.views)} Aufrufe</span>
+                      )}
+                      {r.views !== undefined && r.publishedAt && " · "}
+                      {r.publishedAt && (
+                        <span>{timeAgo(r.publishedAt)}</span>
+                      )}
+                    </p>
+                  )}
+                  <div className="px-4 pb-4 pt-2">
+                    <p className="text-sm font-semibold leading-snug">
                       {r.title}
                     </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <div className="mt-2.5 flex flex-wrap items-center gap-2">
                       <AnimatedDots score={r.score} />
                       <span className={`text-xs font-semibold ${tone.text}`}>
                         {r.label}
