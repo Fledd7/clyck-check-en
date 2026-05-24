@@ -520,7 +520,7 @@ function fitInsight(titleAnalysis: TitleAnalysisResult[]): Insight | null {
   if (avg < 2.5) {
     return {
       headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
-      text: "Die KI-Analyse zeigt: Bei den meisten Videos arbeiten Titel und Bild nicht zusammen. Genau hier entstehen die meisten verlorenen Klicks.",
+      text: "Die Analyse zeigt: Bei den meisten Videos arbeiten Titel und Bild nicht zusammen. Genau hier entstehen die meisten verlorenen Klicks.",
     };
   }
   if (avg < 3.5) {

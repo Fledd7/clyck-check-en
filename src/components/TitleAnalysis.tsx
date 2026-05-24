@@ -27,9 +27,12 @@ function timeAgo(iso: string): string {
   if (days < 1) return "heute";
   if (days === 1) return "gestern";
   if (days < 7) return `vor ${days} Tagen`;
-  if (days < 30) return `vor ${Math.floor(days / 7)} Wochen`;
-  if (days < 365) return `vor ${Math.floor(days / 30)} Monaten`;
-  return `vor ${Math.floor(days / 365)} Jahren`;
+  const weeks = Math.floor(days / 7);
+  if (days < 30) return `vor ${weeks} ${weeks === 1 ? "Woche" : "Wochen"}`;
+  const months = Math.floor(days / 30);
+  if (days < 365) return `vor ${months} ${months === 1 ? "Monat" : "Monaten"}`;
+  const years = Math.floor(days / 365);
+  return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
 }
 
 function textIssueCopy(issue: string): string {
@@ -201,7 +204,7 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
       )}
 
       <p className="mt-3 text-xs text-gray1">
-        KI-basierte Analyse. Kein Zugriff auf interne YouTube-Daten.
+        Automatische Analyse. Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
       </p>
     </div>
   );
@@ -256,7 +259,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
         <div className="mt-4">
           <p className="text-sm text-gray1">
             {timedOut
-              ? "Die KI-Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
+              ? "Die Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
               : `Analysiere Video ${Math.min(analyzedCount + 1, TOTAL_VIDEOS)} von ${TOTAL_VIDEOS} …`}
           </p>
           <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-line">

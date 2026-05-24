@@ -26,9 +26,12 @@ function timeAgo(iso: string): string {
   if (days < 1) return "heute";
   if (days === 1) return "gestern";
   if (days < 7) return `vor ${days} Tagen`;
-  if (days < 30) return `vor ${Math.floor(days / 7)} Wochen`;
-  if (days < 365) return `vor ${Math.floor(days / 30)} Monaten`;
-  return `vor ${Math.floor(days / 365)} Jahren`;
+  const weeks = Math.floor(days / 7);
+  if (days < 30) return `vor ${weeks} ${weeks === 1 ? "Woche" : "Wochen"}`;
+  const months = Math.floor(days / 30);
+  if (days < 365) return `vor ${months} ${months === 1 ? "Monat" : "Monaten"}`;
+  const years = Math.floor(days / 365);
+  return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
 }
 
 function scoreColor(score: number): string {
