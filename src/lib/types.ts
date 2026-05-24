@@ -93,4 +93,5 @@ export type TitleAnalysisResult = {
   reason: string;
   strong: string;
   weak: string;
+  concept?: string;
 };

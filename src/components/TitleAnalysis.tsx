@@ -124,6 +124,72 @@ function CriteriaPanel() {
   );
 }
 
+function Highlights({ results }: { results: TitleAnalysisResult[] }) {
+  if (results.length < 3) return null;
+  const sorted = [...results].sort((a, b) => b.score - a.score);
+  const best = sorted[0];
+  const worst = sorted[sorted.length - 1];
+  if (best.id === worst.id) return null;
+
+  return (
+    <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
+      <div className="rounded-xl border border-green-200 bg-green-50 p-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-600 mb-2">
+          Stärkstes Thumbnail
+        </p>
+        {best.thumbnail && (
+          <img
+            src={best.thumbnail}
+            alt=""
+            className="w-full rounded-lg object-cover"
+            style={{ aspectRatio: "16/9" }}
+          />
+        )}
+        <div className="mt-2 flex items-center gap-1.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <span
+              key={i}
+              className="h-2 w-2 rounded-full"
+              style={{ background: i <= best.score ? "#16A34A" : "#E5E5E5" }}
+            />
+          ))}
+          <span className="ml-1 text-xs font-semibold text-green-600">{best.score}/5</span>
+        </div>
+        <p className="mt-1.5 text-[11px] leading-snug text-gray1">
+          {best.title.length > 50 ? best.title.slice(0, 50) + "..." : best.title}
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+        <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-accent mb-2">
+          Größtes Potenzial
+        </p>
+        {worst.thumbnail && (
+          <img
+            src={worst.thumbnail}
+            alt=""
+            className="w-full rounded-lg object-cover"
+            style={{ aspectRatio: "16/9" }}
+          />
+        )}
+        <div className="mt-2 flex items-center gap-1.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <span
+              key={i}
+              className="h-2 w-2 rounded-full"
+              style={{ background: i <= worst.score ? "#CC001B" : "#E5E5E5" }}
+            />
+          ))}
+          <span className="ml-1 text-xs font-semibold text-accent">{worst.score}/5</span>
+        </div>
+        <p className="mt-1.5 text-[11px] leading-snug text-gray1">
+          {worst.title.length > 50 ? worst.title.slice(0, 50) + "..." : worst.title}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function Summary({ results }: { results: TitleAnalysisResult[] }) {
   const total = results.length;
   const sum = results.reduce((acc, r) => acc + r.score, 0);
@@ -285,12 +351,12 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
               const inner = (
                 <>
                   {r.thumbnail && (
-                    <div className="relative">
+                    <div className="px-3 pt-3">
                       <img
                         src={r.thumbnail}
                         alt=""
                         loading="lazy"
-                        className="block w-full object-cover"
+                        className="block w-full rounded-[10px] object-cover"
                         style={{ aspectRatio: "16/9" }}
                       />
                     </div>
@@ -386,6 +452,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
               );
             })}
           </div>
+          <Highlights results={results} />
           <Summary results={results} />
         </>
       )}

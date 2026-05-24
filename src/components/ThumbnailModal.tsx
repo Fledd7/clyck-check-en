@@ -324,6 +324,17 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                 <p className="mt-1 text-[13px] font-medium">{recommendation}</p>
               </div>
             )}
+
+            {localAnalysis.concept && (
+              <div className="mt-3 rounded-[10px] bg-bg p-3.5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray1 mb-1.5">
+                  Bildkonzept-Vorschlag
+                </p>
+                <p className="text-[13px] font-medium leading-relaxed">
+                  {localAnalysis.concept}
+                </p>
+              </div>
+            )}
           </>
         ) : (
           <>

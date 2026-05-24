@@ -29,6 +29,7 @@ type ResultItem = {
   reason: string;
   strong: string;
   weak: string;
+  concept: string;
 };
 
 const scoreLabels: Record<AnalysisScore, AnalysisLabel> = {
@@ -249,7 +250,8 @@ Antworte NUR als JSON. Kein Text davor oder danach. Kein Markdown.
   "branding": true | false,
   "reason": "<1 Satz auf Deutsch, max. 15 Wörter, konkret und direkt — keine Fachbegriffe, keine englischen Wörter, kein 'könnte', 'wirkt etwas', 'hat gewisse Schwächen'>",
   "strong": "<Was gut funktioniert, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score <= 2>",
-  "weak": "<Was das Zusammenspiel schwächt, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score = 5>"
+  "weak": "<Was das Zusammenspiel schwächt, 1 Satz auf Deutsch ohne Fachbegriffe — oder leerer String wenn score = 5>",
+  "concept": "<Konkrete Regieanweisung in 1–2 Sätzen auf Deutsch. Was wäre das ideale Bild für diesen Titel gewesen? Beschreibe Motiv, Emotion, Bildaufbau — kein Design-Jargon. Nur ausfüllen wenn score <= 3. Sonst leerer String.>"
 }`;
 }
 
@@ -325,6 +327,7 @@ async function analyzeVideo(
       reason?: string;
       strong?: string;
       weak?: string;
+      concept?: string;
     };
 
     const rawScore = Number(parsed.score);
@@ -364,6 +367,7 @@ async function analyzeVideo(
       reason: baseReason,
       strong: typeof parsed.strong === "string" ? parsed.strong : "",
       weak: typeof parsed.weak === "string" ? parsed.weak : "",
+      concept: typeof parsed.concept === "string" ? parsed.concept : "",
     };
   } catch (err) {
     console.error(`title-analysis: error on video ${video.id}`, err);

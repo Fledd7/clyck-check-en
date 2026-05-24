@@ -243,12 +243,6 @@ export default function ResultPreview({
                       <p className="text-base font-semibold">{channelData.medianViews.toLocaleString("de-DE")}</p>
                     </div>
                   )}
-                  {typeof channelData.longformCount === "number" && (
-                    <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Longform</p>
-                      <p className="text-base font-semibold">{channelData.longformCount}</p>
-                    </div>
-                  )}
                 </div>
                 {typeof channelData.subscriberCount === "number" && (
                   <p className="mt-3 border-t border-line pt-3 text-[13px] text-gray1 leading-relaxed">
