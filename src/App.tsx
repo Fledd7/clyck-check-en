@@ -260,17 +260,7 @@ export default function App() {
           const enriched = (taData.results as TitleAnalysisResult[]).map((r) => {
             const v = videos.find((x) => x.id === r.id);
             if (!v) return r;
-            const withMeta = { ...r, views: v.views, publishedAt: v.publishedAt };
-            if (v.views && v.publishedAt) {
-              const ageInDays = Math.max(1, (Date.now() - new Date(v.publishedAt).getTime()) / 86400000);
-              const viewsPerDay = v.views / ageInDays;
-              if (viewsPerDay > 10_000 && withMeta.score < 4) {
-                withMeta.score = 4 as TitleAnalysisResult["score"];
-              } else if (viewsPerDay > 5_000 && withMeta.score < 3) {
-                withMeta.score = 3 as TitleAnalysisResult["score"];
-              }
-            }
-            return withMeta;
+            return { ...r, views: v.views, publishedAt: v.publishedAt };
           });
           setTitleAnalysis(enriched);
         }

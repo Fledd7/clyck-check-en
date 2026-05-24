@@ -9,10 +9,12 @@ type Props = {
 
 const TOTAL_VIDEOS = 5;
 
-function scoreTone(score: TitleAnalysisScore): { dot: string; text: string } {
-  if (score >= 4) return { dot: "bg-green-500", text: "text-green-700" };
-  if (score === 3) return { dot: "bg-amber-400", text: "text-amber-600" };
-  return { dot: "bg-accent", text: "text-accent" };
+function scoreTone(score: TitleAnalysisScore): { dot: string; text: string; label: string } {
+  if (score >= 5) return { dot: "bg-green-500", text: "text-green-700", label: "Perfekter Fit" };
+  if (score >= 4) return { dot: "bg-green-500", text: "text-green-700", label: "Guter Fit" };
+  if (score >= 3) return { dot: "bg-amber-400", text: "text-amber-600", label: "Mittlerer Fit" };
+  if (score >= 2) return { dot: "bg-accent", text: "text-accent", label: "Schwacher Fit" };
+  return { dot: "bg-accent", text: "text-accent", label: "Kein Fit" };
 }
 
 function formatViews(views: number): string {
@@ -379,7 +381,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                     <div className="mt-2.5 flex flex-wrap items-center gap-2">
                       <AnimatedDots score={r.score} />
                       <span className={`text-xs font-semibold ${tone.text}`}>
-                        {r.label}
+                        {tone.label}
                       </span>
                     </div>
                     {r.reason && (
