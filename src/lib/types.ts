@@ -31,12 +31,6 @@ export type VideoItem = {
   publishedAt: string;
 };
 
-export type FitResult = {
-  videoId: string;
-  title: string;
-  fit: "yes" | "no";
-};
-
 export type ChannelData = {
   title?: string;
   handle?: string;
@@ -57,13 +51,6 @@ export type ChannelMaturity = "early" | "growing" | "established" | "strong" | "
 export type ClarityLevel = "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch";
 
 export type ResultCategoryId = "A" | "B" | "C" | "D";
-
-export type ResultCategory = {
-  id: ResultCategoryId;
-  headline: string;
-  text: string;
-  cta: string;
-};
 
 export type LeadClass = "top" | "good" | "mid" | "weak";
 

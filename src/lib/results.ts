@@ -7,7 +7,6 @@ import type {
   Lever,
   Option,
   TitleAnalysisResult,
-  ResultCategory,
   ResultCategoryId,
 } from "./types";
 
@@ -200,36 +199,6 @@ export function getCategoryContent(
   }
 }
 
-export const categories: Record<ResultCategoryId, ResultCategory> = {
-  A: {
-    id: "A",
-    headline: "Klar im Kanal — schwach in der Verpackung",
-    text:
-      "Deine Richtung steht, aber deine Verpackung transportiert sie noch nicht stark genug. Hier lohnt sich ein klares Thumbnail-System, damit Titel, Videoideen und visuelle Linie besser zusammenspielen.",
-    cta: "Lass uns aus deinem klaren Kanal ein klares Thumbnail-System machen.",
-  },
-  B: {
-    id: "B",
-    headline: "Potenzial da — aber kein wiederholbares System",
-    text:
-      "Du veröffentlichst oder planst genug, aber dein Kanal hat noch keine wiederholbare visuelle Linie. Wiedererkennung entsteht durch ein System, nicht durch einzelne Zufalls-Thumbnails.",
-    cta: "Lass uns eine visuelle Linie entwickeln, die du langfristig wiederholen kannst.",
-  },
-  C: {
-    id: "C",
-    headline: "Strategie vor Design",
-    text:
-      "Dein Engpass liegt wahrscheinlich nicht nur beim Bild, sondern davor: bei Richtung, Idee, Titel oder Positionierung. Bevor gestaltet wird, muss klar sein, was eigentlich verpackt werden soll.",
-    cta: "Lass uns zuerst deine Kanalrichtung und dein Packaging schärfen.",
-  },
-  D: {
-    id: "D",
-    headline: "Guter Moment — noch früh genug, es richtig aufzusetzen",
-    text:
-      "Du bist noch früh genug, um deinen Kanal von Anfang an sauber zu verpacken, bevor sich ein uneinheitlicher Stil einschleift.",
-    cta: "Lass uns deinen Start visuell klar aufsetzen.",
-  },
-};
 
 function getDominantTag(problemValues: string[], allOptions: Option[]): string | null {
   const counts: Record<string, number> = {};

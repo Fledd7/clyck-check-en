@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 type LeadClass = "top" | "good" | "mid" | "weak";
-type DiagnosisLevel = "niedrig" | "mittel" | "hoch";
 type TitleAnalysisScore = 1 | 2 | 3 | 4 | 5;
 
 type ChannelData = {
@@ -52,11 +51,6 @@ type Body = {
     };
     insights?: InsightOrLever[];
     levers?: InsightOrLever[];
-    diagnosis?: {
-      direction?: DiagnosisLevel;
-      system?: DiagnosisLevel;
-      cadence?: DiagnosisLevel;
-    };
   };
 };
 
@@ -107,11 +101,6 @@ const leadClassLabel: Record<LeadClass, string> = {
   weak: "Schwacher Lead",
 };
 
-const diagLabel: Record<DiagnosisLevel, string> = {
-  niedrig: "Niedrig",
-  mittel: "Mittel",
-  hoch: "Hoch",
-};
 
 function escape(s: string): string {
   return s
@@ -138,7 +127,6 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
   const ch = body.channelData ?? null;
   const insights = body.result?.insights ?? [];
   const levers = body.result?.levers ?? [];
-  const diag = body.result?.diagnosis;
   const ta = body.titleAnalysis ?? null;
 
   const answerLines = Object.entries(questionLabels)
@@ -191,12 +179,6 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
         .join("")
     : "";
 
-  const diagLines = diag
-    ? `<p style="margin:12px 0 4px"><strong>Packaging-Diagnose</strong></p>` +
-      lineBlock("Kanalrichtung", diagLabel[diag.direction ?? "mittel"]) +
-      lineBlock("Thumbnail-System", diagLabel[diag.system ?? "mittel"]) +
-      lineBlock("Upload-Rhythmus", diagLabel[diag.cadence ?? "mittel"])
-    : "";
 
   const thumbsLine =
     ch?.thumbnails && ch.thumbnails.length > 0
@@ -228,7 +210,6 @@ function buildInternalHtml(body: Required<Pick<Body, "name" | "email">> & Body):
     ${answerLines}
     ${channelLines.length ? `<p style="margin:16px 0 4px"><strong>Kanaldaten</strong></p>${channelLines.join("")}` : ""}
     ${titleAnalysisLines}
-    ${diagLines}
     ${insightLines}
     ${leverLines}
     ${thumbsLine}
