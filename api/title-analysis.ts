@@ -152,18 +152,27 @@ Zählregeln:
 
 Im Zweifel weniger zählen.
 
-overloaded: true NUR wenn elementCount >= 5
-ODER Komposition bei elementCount 4 wirklich
-schwer auf einen Blick erfassbar.
+overloaded: true NUR wenn BEIDE zutreffen:
+- elementCount >= 5 UND
+- Das Bild wirkt auf den ersten Blick
+  chaotisch und schwer erfassbar —
+  es gibt keine klare Hauptperson oder
+  kein klares Hauptmotiv das sofort auffällt
 
-NICHT als overloaded werten:
-- In-Scene-Elemente (Text auf Tafeln, Schildern,
-  Wänden etc.) sind Teil der Szene und kein
-  separates visuelles Element
-- Versus/Debate-Format mit mehreren Personen
-  ist bewusst und kein Overloading
-- Hintergrundszene mit vielen Details ist
-  trotzdem nur 1 Element
+overloaded: false wenn:
+- Klare visuelle Hierarchie erkennbar ist
+  (auch bei 4+ Elementen)
+- Eine Person oder ein Motiv klar dominiert
+- Cartoon/Illustration-Elemente als
+  bewusst gestalteter Stil eingesetzt werden
+  (z.B. Cartoon-Figuren neben echter Person
+  als künstlerisches Konzept)
+- Der Hintergrund dekorativ ist aber
+  die Komposition nicht stört
+
+Kreative Stile mit mehreren Elementen
+sind nicht automatisch überladen —
+nur wenn das Auge keinen Ankerpunkt findet.
 
 ---
 
@@ -211,7 +220,7 @@ Text der als separater Layer über das Bild
 gelegt wurde — erkennbar durch eigene
 Schriftart, eigenen Hintergrund oder
 fehlenden natürlichen Bezug zur Szene.
-→ Hier gelten die normalen textIssue-Regeln
+→ Hier gelten die normalen Regeln
 
 ---
 
