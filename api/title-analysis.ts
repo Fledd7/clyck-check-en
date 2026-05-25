@@ -107,6 +107,31 @@ WICHTIG: "veraltet" hat Vorrang vor allen anderen.
 Ein Thumbnail mit farbigem Text-Banner ist IMMER
 "veraltet" — egal wie modern der Rest wirkt.
 
+### AUSNAHME: Versus/Debate-Format (IMMER zeitgemäß)
+
+Wenn das Thumbnail diesem Muster entspricht:
+- Weißer oder heller Balken/Banner oben oder unten
+- Darin steht "X vs Y", "X vs Z Personen",
+  Titel oder Thema der Debatte
+- Darunter/daneben stehen die beteiligten
+  Personen nebeneinander oder in Konfrontation
+
+→ styleAge: "zeitgemäß" — IMMER, keine Ausnahme
+→ textIssue: "" — Text ist Teil des Formats,
+  kein Titel-Repeat auch wenn Wörter übereinstimmen
+→ overloaded: false — mehrere Personen sind
+  bei diesem Format bewusst und korrekt
+→ Score mindestens 3, bei gutem Fit 4-5
+
+Dieser Stil ist 2024-2025 weit verbreitet und
+zeitgemäß. Der weiße Banner oben ist kein
+veraltetes Element sondern ein Format-Merkmal.
+
+Beispiel:
+Banner oben: "TIERSCHÜTZER VS 10 PRO ZOO"
+Darunter: Personen in Konfrontation
+→ zeitgemäß, kein Textproblem, Score 4-5
+
 ---
 
 ## SCHRITT 2: ELEMENTE ZÄHLEN
@@ -417,7 +442,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  console.log(`title-analysis: received ${videos.length} videos`);
   const videoSubset = videos.slice(0, 5);
+  console.log(`title-analysis: analyzing ${videoSubset.length} videos`);
   const settled = await Promise.allSettled(
     videoSubset.map((video) => analyzeVideo(ai, model, video))
   );
