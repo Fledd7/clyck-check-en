@@ -271,7 +271,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
 
             {localAnalysis.reason && (
               <p className="mt-3 text-sm italic leading-relaxed text-gray1">
-                „{localAnalysis.reason}"
+                „{localAnalysis.reason}“
               </p>
             )}
 
@@ -355,7 +355,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               </p>
             )}
 
-            {recommendation && (
+            {recommendation && localAnalysis.score <= 3 && (
               <div className="mt-4 rounded-[10px] bg-bg p-3.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray1">
                   Empfehlung
@@ -364,13 +364,43 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               </div>
             )}
 
-            {localAnalysis.concept && (
+            {localAnalysis.concept && localAnalysis.score <= 3 && (
               <div className="mt-3 rounded-[10px] bg-bg p-3.5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray1 mb-1.5">
                   Bildkonzept-Vorschlag
                 </p>
                 <p className="text-[13px] font-medium leading-relaxed">
                   {localAnalysis.concept}
+                </p>
+              </div>
+            )}
+
+            {localAnalysis.score === 5 && (
+              <div style={{
+                background: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                borderRadius: '10px',
+                padding: '14px 16px',
+                marginTop: '12px',
+              }}>
+                <p style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: '#16A34A',
+                  marginBottom: '6px',
+                }}>
+                  Was hier besonders stark ist
+                </p>
+                <p style={{
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  color: '#15803D',
+                  lineHeight: 1.5,
+                }}>
+                  {localAnalysis.strong ||
+                   'Bild und Titel erzeugen gemeinsam einen starken Klickanreiz — das ist die Grundlage für ein funktionierendes Thumbnail-System.'}
                 </p>
               </div>
             )}
