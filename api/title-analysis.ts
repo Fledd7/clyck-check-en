@@ -156,6 +156,15 @@ overloaded: true NUR wenn elementCount >= 5
 ODER Komposition bei elementCount 4 wirklich
 schwer auf einen Blick erfassbar.
 
+NICHT als overloaded werten:
+- In-Scene-Elemente (Text auf Tafeln, Schildern,
+  Wänden etc.) sind Teil der Szene und kein
+  separates visuelles Element
+- Versus/Debate-Format mit mehreren Personen
+  ist bewusst und kein Overloading
+- Hintergrundszene mit vielen Details ist
+  trotzdem nur 1 Element
+
 ---
 
 ## SCHRITT 3: TEXT BEWERTEN
@@ -180,6 +189,29 @@ Wörter im Bild.
 Kontext noch Klick-Anreiz verstärkt.
 
 "" (leer) wenn Text fehlt oder korrekt eingesetzt.
+
+WICHTIGE UNTERSCHEIDUNG — Text-Typen:
+
+IN-SCENE-TEXT (nie als textIssue werten):
+Text der natürlich in die Szene integriert ist —
+auf einer Tafel, einem Schild, einer Wand,
+einem Whiteboard, einem Bildschirm, einer
+Verpackung, einem Trikot oder ähnlichem.
+Dieser Text ist Teil der visuellen Geschichte,
+kein separater Textlayer.
+
+Beispiele für In-Scene-Text:
+- "HIDE AND SEEK" auf einer Schultafel
+- "BACK TO SCHOOL 2.0" auf einer Kreidetafel
+- Schriftzug auf einem Plakat im Hintergrund
+→ textIssue: "" — immer leer, nie bestrafen
+
+OVERLAY-TEXT (kann ein Problem sein):
+Text der als separater Layer über das Bild
+gelegt wurde — erkennbar durch eigene
+Schriftart, eigenen Hintergrund oder
+fehlenden natürlichen Bezug zur Szene.
+→ Hier gelten die normalen textIssue-Regeln
 
 ---
 
