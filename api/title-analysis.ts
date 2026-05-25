@@ -115,6 +115,28 @@ WICHTIG — Grenzfälle:
 - Mehrere Objekte die thematisch zusammengehören
   (z.B. Ski + Skifahrer) = 1 Element
 
+HINTERGRUNDSZENE-REGEL (wichtigste Regel):
+Alles was im Hintergrund passiert zählt als
+EIN Element "Hintergrundszene" — egal wie viel
+darin vorkommt.
+
+Beispiele:
+- Person vorne + Wald mit Gruppe und Flaggen hinten
+  = 2 Elemente (Person + Hintergrundszene)
+- Person vorne + Stadtkulisse mit Menschen hinten
+  = 2 Elemente
+- Zwei Personen vorne + Bühne mit Publikum hinten
+  = 2 Elemente (Personengruppe + Hintergrundszene)
+- Person vorne + Hintergrundszene + Text
+  = 3 Elemente
+
+NUR wenn ein Objekt im Vordergrund prominent
+platziert und klar vom Hintergrund getrennt ist,
+zählt es als eigenes Element.
+
+Im Zweifel: Hintergrunddetails gehören zur
+Hintergrundszene und werden nicht separat gezählt.
+
 BEISPIELE (korrekte Zählung):
 Person + Hintergrundszene + Ortsangabe-Badge = 3 Elemente
 Person + Text-Banner + Logo = 3 Elemente
@@ -157,6 +179,39 @@ PROBLEM: Text ohne erkennbaren Klick-Mehrwert
 KEIN PROBLEM: 5 oder weniger bedeutungstragende Wörter
 die den Klick-Anreiz verstärken
 → textIssue: "" (leer)
+
+WICHTIGE UNTERSCHEIDUNG bei textIssue:
+
+"wiederholt Titel" NUR wenn der Text im Thumbnail
+denselben Satz oder dieselbe Aussage wie der Titel
+transportiert — nicht wenn er essenziellen Kontext
+liefert den der Titel allein nicht hat.
+
+KEIN Titel-Repeat (textIssue leer lassen):
+- Ein Name (Person, Ort, Marke) der im Thumbnail
+  eingekreist oder markiert wird: "XAVIER NAIDOO",
+  "REGENSBURG", "PORSCHE" — das ist Kontext-Label,
+  kein Titel-Repeat
+- Schlüsselbegriffe die das Thumbnail ohne Titel
+  nicht verständlich machen würden
+- 1-2 Wörter die einen visuellen Anker setzen
+
+TITEL-REPEAT (textIssue: "wiederholt Titel"):
+- Wenn der komplette Satz des Titels im Bild steht
+- Wenn der Text dieselbe Aussage wie der Titel macht
+  ohne neuen visuellen Mehrwert zu liefern
+- Wenn der Text ohne das Bild denselben Inhalt
+  hätte wie der Titel allein
+
+Beispiel KEIN Repeat:
+Titel: "Xavier Naidoo zu konfrontieren war ein Fehler"
+Text im Bild: "XAVIER NAIDOO" (als Label bei eingekreister Person)
+→ textIssue: "" (essenzieller Kontext-Label)
+
+Beispiel REPEAT:
+Titel: "Ich war beim geheimen AfD Wandertag"
+Text im Bild: "GEHEIMER AFD WANDERTAG"
+→ textIssue: "wiederholt Titel"
 
 ---
 
@@ -246,6 +301,41 @@ erkennbarer moderner Designaufwand vorhanden ist.
 
 ---
 
+## Moderne Thumbnail-Stile (nicht bestrafen)
+
+Folgende Stile sind etablierte moderne Formate
+die bewusst eingesetzt werden und NICHT als
+"veraltet" oder "überladen" gewertet werden:
+
+DEBATE/VERSUS-STIL:
+- Titel oder Thema steht als Text oben/unten
+- Darunter/daneben stehen die beteiligten Parteien
+  als Personen oder Bilder
+- Beispiel: "TIERSCHÜTZER VS 10 PRO ZOO" oben,
+  darunter die Personen in Konfrontation
+- Dieser Stil ist 2024–2025 weit verbreitet und
+  zeitgemäß — styleAge: "zeitgemäß"
+- Score-Abzug für Text nur wenn der Text den
+  Titel komplett wiederholt, nicht bei klarem
+  Versus/Debate-Format
+
+EXPOSÉ/UNDERCOVER-STIL:
+- Person im Vordergrund mit überraschtem/
+  erschrockenem Ausdruck
+- Im Hintergrund erkennbare Szene/Situation
+  die der Titel beschreibt
+- Zeitgemäß, hohe Klickstärke
+- styleAge: "zeitgemäß"
+
+EINKREIS/MARKIERUNGS-STIL:
+- Eine bekannte Person wird eingekreist/markiert
+  mit Namens-Label
+- Hauptperson reagiert darauf im Vordergrund
+- Zeitgemäß und effektiv
+- styleAge: "zeitgemäß"
+
+---
+
 ## Schritt 7: Titel-Thumbnail-Fit bewerten
 
 Bewertet wird ausschließlich das Zusammenspiel aus Bild und Titel
@@ -273,6 +363,24 @@ Gemeint sind: wiederkehrendes Gesicht, Farbpalette, Schriftbild
 oder ein wiederholbarer visueller Aufbau.
 
 ---
+
+SCORE-KALIBRIERUNG:
+
+Wenn das Thumbnail einem der bekannten modernen
+Stile (Debate, Exposé, Einkreis) entspricht:
+- Kein Abzug für Text der zum Stil gehört
+- Kein overloaded: true wenn der Stil bewusst
+  mehrere Elemente kombiniert
+- Minimum-Score für zeitgemäßen Stil mit
+  klarer Botschaft: 3/5
+- Wenn Stil + Titel gut zusammenpassen: 4/5
+- Perfekter Fit (5/5) nur wenn keinerlei
+  Verbesserungspotenzial erkennbar
+
+Für den AfD-Wandertag-Stil (Person flüchtend
+vor Gruppe im Hintergrund):
+→ 2-3 Elemente, zeitgemäß, starke Neugier
+→ Score: mindestens 4/5
 
 SCORE-REGELN (zwingend einhalten):
 - Rotes/gelbes Textbanner als Hauptgestaltungselement
