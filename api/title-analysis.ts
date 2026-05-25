@@ -70,6 +70,46 @@ Videotitel: "${title}"
 
 ---
 
+## HARTE REGELN — immer anwenden, keine Ausnahmen
+
+Diese Stile sind IMMER styleAge "veraltet"
+und bekommen IMMER score maximal 3:
+
+1. LOGO-DOMINANT-STIL
+   Großes Firmen- oder Markenlogo nimmt mehr als
+   1/4 der Bildfläche ein und ist als primäres
+   Gestaltungselement eingesetzt
+   (nicht als kleines Branding-Element am Rand)
+
+2. APP/PRODUKT-SCREENSHOT-STIL
+   Ein App-Screenshot oder Produkt-Interface
+   ist als Hauptelement neben einer Person platziert
+   (typisch für Finanz-, Crypto-, Software-Reviews
+   aus 2019-2022)
+
+3. FARBIGER TEXT-BANNER
+   Gelber, roter, blauer oder grüner Banner/Badge mit
+   Text darin als Gestaltungselement
+
+4. FOLIENLAYOUT
+   Foto und Text nebeneinander ohne echte
+   Bildkomposition — wirkt wie PowerPoint
+
+5. STOCK-FOTO + TEXT OVERLAY
+   Generisches Stock-Foto mit Text darüber —
+   kein echter Compositing-Aufwand erkennbar
+
+Diese Regeln überschreiben ALLE anderen Bewertungen.
+Auch wenn der Rest des Thumbnails modern wirkt,
+auch wenn die Komposition sauber ist,
+auch wenn Kontrast vorhanden ist.
+
+Ein Thumbnail mit Logo-dominant-Stil + sauberer
+Komposition bekommt maximal 3 — nicht 5.
+Ein sauberes Thumbnail ist nicht automatisch zeitgemäß.
+
+---
+
 ## SCHRITT 1: STIL-EINORDNUNG
 
 Ordne das Thumbnail in genau eine Kategorie:
