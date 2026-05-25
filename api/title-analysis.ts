@@ -87,9 +87,29 @@ und bekommen IMMER score maximal 3:
    (typisch für Finanz-, Crypto-, Software-Reviews
    aus 2019-2022)
 
-3. FARBIGER TEXT-BANNER
-   Gelber, roter, blauer oder grüner Banner/Badge mit
-   Text darin als Gestaltungselement
+3. FARBIGER TEXT-BANNER (nur dieser spezifische Typ)
+   Rechteckiger, einfarbiger Balken/Badge
+   (gelb, rot, grün) mit sauber gesetztem Text DARIN —
+   wirkt wie ein Label, Sticker oder Preisschild.
+   Erkennbar durch: klare rechteckige Form,
+   flache Farbe, Text sitzt ordentlich darin.
+   Beispiele: gelbe Box mit "PAIN!", roter Balken
+   mit "NEU!", grüner Badge mit "GRATIS!"
+
+   NICHT gemeint (kein Textbanner, nicht veraltet):
+   Dynamischer Bildtext — Text der als integriertes
+   Gestaltungselement ins Bild eingebaut ist:
+   - Schräggestellte oder perspektivische Schrift
+   - Text mit Schatten, Tiefe oder Bewegungseffekt
+   - Große, gestalterisch eingesetzte Typografie
+     die Teil der visuellen Komposition ist
+   - Text der sich in Größe und Stil der
+     Bildstimmung anpasst
+   Beispiele für dynamischen Bildtext (NICHT veraltet):
+   "PADEL TURNIER" in schrägem Großformat mit Schatten,
+   "10 JAHRE" in stilisierter Schrift über Personen,
+   "HIDE AND SEEK" auf Schultafel im Bild
+   → Diese werden nie als Textbanner gewertet
 
 4. FOLIENLAYOUT
    Foto und Text nebeneinander ohne echte
@@ -120,6 +140,16 @@ Mindestens EINES dieser Merkmale reicht:
   mit Text darin als Gestaltungselement
   (z.B. gelbe Box mit "PAIN!", roter Banner mit
   "NEU!", bunter Badge mit Highlights)
+
+UNTERSCHEIDUNG Textbanner vs. Bildtext:
+Vor der Einordnung als "veraltet" prüfen:
+Ist der Text ein flacher rechteckiger Balken/Badge
+mit einfarbigem Hintergrund?
+→ JA: Textbanner → veraltet
+→ NEIN, sondern dynamische Typografie ohne
+  rechteckigen Hintergrund: → kein Textbanner,
+  styleAge nach anderen Kriterien bestimmen
+
 - Folienlayout: Foto + Text nebeneinander ohne
   echte Bildkomposition, wirkt wie PowerPoint
 - Mehr als 6 bedeutungstragende Wörter im Bild
@@ -132,6 +162,14 @@ NUR wenn BEIDE Punkte zutreffen:
   (hochwertige Bildbearbeitung, komplexe Szene)
 - Trotzdem zu viele Elemente ohne klare Hierarchie,
   das Auge weiß nicht wo es hinschauen soll
+
+Thumbnails mit dynamischem Bildtext + modernem
+Composite + vielen Elementen:
+→ styleAge: "überladen" (nicht "veraltet")
+→ score: 3/5
+Beispiel: Sportliche Komposition mit mehreren
+Personen, dynamischer Schrift und vielen
+Elementen — moderner Stil, aber zu vollgepackt
 
 ### "zeitgemäß"
 - Klare visuelle Hierarchie
