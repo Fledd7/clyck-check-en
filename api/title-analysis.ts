@@ -274,6 +274,16 @@ Sei direkt — nicht diplomatisch.
 - Clipart-artige Elemente oder Stockfoto-Stil
 - Kein erkennbarer Compositing-Aufwand
 
+IMMER als "veraltet" klassifizieren:
+- Vorher-Nachher-Vergleich mit gelbem oder
+  farbigem Textbanner (z.B. "-10KG IN 10 MONATEN"
+  in gelber Box links, Körper-Fotos rechts)
+- Dieser Stil ist ein eindeutiges Signal für
+  ältere Thumbnail-Ästhetik — unabhängig davon
+  ob die Fotos modern wirken
+- Kein moderner Compositing-Aufwand ändert
+  diese Einordnung wenn der Banner-Stil dominant ist
+
 "überladen" — wenn ALLE dieser Punkte zutreffen:
 - Der Stil ist zeitgemäß: hochwertige Bildbearbeitung,
   modernes Composite, erkennbarer Designaufwand
@@ -393,6 +403,18 @@ SCORE-REGELN (zwingend einhalten):
   → score maximal 2
 - Score 5 ist nur möglich wenn:
   Kein Textproblem + zeitgemäßer Stil + kein Overloading
+
+---
+
+NICHT als Manko (weak) werten:
+- Dass die Anzahl der Personen im Thumbnail
+  nicht exakt mit einer Zahl im Titel übereinstimmt
+  (z.B. "10 Pro Zoo" aber nur 5-6 Personen sichtbar)
+  Das ist eine bewusste gestalterische Entscheidung
+  und kein Fehler — mehr Personen würden das
+  Thumbnail überladen
+- Lass diese Art von Diskrepanz komplett weg
+  aus der weak/Manko-Bewertung
 
 ---
 
