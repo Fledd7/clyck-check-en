@@ -306,14 +306,14 @@ lack of natural connection to the scene.
 
 Check whether the main subject stands out clearly:
 
-"Hell/Dunkel": Dark subject against bright background
+"Light/Dark": Dark subject against bright background
 or vice versa. IMPORTANT: Person in dark clothing
 against snowy landscape, bright sky or bright wall
 = clear light/dark contrast. Don't overlook.
 
-"Komplementärfarben": Opposite colors.
+"Complementary Colors": Opposite colors.
 
-"Sättigung": Saturated subject, desaturated
+"Saturation": Saturated subject, desaturated
 background.
 
 "None": ONLY if the subject truly blends into the
