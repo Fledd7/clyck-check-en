@@ -12,12 +12,12 @@ export default function ConfirmationScreen() {
   const lastCheck = useMemo(() => loadCheckHistory(), []);
 
   const linkedInText = useMemo(() => {
-    const lines = ["Ich habe gerade meinen YouTube-Kanal mit dem Clyck Check analysiert."];
+    const lines = ["I just analyzed my YouTube channel with Clyck Check."];
     if (lastCheck && lastCheck.avgFitScore > 0) {
-      lines.push(`Mein Titel-Thumbnail-Fit-Score: Ø ${lastCheck.avgFitScore.toFixed(1)} / 5`);
+      lines.push(`My Title-Thumbnail Fit Score: Ø ${lastCheck.avgFitScore.toFixed(1)} / 5`);
     }
     if (lastCheck?.categoryHeadline) {
-      lines.push(`Ergebnis: ${lastCheck.categoryHeadline}`);
+      lines.push(`Result: ${lastCheck.categoryHeadline}`);
     }
     lines.push(`Tool: ${shareTarget}`);
     return lines.join("\n\n");
@@ -35,15 +35,15 @@ export default function ConfirmationScreen() {
 
   return (
     <section className="container-narrow fade-in py-16 sm:py-24">
-      <h1 className="text-[32px] font-bold sm:text-[38px]">Danke.</h1>
+      <h1 className="text-[32px] font-bold sm:text-[38px]">Thank you.</h1>
       <p className="mt-5 text-lg leading-relaxed text-gray1">
-        Ich sehe mir deine Angaben persönlich an und melde mich mit einer
-        konkreten Einschätzung.
+        I'll personally review your answers and get back to you with a
+        concrete assessment.
       </p>
 
       <div className="mt-12 border-t border-line pt-8">
         <p className="text-sm text-gray1">
-          Kennst du jemanden, dem dieser Check helfen könnte?
+          Know someone this could help?
         </p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <a
@@ -52,10 +52,10 @@ export default function ConfirmationScreen() {
             rel="noopener noreferrer"
             className="btn-secondary text-sm"
           >
-            LinkedIn teilen
+            Share on LinkedIn
           </a>
           <button type="button" onClick={copyLink} className="btn-secondary text-sm">
-            {copied ? "Kopiert!" : "Link kopieren"}
+            {copied ? "Copied!" : "🔗 Copy link"}
           </button>
         </div>
       </div>

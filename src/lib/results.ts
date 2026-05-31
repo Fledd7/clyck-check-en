@@ -15,45 +15,45 @@ export function getThumbnailRecommendation(result: TitleAnalysisResult): string 
 
   if (result.textIssue === "wiederholt Titel") {
     issues.push(
-      "Ersetze den Text durch ein starkes Schlüsselwort oder entferne ihn — der Titel daneben macht ihn überflüssig."
+      "Replace the text with a strong keyword or remove it — the title next to it makes it redundant."
     );
   } else if (result.textIssue === "zu lang") {
-    issues.push("Kürze den Text auf maximal 5 Wörter. Weniger Text, stärkere Wirkung.");
+    issues.push("Shorten the text to a maximum of 5 words. Less text, stronger impact.");
   } else if (result.textIssue === "kein Mehrwert") {
     issues.push(
-      "Der Text verstärkt den Klick-Anreiz nicht. Bau das Thumbnail erst ohne Text — und prüfe ob er wirklich nötig ist."
+      "The text doesn't strengthen the click incentive. Build the thumbnail without text first — then check if it's really needed."
     );
   }
 
   if (result.elementCount > 3) {
     issues.push(
-      `${result.elementCount} Hauptelemente sind zu viel. Reduziere auf 3 — entscheide was das Wichtigste ist.`
+      `${result.elementCount} main elements is too many. Reduce to 3 — decide what's most important.`
     );
   }
 
-  if (result.contrast === "Keiner") {
+  if (result.contrast === "None") {
     issues.push(
-      "Kein klarer Kontrast erkennbar. Probier ein dunkles Subjekt vor hellem Hintergrund oder Komplementärfarben."
+      "No clear contrast recognizable. Try a dark subject against a bright background or complementary colors."
     );
   }
 
   if (result.format === "Keines davon") {
     issues.push(
-      "Das Thumbnail nutzt kein bewährtes Klick-Format. Frag dich: Was ist an dieser Idee remarkable?"
+      "The thumbnail doesn't use a proven click format. Ask yourself: what's remarkable about this idea?"
     );
   }
 
   if (result.score <= 2) {
     issues.push(
-      "Titel und Bild erzeugen keine gemeinsame Botschaft. Plant beide von Anfang an zusammen — nicht getrennt voneinander."
+      "Title and image don't create a shared message. Plan both together from the start — not independently."
     );
   }
 
   if (issues.length === 0) {
     if (result.score >= 4) {
-      return "Starke Kombination. Halte diesen Stil als Vorlage für künftige Thumbnails.";
+      return "Strong combination. Keep this style as a template for future thumbnails.";
     }
-    return "Solide Basis. Schärfe den Klick-Anreiz durch ein klareres Format.";
+    return "Solid foundation. Sharpen the click incentive with a clearer format.";
   }
 
   return issues.slice(0, 2).join(" ");
@@ -99,24 +99,24 @@ export function getCategoryContent(
 ): CategoryContent {
   if (maturity === "authority") {
     return {
-      headline: "Etablierter Kanal — System entscheidet jetzt",
+      headline: "Established channel — the system decides now",
       explanation:
-        "Dein Kanal hat Reichweite und Substanz bewiesen. " +
-        "Auf diesem Level ist die Frage nicht mehr, ob der Kanal funktioniert — " +
-        "sondern ob das visuelle System so stark ist wie der Content dahinter.",
+        "Your channel has proven reach and substance. " +
+        "At this level, the question is no longer whether the channel works — " +
+        "but whether the visual system is as strong as the content behind it.",
       ctaText:
-        "Lass uns prüfen, ob dein Packaging auf diesem Level wirklich ausgereizt ist.",
+        "Let's check whether your packaging is truly maxed out at this level.",
     };
   }
 
   if (maturity === "strong") {
     return {
-      headline: "Starker Kanal — Packaging auf das nächste Level",
+      headline: "Strong channel — take packaging to the next level",
       explanation:
-        "Du hast eine echte Zuschauerschaft aufgebaut. " +
-        "Jetzt geht es darum, ob dein visuelles System diese Stärke " +
-        "konsequent nach außen trägt.",
-      ctaText: "Lass uns dein Packaging auf diesem Level schärfen.",
+        "You've built a real audience. " +
+        "Now it's about whether your visual system consistently " +
+        "communicates this strength.",
+      ctaText: "Let's sharpen your packaging at this level.",
     };
   }
 
@@ -124,38 +124,38 @@ export function getCategoryContent(
     switch (category) {
       case "A":
         return {
-          headline: "Klare Richtung — Packaging kann stärker werden",
+          headline: "Clear direction — packaging can get stronger",
           explanation:
-            "Dein Kanal hat Substanz aufgebaut. " +
-            "Die Richtung stimmt — aber dein visuelles System " +
-            "transportiert diese Stärke noch nicht vollständig.",
+            "Your channel has built substance. " +
+            "The direction is right — but your visual system " +
+            "doesn't fully communicate this strength yet.",
           ctaText:
-            "Lass uns ein Thumbnail-System entwickeln, das zu deinem Level passt.",
+            "Let's develop a thumbnail system that matches your level.",
         };
       case "B":
         return {
-          headline: "Gute Basis — aber noch kein klares System",
+          headline: "Good foundation — but still no clear system",
           explanation:
-            "Du veröffentlichst regelmäßig und baust Reichweite auf. " +
-            "Was fehlt, ist eine wiederholbare visuelle Linie, " +
-            "die deinen Kanal erkennbar macht.",
+            "You publish regularly and are building reach. " +
+            "What's missing is a repeatable visual direction " +
+            "that makes your channel recognizable.",
           ctaText:
-            "Lass uns eine visuelle Linie entwickeln, die du jede Woche wiederholen kannst.",
+            "Let's develop a visual direction you can repeat every week.",
         };
       case "C":
         return {
-          headline: "Strategie zuerst — dann Design",
+          headline: "Strategy first — then design",
           explanation:
-            "Dein Kanal hat bereits eine Basis. " +
-            "Bevor das Packaging stärker wird, sollte klar sein, " +
-            "welche Botschaft es transportieren soll.",
-          ctaText: "Lass uns zuerst deine Kanalrichtung schärfen.",
+            "Your channel already has a foundation. " +
+            "Before the packaging gets stronger, it should be clear " +
+            "what message it needs to communicate.",
+          ctaText: "Let's sharpen your channel direction first.",
         };
       default:
         return {
-          headline: "Gute Basis — Packaging kann stärker werden",
-          explanation: "Dein Kanal hat Substanz. Jetzt lohnt sich ein klares System.",
-          ctaText: "Lass uns dein Packaging systematisch aufbauen.",
+          headline: "Good foundation — packaging can get stronger",
+          explanation: "Your channel has substance. Now a clear system pays off.",
+          ctaText: "Let's build your packaging systematically.",
         };
     }
   }
@@ -163,38 +163,38 @@ export function getCategoryContent(
   switch (category) {
     case "A":
       return {
-        headline: "Klar, aber schwach verpackt",
+        headline: "Clear direction — packaging can get stronger",
         explanation:
-          "Deine Richtung steht — aber deine Verpackung transportiert sie noch nicht. " +
-          "Hier lohnt sich ein klares Thumbnail-System.",
-        ctaText: "Lass uns aus deinem klaren Kanal ein klares Thumbnail-System machen.",
+          "Your direction is set — but your packaging doesn't communicate it fully yet. " +
+          "A clear thumbnail system pays off here.",
+        ctaText: "Let's turn your clear channel into a clear thumbnail system.",
       };
     case "B":
       return {
-        headline: "Potenzial da — aber kein wiederholbares System",
+        headline: "Potential is there — but no repeatable system",
         explanation:
-          "Du veröffentlichst genug, aber dein Kanal hat noch keine wiederholbare " +
-          "visuelle Linie. Wiedererkennung entsteht durch einen konsequenten Stil.",
+          "You're publishing enough, but your channel doesn't have a repeatable " +
+          "visual identity yet. Recognition comes from a consistent style.",
         ctaText:
-          "Lass uns eine visuelle Linie entwickeln, die du jede Woche wiederholen kannst.",
+          "Let's develop a visual direction you can repeat every week.",
       };
     case "C":
       return {
-        headline: "Strategie vor Design",
+        headline: "Strategy before design",
         explanation:
-          "Dein Engpass liegt nicht beim Bild, sondern davor — " +
-          "bei Richtung, Idee und Titel. Bevor wir gestalten, " +
-          "muss klar sein, was eigentlich verpackt werden soll.",
-        ctaText: "Lass uns zuerst deine Kanalrichtung und dein Packaging schärfen.",
+          "Your bottleneck isn't the image — it's what comes before: " +
+          "direction, idea and title. Before designing, " +
+          "it must be clear what is actually being packaged.",
+        ctaText: "Let's sharpen your channel direction and packaging first.",
       };
     case "D":
     default:
       return {
-        headline: "Guter Moment — noch früh genug, es richtig aufzusetzen",
+        headline: "Good timing — still early enough to set it up right",
         explanation:
-          "Du bist noch früh genug, um deinen Kanal von Anfang an sauber zu " +
-          "verpacken, bevor sich ein uneinheitlicher Stil einschleift.",
-        ctaText: "Lass uns deinen Start visuell klar aufsetzen.",
+          "You're early enough to package your channel cleanly from the start, " +
+          "before an unclear style sets in.",
+        ctaText: "Let's set up your launch with visual clarity.",
       };
   }
 }
@@ -256,17 +256,17 @@ export function selectCategory(answers: Answers): ResultCategoryId {
 export function channelDataNote(channel: ChannelData | null): string | null {
   if (!channel) return null;
   if (typeof channel.longformCount === "number" && channel.longformCount === 0) {
-    return "Für diesen Kanal wurden in den letzten Uploads keine klaren Longform-Videos gefunden. Die Einschätzung basiert daher auf deinen Antworten.";
+    return "No clear longform videos were found in the recent uploads for this channel. The assessment is therefore based on your answers.";
   }
   const thumbs = channel.thumbnails ?? [];
   if (thumbs.length >= 6) {
-    return "Deine letzten Thumbnails zeigen Potenzial, aber noch kein durchgängiges System.";
+    return "Your recent thumbnails show potential, but no consistent system yet.";
   }
   if (thumbs.length > 0) {
-    return "Bei deinen letzten Videos ist noch keine klare visuelle Linie erkennbar.";
+    return "No clear visual direction is recognizable in your recent videos yet.";
   }
   if (channel.title) {
-    return `Öffentliche Kanaldaten zu ${channel.title} wurden in die Einschätzung einbezogen.`;
+    return `Public channel data for ${channel.title} was included in the assessment.`;
   }
   return null;
 }
@@ -303,14 +303,14 @@ export function applyMaturityOverride(
 
 export function getBenchmarkText(subs: number): string {
   if (subs > 1_000_000)
-    return "Dein Kanal hat eine signifikante Reichweite aufgebaut. Auf diesem Level entscheidet das System hinter den Thumbnails.";
+    return "Your channel has built significant reach. At this level, the system behind your thumbnails is what matters.";
   if (subs > 100_000)
-    return "Dein Kanal hat bewiesen, dass das Thema funktioniert. Die nächste Stufe erfordert ein klares visuelles System.";
+    return "Your channel has proven the topic works. The next level requires a clear visual system.";
   if (subs > 10_000)
-    return "Du hast erste echte Aufmerksamkeit aufgebaut. Jetzt wird Konsistenz zum entscheidenden Faktor.";
+    return "You've built initial real attention. Now consistency becomes the decisive factor.";
   if (subs > 1_000)
-    return "Du bist in der Aufbauphase — genau hier entscheidet sich, ob der Kanal später skaliert oder nicht.";
-  return "Du stehst am Anfang. Jetzt ist der beste Moment, visuelle Klarheit von Anfang an aufzubauen.";
+    return "You're in the build phase — this is where it's decided whether the channel scales later or not.";
+  return "You're at the beginning. Now is the best time to build visual clarity from the start.";
 }
 
 function rhythmInsight(
@@ -324,62 +324,62 @@ function rhythmInsight(
   if (maturity === "authority" || maturity === "strong") {
     if (typeof medianViews === "number" && medianViews > 1_000_000) {
       return {
-        headline: "Reichweite ist bewiesen — jetzt geht es ums System",
-        text: "Deine Videos erreichen Menschen. Die Frage ist, ob das Thumbnail-System diese Reichweite auch strategisch nutzt — oder ob sie trotz des Systems entsteht.",
+        headline: "Reach is proven — now it's about the system",
+        text: "Your videos reach people. The question is whether the thumbnail system also strategically leverages this reach — or whether it happens despite the system.",
       };
     }
     if (typeof cadence === "number" && cadence > 14) {
       return {
-        headline: "Rhythmus mit Luft nach oben",
-        text: "Auf diesem Kanal-Level ist Upload-Kadenz weniger entscheidend als visuelle Konsistenz. Aber ein engerer Rhythmus würde das System stabiler machen.",
+        headline: "Stable rhythm at a high level",
+        text: "At this channel level, upload cadence matters less than visual consistency. But a tighter rhythm would make the system more stable.",
       };
     }
     return {
-      headline: "Stabiler Rhythmus auf hohem Niveau",
-      text: "Regelmäßige Uploads auf diesem Level sind keine Selbstverständlichkeit. Der Fokus liegt jetzt auf dem System hinter den Thumbnails.",
+      headline: "Stable rhythm at a high level",
+      text: "Regular uploads at this level aren't a given. The focus is now on the system behind the thumbnails.",
     };
   }
 
   if (channel && typeof cadence === "number" && cadence > 0) {
     if (cadence <= 7) {
       return {
-        headline: "Konstanter Rhythmus",
-        text: "Du lädst regelmäßig hoch — das ist eine der wichtigsten Grundlagen für Wiedererkennung.",
+        headline: "Consistent rhythm",
+        text: "You upload regularly — that's one of the most important foundations for recognition.",
       };
     }
     if (cadence <= 14) {
       return {
-        headline: "Solider Rhythmus",
-        text: "Der Upload-Takt wirkt stabil. Für ein Thumbnail-System ist das ein guter Ausgangspunkt.",
+        headline: "Solid rhythm",
+        text: "The upload cadence seems stable. For a thumbnail system, that's a good starting point.",
       };
     }
     return {
-      headline: "Unregelmäßiger Takt",
-      text: "Längere Abstände zwischen Uploads erschweren Wiedererkennung. Noch wichtiger wird dann, dass jedes Video stark verpackt ist.",
+      headline: "Irregular cadence",
+      text: "Longer gaps between uploads make recognition harder. It becomes even more important that every video is packaged strongly.",
     };
   }
 
   switch (answers.status) {
     case "regelmaessig":
       return {
-        headline: "Regelmäßiger Upload-Rhythmus",
-        text: "Ein stabiler Takt ist Voraussetzung dafür, dass ein Thumbnail-System überhaupt greifen kann.",
+        headline: "Regular upload rhythm",
+        text: "A stable cadence is the prerequisite for a thumbnail system to work at all.",
       };
     case "unregelmaessig":
       return {
-        headline: "Noch kein fester Rhythmus",
-        text: "Ohne stabilen Takt kämpft jedes Video neu um Aufmerksamkeit — ein klares System hilft dabei doppelt.",
+        headline: "No fixed rhythm yet",
+        text: "Without a stable cadence, every video fights for attention from scratch — a clear system helps twice as much.",
       };
     case "kaum_aktiv":
     case "plant_start":
       return {
-        headline: "Früher Startpunkt",
-        text: "Jetzt ist der richtige Moment, visuelle Richtung festzulegen — bevor sich ein unklarer Stil einschleift.",
+        headline: "Early starting point",
+        text: "Now is the right time to establish a visual direction — before an unclear style sets in.",
       };
     default:
       return {
-        headline: "Rhythmus unklar",
-        text: "Ein stabiler Upload-Takt ist die Basis für jede Wiedererkennung.",
+        headline: "Rhythm unclear",
+        text: "A stable upload cadence is the foundation for any recognition.",
       };
   }
 }
@@ -388,46 +388,46 @@ function thumbnailInsight(answers: Answers, maturity: ChannelMaturity | null): I
   if (maturity === "authority" || maturity === "strong") {
     if (answers.thumbnails === "einheitlich") {
       return {
-        headline: "Visuelle Konsistenz erkennbar",
-        text: "Dein Kanal wirkt visuell gefestigt. Die spannende Frage ist, ob das System bewusst entwickelt wurde — oder sich über die Zeit zufällig ergeben hat.",
+        headline: "Visual consistency recognizable",
+        text: "Your channel feels visually solid. The interesting question is whether the system was developed consciously — or emerged randomly over time.",
       };
     }
     return {
-      headline: "System auf diesem Level entscheidend",
-      text: "Mit einem Kanal dieser Größe ist ein wiederholbares Thumbnail-System kein Nice-to-have mehr, sondern die Grundlage für konsistente Performance.",
+      headline: "System is decisive at this level",
+      text: "With a channel of this size, a repeatable thumbnail system is no longer a nice-to-have — it's the foundation for consistent performance.",
     };
   }
 
   switch (answers.thumbnails) {
     case "einheitlich":
       return {
-        headline: "Visuell bereits stabil",
-        text: "Deine Thumbnails wirken einheitlich — die Frage ist, ob der Stil auch die richtige Botschaft transportiert.",
+        headline: "Already visually stable",
+        text: "Your thumbnails feel consistent — the question is whether the style also communicates the right message.",
       };
     case "teilweise_gut":
       return {
-        headline: "Kein wiederholbares System",
-        text: "Einzelne gute Thumbnails reichen nicht. Ein System macht den Unterschied zwischen Glückstreffern und verlässlicher Klickstärke.",
+        headline: "No repeatable system",
+        text: "Individual good thumbnails aren't enough. A system makes the difference between lucky shots and reliable click strength.",
       };
     case "sehr_unterschiedlich":
       return {
-        headline: "Visuelle Linie fehlt noch",
-        text: "Unterschiedliche Stile erschweren Wiedererkennung. Wer deinen Kanal besucht, soll sofort spüren: Das ist das gleiche Format.",
+        headline: "Visual direction still missing",
+        text: "Different styles make recognition harder. Anyone visiting your channel should immediately feel: this is the same format.",
       };
     case "schnell_gebaut":
       return {
-        headline: "Design hat noch Luft nach oben",
-        text: "Schnell produzierte Thumbnails funktionieren manchmal — aber ohne System ist das riskant.",
+        headline: "Design still has room to improve",
+        text: "Quickly produced thumbnails sometimes work — but without a system, that's risky.",
       };
     case "keine_eigenen":
       return {
-        headline: "Thumbnail-Strategie noch offen",
-        text: "Bevor das erste Thumbnail entsteht, lohnt sich eine klare Richtung — das spart viele Kurskorrekturen.",
+        headline: "Thumbnail strategy still open",
+        text: "Before the first thumbnail is created, a clear direction pays off — it saves many course corrections.",
       };
     default:
       return {
-        headline: "Visuelle Konsistenz prüfenswert",
-        text: "Ob dein Kanal visuell einheitlich wirkt, ist eine der ersten Fragen, die sich ein neuer Zuschauer stellt.",
+        headline: "Visual consistency worth checking",
+        text: "Whether your channel feels visually consistent is one of the first questions a new viewer asks.",
       };
   }
 }
@@ -439,40 +439,40 @@ function strategyInsight(
 ): Insight {
   if (maturity === "authority" || maturity === "strong") {
     return {
-      headline: "Optimierung auf hohem Niveau",
-      text: "Bei einem etablierten Kanal geht es nicht mehr ums Grundsetup — sondern darum, was auf diesem Level noch mehr herauszuholen ist.",
+      headline: "Optimization at a high level",
+      text: "For an established channel, it's no longer about the basic setup — but about what more can be extracted at this level.",
     };
   }
 
   const problem = answers.problem ?? [];
   if (problem.includes("ideen_visualisieren") || problem.includes("keine_richtung") || category === "C") {
     return {
-      headline: "Hebel liegt vor dem Design",
-      text: "Bevor gestaltet wird, muss klar sein, was eigentlich verpackt werden soll — Richtung, Idee und Titel kommen vor dem Bild.",
+      headline: "The lever lies before the design",
+      text: "Before designing, it must be clear what is actually being packaged — direction, idea and title come before the image.",
     };
   }
   if (problem.includes("titel_thumbnail_mismatch")) {
     return {
-      headline: "Titel-Thumbnail-Fit ausbaufähig",
-      text: "Titel und Bild sollten gemeinsam Neugier erzeugen, nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
+      headline: "Title-thumbnail fit has room to improve",
+      text: "Image and title should create curiosity together — not separately. This is often the underestimated lever.",
     };
   }
   if (problem.includes("wenig_klicks")) {
     return {
-      headline: "Klickreiz, nicht Qualität",
-      text: "Oft sind Videos gut, aber die Verpackung schafft wenig Anreiz, draufzuklicken. Das kann den Klickreiz schwächen — und lässt sich mit dem richtigen System verbessern.",
+      headline: "Click problem, not a quality problem",
+      text: "Often videos are good, but the packaging creates little incentive to click. This can weaken click strength — and can be fixed with the right system.",
     };
   }
   const support = answers.support ?? [];
   if (support.includes("retainer") || support.includes("audit")) {
     return {
-      headline: "Systemdenken ist bereits vorhanden",
-      text: "Wer an laufende Unterstützung oder ein Audit denkt, hat verstanden, dass Thumbnails kein Einmalprojekt sind.",
+      headline: "Systems thinking is already present",
+      text: "Anyone thinking about ongoing support or an audit has understood that thumbnails aren't a one-time project.",
     };
   }
   return {
-    headline: "Packaging ist mehr als Design",
-    text: "Klickstarke Thumbnails entstehen nicht durch schöne Bilder allein, sondern durch das Zusammenspiel aus Idee, Titel und Bild.",
+    headline: "Packaging is more than design",
+    text: "Click-worthy thumbnails don't come from beautiful images alone, but from the interplay of idea, title and image.",
   };
 }
 
@@ -482,19 +482,19 @@ function fitInsight(titleAnalysis: TitleAnalysisResult[]): Insight | null {
     titleAnalysis.reduce((sum, r) => sum + r.score, 0) / titleAnalysis.length;
   if (avg < 2.5) {
     return {
-      headline: "Titel-Thumbnail-Fit ist dein größter Hebel",
-      text: "Die Analyse zeigt: Bei den meisten Videos arbeiten Titel und Bild nicht zusammen. Genau hier entstehen die meisten verlorenen Klicks.",
+      headline: "Title-thumbnail fit is your biggest lever",
+      text: "The analysis shows: in most videos, title and image don't work together. This is exactly where most lost clicks happen.",
     };
   }
   if (avg < 3.5) {
     return {
-      headline: "Titel-Thumbnail-Fit ausbaufähig",
-      text: "Bild und Titel sollten gemeinsam Neugier erzeugen — nicht getrennt voneinander. Das ist oft der unterschätzte Hebel.",
+      headline: "Title-thumbnail fit has room to improve",
+      text: "Image and title should create curiosity together — not separately. This is often the underestimated lever.",
     };
   }
   return {
-    headline: "Gutes Zusammenspiel erkennbar",
-    text: "Deine Videos nutzen das Zusammenspiel aus Bild und Titel bereits gut. Der Fokus liegt auf konsequenter Umsetzung.",
+    headline: "Good interplay recognizable",
+    text: "Your videos already use the interplay of image and title well. The focus is on consistent execution.",
   };
 }
 
@@ -516,58 +516,58 @@ export function buildInsights(
 const leversByCategory: Record<ResultCategoryId, Lever[]> = {
   A: [
     {
-      headline: "Thumbnail-System entwickeln",
-      text: "Definiere 2–3 Regeln, die auf jeden deiner Longform-Thumbnails zutreffen — Farbe, Bildaufbau, Typo.",
+      headline: "Develop a thumbnail system",
+      text: "Define 2–3 rules that apply to each of your longform thumbnails — color, composition, typography.",
     },
     {
-      headline: "Titel und Thumbnail gemeinsam planen",
-      text: "Beide sollten zusammen Neugier erzeugen, nicht unabhängig voneinander.",
+      headline: "Plan title and thumbnail together",
+      text: "Both should create curiosity together, not independently.",
     },
     {
-      headline: "Wiedererkennbare Muster festlegen",
-      text: "Was sollen Zuschauer sofort denken, wenn sie dein Thumbnail sehen? Das muss sich in jedem Video wiederholen.",
+      headline: "Establish recognizable patterns",
+      text: "What should viewers think immediately when they see your thumbnail? This must repeat in every video.",
     },
   ],
   B: [
     {
-      headline: "Visuelle Linie festlegen",
-      text: "Entscheide dich für eine klare Formensprache und halte sie konsequent durch.",
+      headline: "Define a visual direction",
+      text: "Commit to a clear visual language and stick to it consistently.",
     },
     {
-      headline: "Wiederholbare Thumbnail-Muster entwickeln",
-      text: "Ein Template ist kein Einheitsbrei — es ist der Rahmen, der Wiedererkennung schafft.",
+      headline: "Develop repeatable thumbnail patterns",
+      text: "A template isn't boring uniformity — it's the framework that creates recognition.",
     },
     {
-      headline: "Bestehende Thumbnails analysieren",
-      text: "Schau dir die letzten 10 Thumbnails nebeneinander an. Was funktioniert, was bricht die Linie?",
+      headline: "Analyze existing thumbnails",
+      text: "Look at your last 10 thumbnails side by side. What works, what breaks the line?",
     },
   ],
   C: [
     {
-      headline: "Kanalversprechen schärfen",
-      text: "Was bekommt jemand, der deinen Kanal abonniert? Das muss in einem Satz klar sein.",
+      headline: "Sharpen your channel promise",
+      text: "What does someone get when they subscribe to your channel? This must be clear in one sentence.",
     },
     {
-      headline: "Videoideen klarer rahmen",
-      text: "Jede Idee braucht einen Winkel, der sich visuell und im Titel ausdrücken lässt.",
+      headline: "Frame video ideas more clearly",
+      text: "Every idea needs an angle that can be expressed visually and in the title.",
     },
     {
-      headline: "Erst Packaging-Strategie, dann Design",
-      text: "Thumbnails ohne klare Positionierung im Rücken sind Zufallstreffer, keine Systeme.",
+      headline: "Packaging strategy first, then design",
+      text: "Thumbnails without clear positioning behind them are lucky shots, not systems.",
     },
   ],
   D: [
     {
-      headline: "Kanalstart klar positionieren",
-      text: "Definiere von Anfang an: Für wen ist der Kanal, und was soll er auslösen?",
+      headline: "Position your channel launch clearly",
+      text: "Define from the start: Who is the channel for, and what should it trigger?",
     },
     {
-      headline: "Erste Thumbnail-Regeln definieren",
-      text: "Zwei oder drei visuelle Regeln reichen für den Start — Konsistenz schlägt Perfektion.",
+      headline: "Define your first thumbnail rules",
+      text: "Two or three visual rules are enough to start — consistency beats perfection.",
     },
     {
-      headline: "Wiedererkennung von Anfang an aufbauen",
-      text: "Es ist viel einfacher, einen klaren Stil zu etablieren, als einen unklaren später zu korrigieren.",
+      headline: "Build recognition from day one",
+      text: "It's much easier to establish a clear style than to correct an unclear one later.",
     },
   ],
 };

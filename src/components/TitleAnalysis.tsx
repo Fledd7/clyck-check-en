@@ -10,11 +10,11 @@ type Props = {
 const TOTAL_VIDEOS = 5;
 
 function scoreTone(score: TitleAnalysisScore): { dot: string; text: string; label: string } {
-  if (score >= 5) return { dot: "bg-green-500", text: "text-green-700", label: "Perfekter Fit" };
-  if (score >= 4) return { dot: "bg-green-500", text: "text-green-700", label: "Guter Fit" };
-  if (score >= 3) return { dot: "bg-amber-400", text: "text-amber-600", label: "Mittlerer Fit" };
-  if (score >= 2) return { dot: "bg-accent", text: "text-accent", label: "Schwacher Fit" };
-  return { dot: "bg-accent", text: "text-accent", label: "Kein Fit" };
+  if (score >= 5) return { dot: "bg-green-500", text: "text-green-700", label: "Perfect Fit" };
+  if (score >= 4) return { dot: "bg-green-500", text: "text-green-700", label: "Good Fit" };
+  if (score >= 3) return { dot: "bg-amber-400", text: "text-amber-600", label: "Average Fit" };
+  if (score >= 2) return { dot: "bg-accent", text: "text-accent", label: "Weak Fit" };
+  return { dot: "bg-accent", text: "text-accent", label: "No Fit" };
 }
 
 function formatViews(views: number): string {
@@ -26,15 +26,15 @@ function formatViews(views: number): string {
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const days = Math.floor(diff / 86400000);
-  if (days < 1) return "heute";
-  if (days === 1) return "gestern";
-  if (days < 7) return `vor ${days} Tagen`;
+  if (days < 1) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
   const weeks = Math.floor(days / 7);
-  if (days < 30) return `vor ${weeks} ${weeks === 1 ? "Woche" : "Wochen"}`;
+  if (days < 30) return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
   const months = Math.floor(days / 30);
-  if (days < 365) return `vor ${months} ${months === 1 ? "Monat" : "Monaten"}`;
+  if (days < 365) return `${months} ${months === 1 ? "month" : "months"} ago`;
   const years = Math.floor(days / 365);
-  return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
+  return `${years} ${years === 1 ? "year" : "years"} ago`;
 }
 
 function isHighPerformer(views: number | undefined, publishedAt: string | undefined, score: number): boolean {
@@ -44,9 +44,9 @@ function isHighPerformer(views: number | undefined, publishedAt: string | undefi
 }
 
 function textIssueCopy(issue: string): string {
-  if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
-  if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
-  return "Text verstärkt den Klick-Anreiz nicht";
+  if (issue === "zu lang") return "More than 5 words — shorter is stronger";
+  if (issue === "wiederholt Titel") return "Text repeats the title — wasted space";
+  return "Text doesn't strengthen the click incentive";
 }
 
 function AnimatedDots({ score }: { score: TitleAnalysisScore }) {
@@ -94,47 +94,47 @@ function SkeletonCard() {
 function CriteriaPanel() {
   return (
     <div className="mt-3 rounded-2xl border border-line bg-bg p-4 text-sm leading-relaxed text-gray1">
-      <p className="mb-3">Bewertet wird nach diesen Kriterien:</p>
+      <p className="mb-3">Assessed according to these criteria:</p>
       <dl className="space-y-3">
         <div>
-          <dt className="font-semibold text-ink">3-Element-Regel</dt>
+          <dt className="font-semibold text-ink">3-Element Rule</dt>
           <dd>
-            Maximal 3 Hauptinformationen. Mehr bedeutet Überladung — der Blick
-            des Zuschauers verliert sich.
+            Maximum 3 main pieces of information. More means overload — the
+            viewer's eye gets lost.
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-ink">Text-Regel</dt>
+          <dt className="font-semibold text-ink">Text Rule</dt>
           <dd>
-            Text erst wenn er den Klick-Anreiz direkt verstärkt. Unter 3
-            Wörter. Den Videotitel nie 1:1 wiederholen.
+            Text only when it directly strengthens the click incentive. Under 3
+            words. Never repeat the title 1:1.
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-ink">Kontrast</dt>
+          <dt className="font-semibold text-ink">Contrast</dt>
           <dd>
-            Hell/Dunkel, Komplementärfarben oder Sättigung —
-            mindestens einer muss sitzen.
+            Luminosity, color or saturation —
+            at least one must be present.
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-ink">Farbwirkung</dt>
+          <dt className="font-semibold text-ink">Color Impact</dt>
           <dd>
-            Gibt es eine dominante Farbe die im Feed auffällt?
-            Wirken die Farben harmonisch oder chaotisch?
-            Sticht das Thumbnail durch seine Farbgebung heraus?
+            Is there a dominant color that stands out in the feed?
+            Do the colors look harmonious or chaotic?
+            Does the thumbnail stand out through its color scheme?
           </dd>
         </div>
         <div>
-          <dt className="font-semibold text-ink">Titel-Thumbnail-Fit</dt>
+          <dt className="font-semibold text-ink">Title-Thumbnail Fit</dt>
           <dd>
-            Verstärken Bild und Titel sich gegenseitig — oder arbeiten sie
-            aneinander vorbei?
+            Do image and title reinforce each other — or do they
+            work past each other?
           </dd>
         </div>
       </dl>
       <p className="mt-3 text-xs text-gray1">
-        Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
+        Automated analysis. No access to internal YouTube data such as click rate or impressions.
       </p>
     </div>
   );
@@ -151,7 +151,7 @@ function Highlights({ results }: { results: TitleAnalysisResult[] }) {
     <div className="mt-4 grid grid-cols-2 gap-2.5 sm:gap-3">
       <div className="rounded-xl border border-green-200 bg-green-50 p-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-600 mb-2">
-          Stärkstes Thumbnail
+          Strongest Thumbnail
         </p>
         {best.thumbnail && (
           <img
@@ -178,7 +178,7 @@ function Highlights({ results }: { results: TitleAnalysisResult[] }) {
 
       <div className="rounded-xl border border-red-200 bg-red-50 p-3">
         <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-accent mb-2">
-          Größtes Potenzial
+          Biggest Potential
         </p>
         {worst.thumbnail && (
           <img
@@ -225,16 +225,16 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
   let body = "";
 
   if (avg >= 4.0) {
-    headline = `Ø ${avgFormatted} / 5  —  Starker Titel-Thumbnail-Fit`;
+    headline = `Ø ${avgFormatted} / 5  —  Strong Title-Thumbnail Fit`;
     body =
-      "Die meisten deiner Videos nutzen das Zusammenspiel aus Bild und Titel gut.";
+      "Most of your videos use the interplay of image and title well.";
   } else if (avg >= 3.0) {
-    headline = `Ø ${avgFormatted} / 5  —  Gemischter Titel-Thumbnail-Fit`;
-    body = `${weakCount} von ${total} Videos haben einen schwachen Fit. Hier verlierst du Klicks, auch wenn die einzelnen Thumbnails gut aussehen.`;
+    headline = `Ø ${avgFormatted} / 5  —  Mixed Title-Thumbnail Fit`;
+    body = `${weakCount} of ${total} videos have a weak fit. You're losing clicks here, even if the individual thumbnails look good.`;
   } else {
-    headline = `Ø ${avgFormatted} / 5  —  Schwacher Titel-Thumbnail-Fit`;
+    headline = `Ø ${avgFormatted} / 5  —  Weak Title-Thumbnail Fit`;
     body =
-      "Bei den meisten Videos arbeiten Titel und Bild nicht als Team. Das ist einer der häufigsten Gründe für schlechte Klickraten.";
+      "In most videos, title and image don't work as a team. This is one of the most common reasons for poor click rates.";
   }
 
   return (
@@ -252,48 +252,47 @@ function Summary({ results }: { results: TitleAnalysisResult[] }) {
         <div className="mt-3 space-y-1">
           {overloadedCount > 0 && (
             <p className="text-sm text-gray1">
-              ⚠ {overloadedCount} von {total} Videos wirken visuell überladen.
+              ⚠ {overloadedCount} of {total} videos appear visually overloaded.
             </p>
           )}
           {textIssueCount > 0 && (
             <p className="text-sm text-gray1">
-              ⚠ Bei {textIssueCount} Videos gibt es ein Text-Problem im
-              Thumbnail.
+              ⚠ {textIssueCount} videos have a text issue in the
+              thumbnail.
             </p>
           )}
           {noContrastCount > 0 && (
             <p className="text-sm text-gray1">
-              ⚠ {noContrastCount} Videos haben keinen klaren visuellen Kontrast.
+              ⚠ {noContrastCount} videos have no clear visual contrast.
             </p>
           )}
           {brandingCount > 0 && (
             <p className="text-sm text-gray1">
-              ✓ {brandingCount} von {total} Videos zeigen einen wiederkehrenden
-              Kanal-Stil.
+              ✓ {brandingCount} of {total} videos show a recurring
+              channel style.
             </p>
           )}
           {overloadedModernCount > 0 && (
             <p className="mt-1 text-sm text-orange-700">
-              ⚠ {overloadedModernCount} von {total} Thumbnails sind modern gestaltet aber visuell überladen.
+              ⚠ {overloadedModernCount} of {total} thumbnails are modern but visually overloaded.
             </p>
           )}
           {outdatedCount > 0 && outdatedCount >= total / 2 && (
             <p className="mt-1 text-sm text-amber-600">
-              ⚠ Mehrere Thumbnails zeigen einen älteren visuellen Stil. Ein
-              moderneres Packaging-System könnte die Klickstärke deutlich
-              verbessern.
+              ⚠ Several thumbnails show an older visual style. A
+              more modern packaging system could significantly improve click strength.
             </p>
           )}
           {modernCount >= total * 0.7 && (
             <p className="mt-1 text-sm text-green-600">
-              ✓ Die meisten Thumbnails wirken visuell zeitgemäß.
+              ✓ Most thumbnails appear visually contemporary.
             </p>
           )}
         </div>
       )}
 
       <p className="mt-3 text-xs text-gray1">
-        Automatische Analyse. Kein Zugriff auf interne YouTube-Daten wie Klickrate oder Impressionen.
+        Automated analysis. No access to internal YouTube data such as click rate or impressions.
       </p>
     </div>
   );
@@ -327,10 +326,10 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
 
   return (
     <div>
-      <h3 className="text-base font-bold">Titel-Thumbnail-Fit</h3>
+      <h3 className="text-base font-bold">Title-Thumbnail Fit</h3>
       <p className="mt-1 text-sm text-gray1 leading-relaxed">
-        Deine Thumbnails werden nach Klickpsychologie und
-        Thumbnail-Systematik analysiert.
+        Your thumbnails are analyzed based on click psychology and
+        thumbnail methodology.
       </p>
 
       <button
@@ -339,7 +338,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
         aria-expanded={criteriaOpen}
         className="mt-2 text-xs font-medium text-gray1 underline-offset-2 hover:text-ink hover:underline"
       >
-        ⓘ Wie wird bewertet?
+        ⓘ How is it assessed?
       </button>
 
       {criteriaOpen && <CriteriaPanel />}
@@ -348,8 +347,8 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
         <div className="mt-4">
           <p className="text-sm text-gray1">
             {timedOut
-              ? "Die Analyse dauert gerade länger als üblich. Das kann an der Serverlast liegen."
-              : `Analysiere Video ${Math.min(analyzedCount + 1, TOTAL_VIDEOS)} von ${TOTAL_VIDEOS} …`}
+              ? "The analysis is taking longer than usual. This may be due to server load."
+              : `Analyzing video ${Math.min(analyzedCount + 1, TOTAL_VIDEOS)} of ${TOTAL_VIDEOS} …`}
           </p>
           <div className="mt-2 h-[3px] w-full overflow-hidden rounded-full bg-line">
             <div
@@ -387,7 +386,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                   {(r.views !== undefined || r.publishedAt) && (
                     <p className="text-center text-[11px] text-gray1 pt-1.5 pb-0.5">
                       {r.views !== undefined && (
-                        <span>{formatViews(r.views)} Aufrufe</span>
+                        <span>{formatViews(r.views)} views</span>
                       )}
                       {r.views !== undefined && r.publishedAt && " · "}
                       {r.publishedAt && (
@@ -397,7 +396,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                   )}
                   {isHighPerformer(r.views, r.publishedAt, r.score) && (
                     <div className="mx-3 mt-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs leading-relaxed text-sky-700">
-                      ℹ Hohe Aufrufe trotz schwachem Thumbnail-Design deuten darauf hin, dass hier das Thema die Klicks antreibt — nicht die Verpackung.
+                      ℹ High views despite weak thumbnail design suggest the topic is driving clicks here — not the packaging.
                     </div>
                   )}
                   <div className="px-4 pb-4 pt-2">
@@ -418,7 +417,7 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                     <div className="mt-1.5 space-y-0.5">
                       {r.overloaded && (
                         <p className="text-xs text-accent">
-                          ⚠ Visuell überladen — zu viele Elemente auf einmal
+                          ⚠ Visually overloaded — too many elements at once
                         </p>
                       )}
                       {r.textIssue && (
@@ -426,59 +425,58 @@ export default function TitleAnalysis({ results, loading, onSelect }: Props) {
                           ⚠ Text: {textIssueCopy(r.textIssue)}
                         </p>
                       )}
-                      {r.contrast && r.contrast !== "Keiner" && (
+                      {r.contrast && r.contrast !== "None" && (
                         <p className="text-xs text-green-600">
-                          ✓ Kontrast: {r.contrast}
+                          ✓ Contrast: {r.contrast}
                         </p>
                       )}
-                      {r.contrast === "Keiner" && (
+                      {r.contrast === "None" && (
                         <p className="text-xs text-accent">
-                          ⚠ Kein klarer Kontrast erkennbar
+                          ⚠ No clear contrast recognizable
                         </p>
                       )}
                       {r.colorImpact === "stark" && r.colorDominant && (
                         <p className="text-xs text-green-600">
-                          ✓ Starke Farbwirkung im Feed
+                          ✓ Strong color impact in feed
                         </p>
                       )}
                       {r.colorHarmony === "chaotisch" && (
                         <p className="text-xs text-accent">
-                          ⚠ Farbpalette wirkt unruhig
+                          ⚠ Color palette appears restless
                         </p>
                       )}
                       {r.colorImpact === "schwach" && (
                         <p className="text-xs text-accent">
-                          ⚠ Schwache Farbwirkung — geht im Feed unter
+                          ⚠ Weak color impact — gets lost in feed
                         </p>
                       )}
                     </div>
                     {r.styleAge === "überladen" && (
                       <div className="mt-2 rounded-lg border border-orange-200 bg-orange-50 p-2.5">
                         <p className="text-xs font-bold text-orange-700">
-                          Visuell überladen — aber zeitgemäß
+                          Visually overloaded — but contemporary
                         </p>
                         <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
-                          Das Thumbnail hat einen modernen Stil und erkennbaren
-                          Designaufwand — aber zu viele Elemente auf einmal.
-                          Weniger wäre hier mehr.
+                          The thumbnail has a modern style and recognizable design effort — but too many elements at once.
+                          Less would be more here.
                         </p>
                       </div>
                     )}
                     {r.styleAge === "veraltet" && (
                       <div className="mt-2 rounded-lg border border-orange-200 bg-[#FFF8F0] p-2.5">
                         <p className="text-xs font-bold text-orange-700">
-                          Stilrichtung: Ältere Thumbnail-Ästhetik
+                          Style: Older Thumbnail Aesthetic
                         </p>
                         <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
-                          Dieser Stil war 2018–2022 weit verbreitet.
-                          Klarere, bildstärkere Thumbnails performen
-                          in den meisten Nischen heute oft besser.
+                          This style was widespread in 2018–2022.
+                          Clearer, more image-driven thumbnails tend to perform
+                          better in most niches today.
                         </p>
                       </div>
                     )}
                     {r.styleAge === "zeitgemäß" && (
                       <p className="mt-1 text-xs text-green-600">
-                        ✓ Stilrichtung: Zeitgemäß
+                        ✓ Style: Contemporary
                       </p>
                     )}
                     {r.strong && (

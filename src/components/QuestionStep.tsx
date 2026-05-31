@@ -50,7 +50,7 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
       <div className="rounded-[20px] bg-white p-8 shadow-card">
         {multi && (
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-gray1">
-            Wähle bis zu {max}
+            Choose up to {max}
           </p>
         )}
         <h2 className="text-[22px] font-bold leading-snug mb-6">
@@ -80,7 +80,7 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
             onClick={handleContinue}
             className="btn-primary w-full sm:w-auto"
           >
-            Weiter
+            Next
           </button>
         </div>
 
@@ -91,7 +91,7 @@ export default function QuestionStep({ question, value, onAnswer, onBack, isFirs
               onClick={onBack}
               className="text-[13px] text-gray1 underline-offset-4 hover:underline"
             >
-              Zurück
+              ← Back
             </button>
           </div>
         )}

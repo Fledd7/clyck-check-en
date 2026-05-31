@@ -16,18 +16,18 @@ export default function StartScreen({ onStart }: Props) {
         Clyck Check
       </p>
       <h1 className="mt-4 text-[32px] font-bold leading-[1.15] sm:text-[38px]">
-        Was hält deine Videos davon ab, mehr geklickt zu werden?
+        What's stopping your videos from getting more clicks?
       </h1>
       <p className="mt-4 max-w-[380px] text-base text-gray1">
-        Beantworte 5 kurze Fragen und erhalte eine erste Einschätzung
-        zu Thumbnails, Titeln und der visuellen Klarheit deines Kanals.
+        Answer 5 short questions and get an initial assessment of your
+        thumbnails, titles and your channel's visual clarity.
       </p>
       <button
         type="button"
         onClick={onStart}
         className="btn-primary mt-8 w-full sm:w-auto"
       >
-        Clyck Check starten
+        Start Clyck Check
       </button>
     </section>
   );

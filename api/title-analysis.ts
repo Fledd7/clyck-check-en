@@ -7,11 +7,11 @@ type VideoInput = { id: string; title: string; thumbnail: string };
 
 type AnalysisScore = 1 | 2 | 3 | 4 | 5;
 type AnalysisLabel =
-  | "Kein Fit"
-  | "Schwacher Fit"
-  | "Mittlerer Fit"
-  | "Guter Fit"
-  | "Perfekter Fit";
+  | "No Fit"
+  | "Weak Fit"
+  | "Average Fit"
+  | "Good Fit"
+  | "Perfect Fit";
 
 type ResultItem = {
   id: string;
@@ -36,11 +36,11 @@ type ResultItem = {
 };
 
 const scoreLabels: Record<AnalysisScore, AnalysisLabel> = {
-  1: "Kein Fit",
-  2: "Schwacher Fit",
-  3: "Mittlerer Fit",
-  4: "Guter Fit",
-  5: "Perfekter Fit",
+  1: "No Fit",
+  2: "Weak Fit",
+  3: "Average Fit",
+  4: "Good Fit",
+  5: "Perfect Fit",
 };
 
 async function fetchImageAsBase64(
@@ -62,331 +62,333 @@ async function fetchImageAsBase64(
 }
 
 function buildPrompt(title: string): string {
-  return `Du bist ein YouTube-Thumbnail-Stratege.
-Analysiere dieses Thumbnail und den Videotitel.
-Sei direkt, präzise und konsistent.
+  return `You are a YouTube thumbnail strategist.
+Analyze this thumbnail and the video title.
+Be direct, precise and consistent.
 
-Videotitel: "${title}"
-
----
-
-## HARTE REGELN — immer anwenden, keine Ausnahmen
-
-Diese Stile sind IMMER styleAge "veraltet"
-und bekommen IMMER score maximal 3:
-
-1. LOGO-DOMINANT-STIL
-   Großes Firmen- oder Markenlogo nimmt mehr als
-   1/4 der Bildfläche ein und ist als primäres
-   Gestaltungselement eingesetzt
-   (nicht als kleines Branding-Element am Rand)
-
-2. APP/PRODUKT-SCREENSHOT-STIL
-   Ein App-Screenshot oder Produkt-Interface
-   ist als Hauptelement neben einer Person platziert
-   (typisch für Finanz-, Crypto-, Software-Reviews
-   aus 2019-2022)
-
-3. FARBIGER TEXT-BANNER (nur dieser spezifische Typ)
-   Rechteckiger, einfarbiger Balken/Badge
-   (gelb, rot, grün) mit sauber gesetztem Text DARIN —
-   wirkt wie ein Label, Sticker oder Preisschild.
-   Erkennbar durch: klare rechteckige Form,
-   flache Farbe, Text sitzt ordentlich darin.
-   Beispiele: gelbe Box mit "PAIN!", roter Balken
-   mit "NEU!", grüner Badge mit "GRATIS!"
-
-   NICHT gemeint (kein Textbanner, nicht veraltet):
-   Dynamischer Bildtext — Text der als integriertes
-   Gestaltungselement ins Bild eingebaut ist:
-   - Schräggestellte oder perspektivische Schrift
-   - Text mit Schatten, Tiefe oder Bewegungseffekt
-   - Große, gestalterisch eingesetzte Typografie
-     die Teil der visuellen Komposition ist
-   - Text der sich in Größe und Stil der
-     Bildstimmung anpasst
-   Beispiele für dynamischen Bildtext (NICHT veraltet):
-   "PADEL TURNIER" in schrägem Großformat mit Schatten,
-   "10 JAHRE" in stilisierter Schrift über Personen,
-   "HIDE AND SEEK" auf Schultafel im Bild
-   → Diese werden nie als Textbanner gewertet
-
-4. FOLIENLAYOUT
-   Foto und Text nebeneinander ohne echte
-   Bildkomposition — wirkt wie PowerPoint
-
-5. STOCK-FOTO + TEXT OVERLAY
-   Generisches Stock-Foto mit Text darüber —
-   kein echter Compositing-Aufwand erkennbar
-
-Diese Regeln überschreiben ALLE anderen Bewertungen.
-Auch wenn der Rest des Thumbnails modern wirkt,
-auch wenn die Komposition sauber ist,
-auch wenn Kontrast vorhanden ist.
-
-Ein Thumbnail mit Logo-dominant-Stil + sauberer
-Komposition bekommt maximal 3 — nicht 5.
-Ein sauberes Thumbnail ist nicht automatisch zeitgemäß.
+Video title: "${title}"
 
 ---
 
-## SCHRITT 1: STIL-EINORDNUNG
+## HARD RULES — always apply, no exceptions
 
-Ordne das Thumbnail in genau eine Kategorie:
+These styles are ALWAYS styleAge "veraltet"
+and ALWAYS receive a maximum score of 3:
+
+1. LOGO-DOMINANT STYLE
+   A large company or brand logo takes up more than
+   1/4 of the image area and is used as the primary
+   design element
+   (not as a small branding element at the edge)
+
+2. APP/PRODUCT SCREENSHOT STYLE
+   An app screenshot or product interface
+   is placed as the main element next to a person
+   (typical for finance, crypto, software reviews
+   from 2019-2022)
+
+3. COLORED TEXT BANNER (only this specific type)
+   Rectangular, solid-color bar/badge
+   (yellow, red, green) with neatly placed text INSIDE —
+   looks like a label, sticker or price tag.
+   Recognizable by: clear rectangular shape,
+   flat color, text sits neatly inside.
+   Examples: yellow box with "PAIN!", red bar
+   with "NEW!", green badge with "FREE!"
+
+   NOT meant (not a text banner, not outdated):
+   Dynamic image text — text built as an integrated
+   design element into the image:
+   - Angled or perspective lettering
+   - Text with shadows, depth or motion effects
+   - Large, design-oriented typography
+     that is part of the visual composition
+   - Text that adapts in size and style to
+     the mood of the image
+   Examples of dynamic image text (NOT outdated):
+   "PADEL TOURNAMENT" in diagonal large format with shadow,
+   "10 YEARS" in stylized font over people,
+   "HIDE AND SEEK" on a chalkboard in the image
+   → These are never counted as text banners
+
+4. SLIDE LAYOUT
+   Photo and text side by side without real
+   image composition — looks like PowerPoint
+
+5. STOCK PHOTO + TEXT OVERLAY
+   Generic stock photo with text on top —
+   no real compositing effort recognizable
+
+These rules override ALL other assessments.
+Even if the rest of the thumbnail looks modern,
+even if the composition is clean,
+even if contrast is present.
+
+A thumbnail with logo-dominant style + clean
+composition gets a maximum of 3 — not 5.
+A clean thumbnail is not automatically zeitgemäß.
+
+---
+
+## STEP 1: STYLE CLASSIFICATION
+
+Classify the thumbnail into exactly one category:
 
 ### "veraltet"
-Mindestens EINES dieser Merkmale reicht:
-- Farbiger Text-Banner/Badge (gelb, rot, grün)
-  mit Text darin als Gestaltungselement
-  (z.B. gelbe Box mit "PAIN!", roter Banner mit
-  "NEU!", bunter Badge mit Highlights)
+At least ONE of these features is enough:
+- Colored text banner/badge (yellow, red, green)
+  with text inside as a design element
+  (e.g. yellow box with "PAIN!", red banner with
+  "NEW!", colorful badge with highlights)
 
-UNTERSCHEIDUNG Textbanner vs. Bildtext:
-Vor der Einordnung als "veraltet" prüfen:
-Ist der Text ein flacher rechteckiger Balken/Badge
-mit einfarbigem Hintergrund?
-→ JA: Textbanner → veraltet
-→ NEIN, sondern dynamische Typografie ohne
-  rechteckigen Hintergrund: → kein Textbanner,
-  styleAge nach anderen Kriterien bestimmen
+DISTINCTION text banner vs. image text:
+Before classifying as "veraltet" check:
+Is the text a flat rectangular bar/badge
+with a solid-color background?
+→ YES: text banner → veraltet
+→ NO, but dynamic typography without
+  rectangular background: → not a text banner,
+  determine styleAge by other criteria
 
-- Folienlayout: Foto + Text nebeneinander ohne
-  echte Bildkomposition, wirkt wie PowerPoint
-- Mehr als 6 bedeutungstragende Wörter im Bild
-- Kein erkennbarer Compositing-Aufwand,
-  wirkt wie übereinandergelegte Einzelteile
+- Slide layout: photo + text side by side without
+  real image composition, looks like PowerPoint
+- More than 6 meaningful words in the image
+- No recognizable compositing effort,
+  looks like stacked separate elements
 
 ### "überladen"
-NUR wenn BEIDE Punkte zutreffen:
-- Erkennbarer moderner Compositing-Aufwand
-  (hochwertige Bildbearbeitung, komplexe Szene)
-- Trotzdem zu viele Elemente ohne klare Hierarchie,
-  das Auge weiß nicht wo es hinschauen soll
+ONLY if BOTH points apply:
+- Recognizable modern compositing effort
+  (high-quality image editing, complex scene)
+- Yet too many elements without clear hierarchy,
+  the eye doesn't know where to look
 
-Thumbnails mit dynamischem Bildtext + modernem
-Composite + vielen Elementen:
-→ styleAge: "überladen" (nicht "veraltet")
+Thumbnails with dynamic image text + modern
+composite + many elements:
+→ styleAge: "überladen" (not "veraltet")
 → score: 3/5
-Beispiel: Sportliche Komposition mit mehreren
-Personen, dynamischer Schrift und vielen
-Elementen — moderner Stil, aber zu vollgepackt
+Example: Athletic composition with multiple
+people, dynamic lettering and many
+elements — modern style, but too packed
 
 ### "zeitgemäß"
-- Klare visuelle Hierarchie
-- Starkes Hauptmotiv das sofort erkannt wird
-- Wenig oder kein Text
-- Hochwertiges Composite oder starkes Foto
-- Der Blick wird sofort auf das Wesentliche gelenkt
+- Clear visual hierarchy
+- Strong main subject that is immediately recognized
+- Little or no text
+- High-quality composite or strong photo
+- The eye is immediately drawn to what matters
 
 ### "neutral"
-Wenn kein eindeutiges Signal.
+When there is no clear signal.
 
-WICHTIG: "veraltet" hat Vorrang vor allen anderen.
-Ein Thumbnail mit farbigem Text-Banner ist IMMER
-"veraltet" — egal wie modern der Rest wirkt.
+IMPORTANT: "veraltet" takes precedence over all others.
+A thumbnail with a colored text banner is ALWAYS
+"veraltet" — no matter how modern the rest looks.
 
-### AUSNAHME: Versus/Debate-Format (IMMER zeitgemäß)
+### EXCEPTION: Versus/Debate Format (ALWAYS zeitgemäß)
 
-Wenn das Thumbnail diesem Muster entspricht:
-- Weißer oder heller Balken/Banner oben oder unten
-- Darin steht "X vs Y", "X vs Z Personen",
-  Titel oder Thema der Debatte
-- Darunter/daneben stehen die beteiligten
-  Personen nebeneinander oder in Konfrontation
+If the thumbnail matches this pattern:
+- White or light bar/banner at the top or bottom
+- It says "X vs Y", "X vs Z people",
+  title or topic of the debate
+- Below/next to it are the participants
+  side by side or in confrontation
 
-→ styleAge: "zeitgemäß" — IMMER, keine Ausnahme
-→ textIssue: "" — Text ist Teil des Formats,
-  kein Titel-Repeat auch wenn Wörter übereinstimmen
-→ overloaded: false — mehrere Personen sind
-  bei diesem Format bewusst und korrekt
-→ Score mindestens 3, bei gutem Fit 4-5
+→ styleAge: "zeitgemäß" — ALWAYS, no exception
+→ textIssue: "" — text is part of the format,
+  no title repeat even if words match
+→ overloaded: false — multiple people are
+  intentional and correct for this format
+→ Score at least 3, with good fit 4-5
 
-Dieser Stil ist 2024-2025 weit verbreitet und
-zeitgemäß. Der weiße Banner oben ist kein
-veraltetes Element sondern ein Format-Merkmal.
+This style is widespread in 2024-2025 and
+contemporary. The white banner on top is not
+an outdated element but a format feature.
 
-Beispiel:
-Banner oben: "TIERSCHÜTZER VS 10 PRO ZOO"
-Darunter: Personen in Konfrontation
-→ zeitgemäß, kein Textproblem, Score 4-5
-
----
-
-## SCHRITT 2: ELEMENTE ZÄHLEN
-
-Zähle visuelle HAUPTGRUPPEN:
-
-Zählregeln:
-- Alle Personen zusammen = 1 Element
-- Gesamter Text im Bild = 1 Element
-  (egal ob 1 Wort oder mehrere Textblöcke)
-- Alle Logos zusammen = 1 Element
-- Ein dominantes Objekt im Vordergrund = 1 Element
-- Hintergrundszene = 1 Element
-  (alles was im Hintergrund passiert —
-  egal wie viel darin vorkommt)
-- Hintergrundszene mit Flaggen, Gruppe, Gebäuden,
-  Landschaft etc. = immer 1 Element
-
-Im Zweifel weniger zählen.
-
-overloaded: true NUR wenn BEIDE zutreffen:
-- elementCount >= 5 UND
-- Das Bild wirkt auf den ersten Blick
-  chaotisch und schwer erfassbar —
-  es gibt keine klare Hauptperson oder
-  kein klares Hauptmotiv das sofort auffällt
-
-overloaded: false wenn:
-- Klare visuelle Hierarchie erkennbar ist
-  (auch bei 4+ Elementen)
-- Eine Person oder ein Motiv klar dominiert
-- Cartoon/Illustration-Elemente als
-  bewusst gestalteter Stil eingesetzt werden
-  (z.B. Cartoon-Figuren neben echter Person
-  als künstlerisches Konzept)
-- Der Hintergrund dekorativ ist aber
-  die Komposition nicht stört
-
-Kreative Stile mit mehreren Elementen
-sind nicht automatisch überladen —
-nur wenn das Auge keinen Ankerpunkt findet.
+Example:
+Banner on top: "ANIMAL RIGHTS ACTIVIST VS 10 PRO ZOO"
+Below: people in confrontation
+→ zeitgemäß, no text issue, score 4-5
 
 ---
 
-## SCHRITT 3: TEXT BEWERTEN
+## STEP 2: COUNT ELEMENTS
 
-Bedeutungstragende Wörter zählen:
-- Zahlen, Sonderzeichen, Emojis zählen NICHT
-- Wörter unter 2 Buchstaben zählen NICHT
-- Eigennamen als Kontext-Label zählen NICHT
-  (z.B. "XAVIER NAIDOO" neben eingekreister
-  Person = Kontext, kein Problem)
+Count visual MAIN GROUPS:
 
-textIssue setzen:
+Counting rules:
+- All people together = 1 element
+- All text in the image = 1 element
+  (regardless of whether 1 word or multiple text blocks)
+- All logos together = 1 element
+- One dominant object in the foreground = 1 element
+- Background scene = 1 element
+  (everything happening in the background —
+  regardless of how much is in it)
+- Background scene with flags, group, buildings,
+  landscape etc. = always 1 element
 
-"wiederholt Titel" NUR wenn der Text im Bild
-dieselbe Aussage wie der Titel macht —
-nicht wenn er essenziellen Kontext liefert.
+When in doubt, count fewer.
 
-"zu lang" wenn mehr als 5 bedeutungstragende
-Wörter im Bild.
+overloaded: true ONLY if BOTH apply:
+- elementCount >= 5 AND
+- The image looks chaotic and hard to grasp
+  at first glance —
+  there is no clear main person or
+  no clear main subject that immediately stands out
 
-"kein Mehrwert" wenn Text vorhanden aber weder
-Kontext noch Klick-Anreiz verstärkt.
+overloaded: false if:
+- Clear visual hierarchy is recognizable
+  (even with 4+ elements)
+- A person or motif clearly dominates
+- Cartoon/illustration elements are used as
+  a deliberately designed style
+  (e.g. cartoon characters next to a real person
+  as an artistic concept)
+- The background is decorative but
+  doesn't disturb the composition
 
-"" (leer) wenn Text fehlt oder korrekt eingesetzt.
-
-WICHTIGE UNTERSCHEIDUNG — Text-Typen:
-
-IN-SCENE-TEXT (nie als textIssue werten):
-Text der natürlich in die Szene integriert ist —
-auf einer Tafel, einem Schild, einer Wand,
-einem Whiteboard, einem Bildschirm, einer
-Verpackung, einem Trikot oder ähnlichem.
-Dieser Text ist Teil der visuellen Geschichte,
-kein separater Textlayer.
-
-Beispiele für In-Scene-Text:
-- "HIDE AND SEEK" auf einer Schultafel
-- "BACK TO SCHOOL 2.0" auf einer Kreidetafel
-- Schriftzug auf einem Plakat im Hintergrund
-→ textIssue: "" — immer leer, nie bestrafen
-
-OVERLAY-TEXT (kann ein Problem sein):
-Text der als separater Layer über das Bild
-gelegt wurde — erkennbar durch eigene
-Schriftart, eigenen Hintergrund oder
-fehlenden natürlichen Bezug zur Szene.
-→ Hier gelten die normalen Regeln
+Creative styles with multiple elements
+are not automatically overloaded —
+only when the eye finds no anchor point.
 
 ---
 
-## SCHRITT 4: KONTRAST PRÜFEN
+## STEP 3: EVALUATE TEXT
 
-Prüfe ob das Hauptmotiv sich klar abhebt:
+Count meaningful words:
+- Numbers, special characters, emojis do NOT count
+- Words under 2 letters do NOT count
+- Proper names as context labels do NOT count
+  (e.g. "XAVIER NAIDOO" next to a circled
+  person = context, no problem)
 
-"Hell/Dunkel": Dunkles Motiv vor hellem Hintergrund
-oder umgekehrt. WICHTIG: Person in dunkler Kleidung
-vor Schneelandschaft, hellem Himmel oder heller Wand
-= klarer Hell/Dunkel-Kontrast. Nicht übersehen.
+Set textIssue:
 
-"Komplementärfarben": Gegensätzliche Farben.
+"wiederholt Titel" ONLY if the text in the image
+makes the same statement as the title —
+not if it provides essential context.
 
-"Sättigung": Gesättigtes Motiv, entsättigter
-Hintergrund.
+"zu lang" if more than 5 meaningful
+words in the image.
 
-"Keiner": NUR wenn das Motiv wirklich im
-Hintergrund untergeht und kaum erkennbar ist.
+"kein Mehrwert" if text is present but neither
+strengthens context nor click incentive.
+
+"" (empty) if text is absent or correctly used.
+
+IMPORTANT DISTINCTION — text types:
+
+IN-SCENE TEXT (never count as textIssue):
+Text naturally integrated into the scene —
+on a board, a sign, a wall,
+a whiteboard, a screen, a
+packaging, a jersey or similar.
+This text is part of the visual story,
+not a separate text layer.
+
+Examples of in-scene text:
+- "HIDE AND SEEK" on a chalkboard
+- "BACK TO SCHOOL 2.0" on a blackboard
+- Writing on a poster in the background
+→ textIssue: "" — always empty, never penalize
+
+OVERLAY TEXT (can be a problem):
+Text placed as a separate layer over the image —
+recognizable by its own
+font, its own background or
+lack of natural connection to the scene.
+→ Normal rules apply here
 
 ---
 
-## SCHRITT 5: FARBE PRÜFEN
+## STEP 4: CHECK CONTRAST
 
-colorDominant: true wenn eine Farbe sofort
-auffällt und das Thumbnail im Feed hervorhebt.
+Check whether the main subject stands out clearly:
+
+"Hell/Dunkel": Dark subject against bright background
+or vice versa. IMPORTANT: Person in dark clothing
+against snowy landscape, bright sky or bright wall
+= clear light/dark contrast. Don't overlook.
+
+"Komplementärfarben": Opposite colors.
+
+"Sättigung": Saturated subject, desaturated
+background.
+
+"None": ONLY if the subject truly blends into the
+background and is barely recognizable.
+
+---
+
+## STEP 5: CHECK COLOR
+
+colorDominant: true if a color immediately
+stands out and highlights the thumbnail in the feed.
 
 colorHarmony:
-"harmonisch" = Farben ergänzen sich
-"neutral" = weder harmonisch noch störend
-"chaotisch" = zu viele unverbundene Farben
+"harmonisch" = colors complement each other
+"neutral" = neither harmonious nor disturbing
+"chaotisch" = too many unrelated colors
 
 colorImpact:
-"stark" = sticht im Feed heraus
-"mittel" = durchschnittlich
-"schwach" = geht im Feed unter
+"stark" = stands out in the feed
+"mittel" = average
+"schwach" = gets lost in the feed
 
 ---
 
-## SCHRITT 6: SCORE BERECHNEN
+## STEP 6: CALCULATE SCORE
 
-Skala 1–5 für das Zusammenspiel aus Bild und Titel:
-1 = Kein Fit: keine erkennbare Verbindung
-2 = Schwacher Fit: lose Verbindung
-3 = Mittlerer Fit: Verbindung erkennbar, Potenzial unausgeschöpft
-4 = Guter Fit: Bild und Titel ergänzen sich
-5 = Perfekter Fit: starke Einheit, maximaler Klickanreiz
+Scale 1–5 for the interplay of image and title:
+1 = No Fit: no recognizable connection
+2 = Weak Fit: loose connection
+3 = Average Fit: connection recognizable, potential untapped
+4 = Good Fit: image and title complement each other
+5 = Perfect Fit: strong unity, maximum click incentive
 
-PFLICHT-CAPS (immer anwenden):
-- styleAge "veraltet" → score maximal 3
-- styleAge "überladen" + overloaded true → score maximal 3
-- textIssue "wiederholt Titel" → score maximal 3
-- colorHarmony "chaotisch" → score maximal 3
-- 2+ dieser Probleme gleichzeitig → score maximal 2
-- Score 5 NUR wenn: zeitgemäßer Stil + kein Textproblem
-  + kein Overloading + starker Fit
-
----
-
-## SCHRITT 7: BILDKONZEPT-VORSCHLAG
-
-concept: Nur ausfüllen wenn score <= 3.
-1-2 Sätze: Was wäre das ideale Bild für diesen Titel?
-Konkretes Motiv beschreiben, keine Design-Theorie.
-Bei score >= 4: "" (leer)
+MANDATORY CAPS (always apply):
+- styleAge "veraltet" → score maximum 3
+- styleAge "überladen" + overloaded true → score maximum 3
+- textIssue "wiederholt Titel" → score maximum 3
+- colorHarmony "chaotisch" → score maximum 3
+- 2+ of these problems simultaneously → score maximum 2
+- Score 5 ONLY if: zeitgemäß style + no text issue
+  + no overloading + strong fit
 
 ---
 
-## AUSGABE
+## STEP 7: IMAGE CONCEPT SUGGESTION
 
-Antworte NUR als JSON. Kein Text. Kein Markdown.
+concept: Only fill in if score <= 3.
+1-2 sentences: What would be the ideal image for this title?
+Describe a concrete motif, no design theory.
+For score >= 4: "" (empty)
+
+---
+
+## OUTPUT
+
+Reply ONLY as JSON. No text. No markdown.
 
 {
   "score": <1-5>,
   "styleAge": <"zeitgemäß"|"veraltet"|"überladen"|"neutral">,
-  "elementCount": <Zahl>,
+  "elementCount": <number>,
   "overloaded": <true|false>,
   "textIssue": <"wiederholt Titel"|"zu lang"|"kein Mehrwert"|"">,
-  "contrast": <"Hell/Dunkel"|"Komplementärfarben"|"Sättigung"|"Keiner">,
+  "contrast": <"Light/Dark"|"Complementary Colors"|"Saturation"|"None">,
   "colorDominant": <true|false>,
   "colorHarmony": <"harmonisch"|"neutral"|"chaotisch">,
   "colorImpact": <"stark"|"mittel"|"schwach">,
   "branding": <true|false>,
-  "reason": "<1 Satz Deutsch, max 15 Wörter, was den Score begründet>",
-  "strong": "<Was gut funktioniert, 1 Satz — leer wenn score <= 2>",
-  "weak": "<Was fehlt, 1 Satz — leer wenn score = 5>",
-  "concept": "<Bildkonzept-Vorschlag wenn score <= 3, sonst leer>"
-}`;
+  "reason": "<1 sentence, max 15 words, what justifies the score>",
+  "strong": "<What works well, 1 sentence — empty if score <= 2>",
+  "weak": "<What's missing, 1 sentence — empty if score = 5>",
+  "concept": "<Image concept suggestion if score <= 3, otherwise empty>"
+}
+
+Respond in English.`;
 }
 
 function clampScore(n: unknown): AnalysisScore {
@@ -505,7 +507,7 @@ async function analyzeVideo(
       elementCount: Number.isFinite(elementCountRaw) ? elementCountRaw : 0,
       overloaded: parsed.overloaded ?? (Number.isFinite(elementCountRaw) && elementCountRaw > 3),
       textIssue: typeof parsed.textIssue === "string" ? parsed.textIssue : "",
-      contrast: typeof parsed.contrast === "string" ? parsed.contrast : "Keiner",
+      contrast: typeof parsed.contrast === "string" ? parsed.contrast : "None",
       styleAge: (parsed.styleAge === "zeitgemäß" || parsed.styleAge === "veraltet" || parsed.styleAge === "überladen") ? parsed.styleAge : "neutral",
       colorDominant: parsed.colorDominant ?? false,
       colorHarmony: (parsed.colorHarmony === "harmonisch" || parsed.colorHarmony === "chaotisch") ? parsed.colorHarmony : "neutral",

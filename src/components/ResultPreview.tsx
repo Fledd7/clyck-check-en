@@ -71,7 +71,7 @@ export default function ResultPreview({
     : null;
   const textIssueCount = titleAnalysis.filter((r) => r.textIssue !== "").length;
   const overloadedCount = titleAnalysis.filter((r) => r.elementCount > 3).length;
-  const noContrastCount = titleAnalysis.filter((r) => r.contrast === "Keiner").length;
+  const noContrastCount = titleAnalysis.filter((r) => r.contrast === "None").length;
 
   function copyShareUrl() {
     navigator.clipboard.writeText(shareUrl).catch(() => {});
@@ -96,20 +96,20 @@ export default function ResultPreview({
     })();
 
   const summaryParts: string[] = [];
-  if (avgScore !== null) summaryParts.push(`Titel-Thumbnail-Fit: Ø ${avgScore.toFixed(1)} / 5`);
+  if (avgScore !== null) summaryParts.push(`Title-Thumbnail Fit: Ø ${avgScore.toFixed(1)} / 5`);
   if (textIssueCount > 0)
-    summaryParts.push(`${textIssueCount} Video${textIssueCount === 1 ? "" : "s"} mit Textproblem`);
+    summaryParts.push(`${textIssueCount} video${textIssueCount === 1 ? "" : "s"} with text issue`);
   if (overloadedCount > 0)
-    summaryParts.push(`${overloadedCount} Video${overloadedCount === 1 ? "" : "s"} überladen`);
+    summaryParts.push(`${overloadedCount} video${overloadedCount === 1 ? "" : "s"} overloaded`);
   if (noContrastCount > 0)
-    summaryParts.push(`${noContrastCount} Video${noContrastCount === 1 ? "" : "s"} ohne Kontrast`);
+    summaryParts.push(`${noContrastCount} video${noContrastCount === 1 ? "" : "s"} without contrast`);
   if (
     avgScore !== null &&
     textIssueCount === 0 &&
     overloadedCount === 0 &&
     noContrastCount === 0
   ) {
-    summaryParts.push("Kein offensichtliches Problem erkannt");
+    summaryParts.push("No obvious problem detected");
   }
   const summaryLine = summaryParts.join(" · ");
 
@@ -123,16 +123,16 @@ export default function ResultPreview({
     const sign = delta > 0 ? "+" : "";
     return {
       tone,
-      text: `Letzter Check vor ${daysSinceLastCheck} Tagen: Fit-Score Ø ${lastCheck.avgFitScore.toFixed(
+      text: `Last check ${daysSinceLastCheck} days ago: Fit Score Ø ${lastCheck.avgFitScore.toFixed(
         1
-      )} → heute Ø ${avgScore.toFixed(1)} (${sign}${delta.toFixed(1)})`,
+      )} → today Ø ${avgScore.toFixed(1)} (${sign}${delta.toFixed(1)})`,
     };
   })();
 
   return (
     <section className="container-narrow fade-in py-8">
       <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">
-        Erste Einschätzung
+        First Assessment
       </p>
       <h1 className="mt-3 text-[28px] font-bold leading-snug sm:text-[34px]">
         {category.headline}
@@ -142,21 +142,21 @@ export default function ResultPreview({
           <p className="mt-2">
             <span
               className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                clarityLevel === "Sehr hoch"
+                clarityLevel === "Very High"
                   ? "bg-accent text-white"
                   : "bg-ink text-white"
               }`}
             >
-              {titleAnalysisLoading ? "Clyck-Score: wird berechnet..." : clarityLabel}
+              {titleAnalysisLoading ? "Clyck Score: calculating..." : clarityLabel}
             </span>
           </p>
           <p className="mt-1 text-xs text-gray1">
-            Basierend auf öffentlichen Kanaldaten und Thumbnail-Analyse.
+            Based on your answers and public channel data.
           </p>
         </>
       ) : (
         <p className="mt-2 text-xs text-gray1">
-          Für einen Clyck-Score bitte Kanal verlinken.
+          Please link your channel to get a Clyck Score.
         </p>
       )}
 
@@ -171,7 +171,7 @@ export default function ResultPreview({
               : "text-gray1 hover:text-ink"
           }`}
         >
-          Kanal-Analyse
+          Channel Analysis
           {titleAnalysisLoading && (
             <span className="ml-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-gray1" />
           )}
@@ -185,26 +185,26 @@ export default function ResultPreview({
               : "text-gray1 hover:text-ink"
           }`}
         >
-          Einschätzung
+          Assessment
         </button>
       </div>
 
-      {/* Tab 1: Kanal-Analyse */}
+      {/* Tab 1: Channel Analysis */}
       {tab === "analysis" && (
         <>
           {!channelData ? (
             <div className="card">
               <p className="text-sm leading-relaxed text-gray1">
-                Du hast keinen Kanal-Link eingegeben. Die Einschätzung basiert
-                auf deinen Antworten. Mit Link bekommst du eine detailliertere
-                Analyse.
+                You haven't entered a channel link. The assessment is based
+                on your answers. With a link you'll get a more detailed
+                analysis.
               </p>
               <button
                 type="button"
                 onClick={onAddChannelLink}
                 className="btn-secondary mt-4 text-sm"
               >
-                Kanal-Link nachträglich eingeben
+                Add channel link
               </button>
             </div>
           ) : (
@@ -220,27 +220,27 @@ export default function ResultPreview({
                 <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
                   {typeof channelData.subscriberCount === "number" && (
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Abonnenten</p>
-                      <p className="text-base font-semibold">{channelData.subscriberCount.toLocaleString("de-DE")}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Subscribers</p>
+                      <p className="text-base font-semibold">{channelData.subscriberCount.toLocaleString("en-US")}</p>
                     </div>
                   )}
                   {typeof channelData.videoCount === "number" && (
                     <div>
                       <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Videos</p>
-                      <p className="text-base font-semibold">{channelData.videoCount.toLocaleString("de-DE")}</p>
+                      <p className="text-base font-semibold">{channelData.videoCount.toLocaleString("en-US")}</p>
                     </div>
                   )}
                   {typeof channelData.uploadCadenceDays === "number" &&
                     channelData.uploadCadenceDays > 0 && (
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Upload-Abstand</p>
-                      <p className="text-base font-semibold">ca. {channelData.uploadCadenceDays} Tage</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Avg. Upload Gap</p>
+                      <p className="text-base font-semibold">approx. {channelData.uploadCadenceDays} days</p>
                     </div>
                   )}
                   {typeof channelData.medianViews === "number" && (
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Median-Aufrufe</p>
-                      <p className="text-base font-semibold">{channelData.medianViews.toLocaleString("de-DE")}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-gray1">Median Views</p>
+                      <p className="text-base font-semibold">{channelData.medianViews.toLocaleString("en-US")}</p>
                     </div>
                   )}
                 </div>
@@ -254,7 +254,7 @@ export default function ResultPreview({
               {hasLongform && (
                 <div className="mt-4 card">
                   <p className="text-sm font-medium text-gray1">
-                    Deine letzten Longform-Thumbnails
+                    Your latest longform thumbnails
                   </p>
                   <div className="mt-3">
                     <ThumbnailGrid
@@ -267,10 +267,9 @@ export default function ResultPreview({
                     />
                   </div>
                   <p className="mt-2 text-xs text-gray1">
-                    Nur Longform-Videos werden analysiert. Shorts werden bewusst
-                    ausgelassen.
+                    Only longform videos are analyzed. Shorts are intentionally excluded.
                     {videos.length > 0 && titleAnalysis.length > 0 && (
-                      <> Klick ein Thumbnail an für Details.</>
+                      <> Click a thumbnail for details.</>
                     )}
                   </p>
                 </div>
@@ -294,13 +293,13 @@ export default function ResultPreview({
               onClick={() => setTab("assessment")}
               className="text-sm text-gray1 underline-offset-4 hover:underline"
             >
-              Zur Einschätzung →
+              → Go to Assessment
             </button>
           </div>
         </>
       )}
 
-      {/* Tab 2: Einschätzung */}
+      {/* Tab 2: Assessment */}
       {tab === "assessment" && (
         <>
           {deltaInfo && (
@@ -324,7 +323,7 @@ export default function ResultPreview({
           {channelNote && <p className="mt-5 text-sm italic text-gray1">{channelNote}</p>}
 
           <div className="mt-10">
-            <h2 className="text-lg font-bold">Was bei dir auffällt</h2>
+            <h2 className="text-lg font-bold">What stands out</h2>
             <div className="mt-4 grid gap-3">
               {insights.map((ins, i) => (
                 <div key={i} className="card">
@@ -336,7 +335,7 @@ export default function ResultPreview({
           </div>
 
           <div className="mt-10">
-            <h2 className="text-lg font-bold">Deine nächsten 3 Hebel</h2>
+            <h2 className="text-lg font-bold">Your next 3 levers</h2>
             <ol className="mt-4 grid gap-3">
               {levers.map((lv, i) => (
                 <li key={i} className="card">
@@ -356,29 +355,29 @@ export default function ResultPreview({
 
           {/* CTA card */}
           <div className="mt-10 rounded-[20px] bg-ink p-7">
-            <h2 className="text-[20px] font-bold text-white">Willst du wissen, was ich konkret ändern würde?</h2>
+            <h2 className="text-[20px] font-bold text-white">Want to know what I'd specifically change?</h2>
             <p className="mt-2 text-sm text-white/65">
-              Die automatische Einschätzung zeigt dir die Richtung. Für eine
-              echte Bewertung muss ich mir Kanal, Titel und Thumbnails manuell
-              ansehen.
+              The automated assessment shows you the direction. For a real
+              evaluation I need to manually review your channel, titles
+              and thumbnails.
             </p>
             <ul className="mt-4 grid gap-1 text-[13px] text-white/65">
-              <li>✓ Kanalwirkung auf den ersten Blick</li>
-              <li>✓ Zusammenspiel aus Titel, Idee und Thumbnail</li>
-              <li>✓ ob Audit, System oder laufende Unterstützung sinnvoller ist</li>
+              <li>✓ Channel impact at first glance</li>
+              <li>✓ Interplay of title, idea and thumbnail</li>
+              <li>✓ whether an audit, system or ongoing support makes more sense</li>
             </ul>
             <button
               type="button"
               onClick={onContinue}
               className="mt-6 w-full rounded-[10px] bg-accent px-7 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#AA0015]"
             >
-              Persönliche Einschätzung anfragen
+              Request personal assessment
             </button>
           </div>
 
           <div className="mt-8 flex items-center gap-2">
             <button type="button" onClick={copyShareUrl} className="btn-secondary text-sm">
-              {linkCopied ? "Kopiert!" : "Ergebnis-Link kopieren"}
+              {linkCopied ? "Copied!" : "Copy result link"}
             </button>
           </div>
         </>

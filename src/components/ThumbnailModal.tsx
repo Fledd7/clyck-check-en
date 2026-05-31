@@ -9,9 +9,9 @@ type Props = {
 };
 
 function textIssueCopy(issue: string): string {
-  if (issue === "zu lang") return "Mehr als 5 Wörter — kürzer ist stärker";
-  if (issue === "wiederholt Titel") return "Text wiederholt den Titel — verschenkte Fläche";
-  return "Text verstärkt den Klick-Anreiz nicht";
+  if (issue === "zu lang") return "More than 5 words — shorter is stronger";
+  if (issue === "wiederholt Titel") return "Text repeats the title — wasted space";
+  return "Text doesn't strengthen the click incentive";
 }
 
 function formatViews(views: number): string {
@@ -23,15 +23,15 @@ function formatViews(views: number): string {
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const days = Math.floor(diff / 86400000);
-  if (days < 1) return "heute";
-  if (days === 1) return "gestern";
-  if (days < 7) return `vor ${days} Tagen`;
+  if (days < 1) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
   const weeks = Math.floor(days / 7);
-  if (days < 30) return `vor ${weeks} ${weeks === 1 ? "Woche" : "Wochen"}`;
+  if (days < 30) return `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
   const months = Math.floor(days / 30);
-  if (days < 365) return `vor ${months} ${months === 1 ? "Monat" : "Monaten"}`;
+  if (days < 365) return `${months} ${months === 1 ? "month" : "months"} ago`;
   const years = Math.floor(days / 365);
-  return `vor ${years} ${years === 1 ? "Jahr" : "Jahren"}`;
+  return `${years} ${years === 1 ? "year" : "years"} ago`;
 }
 
 function isHighPerformer(views: number | undefined, publishedAt: string | undefined, score: number | undefined): boolean {
@@ -142,7 +142,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Thumbnail-Analyse"
+      aria-label="Thumbnail Analysis"
       onClick={onClose}
       className="fixed inset-0 z-40 overflow-y-auto bg-black/70 py-8"
     >
@@ -154,7 +154,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           ref={closeBtnRef}
           type="button"
           onClick={onClose}
-          aria-label="Schließen"
+          aria-label="Close"
           style={{
             position: "absolute",
             top: "12px",
@@ -209,13 +209,13 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
           onClick={() => setShowGrid((v) => !v)}
           className="mt-1 mb-3 text-xs text-gray1 hover:underline"
         >
-          {showGrid ? "✕ Grid ausblenden" : "⊞ Rule of Thirds"}
+          {showGrid ? "✕ Hide grid" : "⊞ Rule of Thirds"}
         </button>
 
         {showGrid && (
           <p className="mb-3 text-[11px] leading-relaxed text-gray1">
-            Die Schnittpunkte (●) markieren die stärksten Positionen für Gesichter,
-            Text und Hauptmotive.
+            The intersection points (●) mark the strongest positions for faces,
+            text and main subjects.
           </p>
         )}
 
@@ -224,7 +224,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
         {(video.views !== undefined || video.publishedAt) && (
           <p className="mt-1 mb-3 flex items-center gap-2 text-xs text-gray1">
             {video.views !== undefined && (
-              <span>{formatViews(video.views)} Aufrufe</span>
+              <span>{formatViews(video.views)} views</span>
             )}
             {video.publishedAt && (
               <span>· {timeAgo(video.publishedAt)}</span>
@@ -234,7 +234,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
 
         {isHighPerformer(video.views, video.publishedAt, localAnalysis?.score) && (
           <div className="mt-2 mb-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs leading-relaxed text-sky-700">
-            ℹ Hohe Aufrufe trotz schwachem Thumbnail-Design deuten darauf hin, dass hier das Thema die Klicks antreibt — nicht die Verpackung.
+            ℹ High views despite weak thumbnail design suggest the topic is driving clicks here — not the packaging.
           </div>
         )}
 
@@ -262,9 +262,9 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               >
                 {localAnalysis.label}
               </span>
-              {localAnalysis.contrast && localAnalysis.contrast !== "Keiner" && (
+              {localAnalysis.contrast && localAnalysis.contrast !== "None" && (
                 <span className="text-xs font-medium text-green-600">
-                  Kontrast: {localAnalysis.contrast}
+                  Contrast: {localAnalysis.contrast}
                 </span>
               )}
             </div>
@@ -277,13 +277,13 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
 
             {localAnalysis.strong && (
               <p className="mt-3 text-sm leading-relaxed text-gray1">
-                <span className="font-semibold text-green-700">✓ Was funktioniert: </span>
+                <span className="font-semibold text-green-700">✓ What works: </span>
                 {localAnalysis.strong}
               </p>
             )}
             {localAnalysis.weak && (
               <p className="mt-2 text-sm leading-relaxed text-gray1">
-                <span className="font-semibold text-accent">✗ Was fehlt: </span>
+                <span className="font-semibold text-accent">✗ What's missing: </span>
                 {localAnalysis.weak}
               </p>
             )}
@@ -294,7 +294,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
               <div className="mt-3 space-y-1">
                 {localAnalysis.overloaded && (
                   <p className="text-xs text-accent">
-                    ⚠ Visuell überladen — zu viele Elemente auf einmal
+                    ⚠ Visually overloaded — too many elements at once
                   </p>
                 )}
                 {localAnalysis.textIssue && (
@@ -302,24 +302,24 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                     ⚠ Text: {textIssueCopy(localAnalysis.textIssue)}
                   </p>
                 )}
-                {localAnalysis.contrast === "Keiner" && (
+                {localAnalysis.contrast === "None" && (
                   <p className="text-xs text-accent">
-                    ⚠ Kein klarer Kontrast erkennbar
+                    ⚠ No clear contrast recognizable
                   </p>
                 )}
                 {localAnalysis.colorImpact === "stark" && localAnalysis.colorDominant && (
                   <p className="text-xs text-green-600">
-                    ✓ Starke Farbwirkung im Feed
+                    ✓ Strong color impact in feed
                   </p>
                 )}
                 {localAnalysis.colorHarmony === "chaotisch" && (
                   <p className="text-xs text-accent">
-                    ⚠ Farbpalette wirkt unruhig
+                    ⚠ Color palette appears restless
                   </p>
                 )}
                 {localAnalysis.colorImpact === "schwach" && (
                   <p className="text-xs text-accent">
-                    ⚠ Schwache Farbwirkung — geht im Feed unter
+                    ⚠ Weak color impact — gets lost in feed
                   </p>
                 )}
               </div>
@@ -328,37 +328,36 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             {localAnalysis.styleAge === "überladen" && (
               <div className="mt-2 rounded-lg border border-orange-200 bg-orange-50 p-2.5">
                 <p className="text-xs font-bold text-orange-700">
-                  Visuell überladen — aber zeitgemäß
+                  Visually overloaded — but contemporary
                 </p>
                 <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
-                  Das Thumbnail hat einen modernen Stil und erkennbaren
-                  Designaufwand — aber zu viele Elemente auf einmal.
-                  Weniger wäre hier mehr.
+                  The thumbnail has a modern style and recognizable design effort — but too many elements at once.
+                  Less would be more here.
                 </p>
               </div>
             )}
             {localAnalysis.styleAge === "veraltet" && (
               <div className="mt-2 rounded-lg border border-orange-200 bg-[#FFF8F0] p-2.5">
                 <p className="text-xs font-bold text-orange-700">
-                  Stilrichtung: Ältere Thumbnail-Ästhetik
+                  Style: Older Thumbnail Aesthetic
                 </p>
                 <p className="mt-0.5 text-xs text-orange-800 leading-relaxed">
-                  Dieser Stil war 2018–2022 weit verbreitet.
-                  Klarere, bildstärkere Thumbnails performen
-                  in den meisten Nischen heute oft besser.
+                  This style was widespread in 2018–2022.
+                  Clearer, more image-driven thumbnails tend to perform
+                  better in most niches today.
                 </p>
               </div>
             )}
             {localAnalysis.styleAge === "zeitgemäß" && (
               <p className="mt-1 text-xs text-green-600">
-                ✓ Stilrichtung: Zeitgemäß
+                ✓ Style: Contemporary
               </p>
             )}
 
             {recommendation && localAnalysis.score <= 3 && (
               <div className="mt-4 rounded-[10px] bg-bg p-3.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-gray1">
-                  Empfehlung
+                  Recommendation
                 </p>
                 <p className="mt-1 text-[13px] font-medium">{recommendation}</p>
               </div>
@@ -367,7 +366,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
             {localAnalysis.concept && localAnalysis.score <= 3 && (
               <div className="mt-3 rounded-[10px] bg-bg p-3.5">
                 <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-gray1 mb-1.5">
-                  Bildkonzept-Vorschlag
+                  Image Concept Suggestion
                 </p>
                 <p className="text-[13px] font-medium leading-relaxed">
                   {localAnalysis.concept}
@@ -391,7 +390,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                   color: '#16A34A',
                   marginBottom: '6px',
                 }}>
-                  Was hier besonders stark ist
+                  What's particularly strong here
                 </p>
                 <p style={{
                   fontSize: '13px',
@@ -400,7 +399,7 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                   lineHeight: 1.5,
                 }}>
                   {localAnalysis.strong ||
-                   'Bild und Titel erzeugen gemeinsam einen starken Klickanreiz — das ist die Grundlage für ein funktionierendes Thumbnail-System.'}
+                   'Image and title together create a strong click incentive — that is the foundation of a working thumbnail system.'}
                 </p>
               </div>
             )}
@@ -413,12 +412,12 @@ export default function ThumbnailModal({ video, analysis, onClose }: Props) {
                 onClick={analyzeNow}
                 className="mt-3 w-full rounded-xl border border-line px-4 py-2 text-sm text-gray1 transition-colors hover:bg-bg"
               >
-                Dieses Thumbnail jetzt analysieren
+                Analyze this thumbnail now
               </button>
             )}
             {analyzing && (
               <p className="mt-3 text-sm text-gray1">
-                Analysiere Thumbnail und Titel...
+                Analyzing thumbnail and title...
               </p>
             )}
           </>

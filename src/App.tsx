@@ -143,9 +143,9 @@ export default function App() {
   );
   const clarity = useMemo(() => {
     if (!clyckScore.hasEnoughData || !clyckScore.clarityLevel) {
-      return { label: "", level: "Niedrig" as const };
+      return { label: "", level: "Low" as const };
     }
-    return { label: `Clyck-Score: ${clyckScore.clarityLevel}`, level: clyckScore.clarityLevel };
+    return { label: `Clyck Score: ${clyckScore.clarityLevel}`, level: clyckScore.clarityLevel };
   }, [clyckScore]);
   const insights = useMemo(
     () => buildInsights(categoryId, answers, channelData, maturity, titleAnalysis),
@@ -326,7 +326,7 @@ export default function App() {
     }
     if (!res.ok || !data.ok) {
       throw new Error(
-        "Die Anfrage konnte gerade nicht gesendet werden. Bitte noch einmal versuchen."
+        "The request could not be sent right now. Please try again."
       );
     }
     const avgFitScore = titleAnalysis.length > 0
@@ -361,13 +361,13 @@ export default function App() {
       {showResume && step.kind === "start" && (
         <div className="container-narrow pt-6">
           <div className="card flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-ink/80">Du hast den Check bereits begonnen.</p>
+            <p className="text-sm text-ink/80">You've already started the check.</p>
             <div className="flex gap-3">
               <button type="button" onClick={resumeProgress} className="btn-primary text-sm py-2">
-                Weitermachen
+                Continue
               </button>
               <button type="button" onClick={discardProgress} className="btn-secondary text-sm py-2">
-                Neu starten
+                Start over
               </button>
             </div>
           </div>
@@ -403,9 +403,9 @@ export default function App() {
 
       {step.kind === "loading" && (
         <section className="container-narrow fade-in py-16">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">Einen Moment</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">One moment</p>
           <h1 className="mt-3 text-[22px] font-bold sm:text-[28px]">
-            Öffentliche Kanaldaten werden geladen …
+            Loading public channel data …
           </h1>
           <div className="mt-6 h-[3px] w-full overflow-hidden rounded-full bg-line">
             <div className="h-full w-1/3 animate-pulse bg-ink" />
@@ -434,7 +434,7 @@ export default function App() {
       {step.kind === "shared" && (
         <section className="container-narrow fade-in py-8">
           <p className="text-sm font-medium uppercase tracking-wide text-ink/60">
-            Geteilte Einschätzung
+            Shared Assessment
           </p>
           <h1 className="mt-3 text-2xl font-semibold leading-snug sm:text-3xl">
             {getCategoryContent(step.payload.cat, null).headline}
@@ -448,7 +448,7 @@ export default function App() {
             {getCategoryContent(step.payload.cat, null).explanation}
           </p>
           <p className="mt-6 text-sm text-ink/60">
-            Das ist eine geteilte Einschätzung. Mach deinen eigenen Check:
+            This is a shared assessment. Do your own check:
           </p>
           <button
             type="button"
@@ -458,7 +458,7 @@ export default function App() {
             }}
             className="btn-primary mt-4"
           >
-            Clyck Check starten
+            Start Clyck Check
           </button>
         </section>
       )}

@@ -48,7 +48,7 @@ export type Insight = { headline: string; text: string };
 export type Lever = { headline: string; text: string };
 
 export type ChannelMaturity = "early" | "growing" | "established" | "strong" | "authority";
-export type ClarityLevel = "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch";
+export type ClarityLevel = "Low" | "Medium" | "High" | "Very High";
 
 export type ResultCategoryId = "A" | "B" | "C" | "D";
 
@@ -56,11 +56,11 @@ export type LeadClass = "top" | "good" | "mid" | "weak";
 
 export type TitleAnalysisScore = 1 | 2 | 3 | 4 | 5;
 export type TitleAnalysisLabel =
-  | "Kein Fit"
-  | "Schwacher Fit"
-  | "Mittlerer Fit"
-  | "Guter Fit"
-  | "Perfekter Fit";
+  | "No Fit"
+  | "Weak Fit"
+  | "Average Fit"
+  | "Good Fit"
+  | "Perfect Fit";
 
 export type TitleAnalysisResult = {
   id: string;

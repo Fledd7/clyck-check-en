@@ -40,7 +40,7 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
       });
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Etwas ist schiefgelaufen. Bitte noch einmal versuchen."
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -50,11 +50,11 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
   return (
     <section className="container-narrow fade-in py-8">
       <h1 className="text-[22px] font-bold leading-snug sm:text-[28px]">
-        Persönliche Einschätzung anfragen
+        Request personal assessment
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-gray1">
-        Das war die kurze Einschätzung. Wenn du möchtest, schaue ich mir deine Angaben persönlich an
-        und melde mich mit einer konkreteren Rückmeldung. Kostenlos und unverbindlich.
+        That was the quick assessment. If you'd like, I'll personally review your answers
+        and get back to you with more specific feedback. Free and non-binding.
       </p>
 
       <form className="mt-6 grid gap-4" onSubmit={handleSubmit} noValidate>
@@ -71,7 +71,7 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
           />
         </div>
         <div>
-          <label htmlFor="email" className="label">E-Mail</label>
+          <label htmlFor="email" className="label">Email</label>
           <input
             id="email"
             type="email"
@@ -83,11 +83,11 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
           />
         </div>
         <div>
-          <label htmlFor="message" className="label">Was möchtest du mit deinem Kanal erreichen?</label>
+          <label htmlFor="message" className="label">What do you want to achieve with your channel?</label>
           <textarea
             id="message"
             rows={4}
-            placeholder="z. B. mehr Kundenanfragen, klarere Positionierung, professionellerer Auftritt..."
+            placeholder="e.g. more client inquiries, clearer positioning, more professional appearance..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="input resize-y"
@@ -102,8 +102,7 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
             required
           />
           <span>
-            Deine Angaben nutze ich ausschließlich, um deine Anfrage einzuschätzen und dir zu antworten.
-            Keine Weitergabe an Dritte, keine Veröffentlichung.
+            I agree that my information will be used to process my request. No sharing with third parties.
           </span>
         </label>
 
@@ -115,10 +114,10 @@ export default function LeadCaptureForm({ onSubmit, onBack }: Props) {
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button type="submit" disabled={!canSubmit} className="btn-primary w-full">
-            {submitting ? "Wird gesendet …" : "Einschätzung anfragen"}
+            {submitting ? "Sending …" : "Request assessment"}
           </button>
           <button type="button" onClick={onBack} className="btn-secondary">
-            Zurück
+            ← Back
           </button>
         </div>
       </form>

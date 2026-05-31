@@ -13,26 +13,26 @@ export default function ChannelLinkStep({ initialUrl, onSubmitWithUrl, onSkip, o
   return (
     <section className="container-narrow fade-in py-8">
       <h1 className="text-[22px] font-bold leading-snug sm:text-[28px]">
-        Möchtest du deinen Kanal verlinken?
+        Would you like to link your YouTube channel?
       </h1>
       <p className="mt-4 text-[15px] leading-relaxed text-gray1">
-        Mit Link kann die Einschätzung um öffentliche Kanaldaten und deine letzten Thumbnails ergänzt werden.
-        Ohne Link bekommst du eine reine Selbsteinschätzung.
+        With a link, the assessment can be extended with public channel data and your latest thumbnails.
+        Without a link you'll get a pure self-assessment.
       </p>
       <p className="mt-3 text-sm text-gray1">
-        Ich sehe nur öffentliche Daten — keine internen Analytics, keine Klickrate, keine privaten Zahlen.
+        I only see public data — no internal analytics, no click rate, no private numbers.
       </p>
 
       <div className="mt-6">
         <label htmlFor="channel-url" className="label">
-          Kanal-Link, @handle oder Kanalname
+          Enter channel URL or @handle
         </label>
         <input
           id="channel-url"
           type="text"
           inputMode="url"
           autoComplete="off"
-          placeholder="https://youtube.com/@deinkanal"
+          placeholder="https://youtube.com/@yourchannel"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           className="input"
@@ -46,16 +46,16 @@ export default function ChannelLinkStep({ initialUrl, onSubmitWithUrl, onSkip, o
           onClick={() => onSubmitWithUrl(trimmed)}
           className="btn-primary"
         >
-          Mit Kanal weitermachen
+          Continue with channel
         </button>
         <button type="button" onClick={onSkip} className="btn-secondary">
-          Ohne Link weitermachen
+          Skip
         </button>
       </div>
 
       <div className="mt-6">
         <button type="button" onClick={onBack} className="text-[13px] text-gray1 underline-offset-4 hover:underline">
-          Zurück
+          ← Back
         </button>
       </div>
     </section>

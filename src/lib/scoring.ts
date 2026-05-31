@@ -21,7 +21,7 @@ export type ClyckScoreBreakdown = {
 
 export type ClyckScoreResult = {
   score: number;
-  clarityLevel: "Niedrig" | "Mittel" | "Hoch" | "Sehr hoch" | null;
+  clarityLevel: "Low" | "Medium" | "High" | "Very High" | null;
   hasEnoughData: boolean;
   breakdown: ClyckScoreBreakdown;
 };
@@ -83,14 +83,14 @@ export function calculateClyckScore(
 
   let clarityLevel: ClyckScoreResult["clarityLevel"];
   if (!hasAnalysis) {
-    if (score >= 55) clarityLevel = "Hoch";
-    else if (score >= 35) clarityLevel = "Mittel";
-    else clarityLevel = "Niedrig";
+    if (score >= 55) clarityLevel = "High";
+    else if (score >= 35) clarityLevel = "Medium";
+    else clarityLevel = "Low";
   } else {
-    if (score >= 80) clarityLevel = "Sehr hoch";
-    else if (score >= 60) clarityLevel = "Hoch";
-    else if (score >= 35) clarityLevel = "Mittel";
-    else clarityLevel = "Niedrig";
+    if (score >= 80) clarityLevel = "Very High";
+    else if (score >= 60) clarityLevel = "High";
+    else if (score >= 35) clarityLevel = "Medium";
+    else clarityLevel = "Low";
   }
 
   return {
