@@ -18,6 +18,30 @@ import {
   type CategoryContent,
 } from "../lib/results";
 
+function RuleOfThirdsGrid() {
+  const points = [
+    { top: "33.33%", left: "33.33%" },
+    { top: "33.33%", left: "66.66%" },
+    { top: "66.66%", left: "33.33%" },
+    { top: "66.66%", left: "66.66%" },
+  ];
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute left-[33.33%] top-0 h-full w-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute left-[66.66%] top-0 h-full w-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute top-[33.33%] left-0 w-full h-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      <div className="absolute top-[66.66%] left-0 w-full h-px" style={{ background: "rgba(255,255,255,0.7)", boxShadow: "0 0 2px rgba(0,0,0,0.5)" }} />
+      {points.map((p, i) => (
+        <div
+          key={i}
+          className="absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ top: p.top, left: p.left, background: "rgba(255,255,255,0.9)", boxShadow: "0 0 3px rgba(0,0,0,0.6)" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 type Props = {
   category: CategoryContent;
   channelData: ChannelData | null;
@@ -54,6 +78,7 @@ export default function ResultPreview({
   const [tab, setTab] = useState<"assessment" | "analysis">(uploadResult ? "assessment" : "analysis");
   const [linkCopied, setLinkCopied] = useState(false);
   const [openVideoId, setOpenVideoId] = useState<string | null>(null);
+  const [showGrid, setShowGrid] = useState(false);
 
   const longformCount = channelData?.longformCount ?? 0;
   const hasLongform = longformCount > 0 && (channelData?.thumbnails?.length ?? 0) > 0;
@@ -216,13 +241,28 @@ export default function ResultPreview({
             /* Upload path — show uploaded thumbnail + single analysis */
             <div>
               <p className="text-[13px] font-semibold mb-3">Your thumbnail</p>
-              <img
-                src={`data:${uploadResult.mimeType};base64,${uploadResult.imageBase64}`}
-                alt="Uploaded thumbnail"
-                className="w-full rounded-xl object-cover"
-                style={{ aspectRatio: "16/9" }}
-              />
-              <div className="mt-4">
+              <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-line">
+                <img
+                  src={`data:${uploadResult.mimeType};base64,${uploadResult.imageBase64}`}
+                  alt="Uploaded thumbnail"
+                  className="h-full w-full object-cover"
+                />
+                {showGrid && <RuleOfThirdsGrid />}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowGrid((v) => !v)}
+                className="mt-1 mb-1 text-xs text-gray1 hover:underline"
+              >
+                {showGrid ? "✕ Hide grid" : "⊞ Rule of Thirds"}
+              </button>
+              {showGrid && (
+                <p className="mb-3 text-[11px] leading-relaxed text-gray1">
+                  The intersection points (●) mark the strongest positions for faces,
+                  text and main subjects.
+                </p>
+              )}
+              <div className="mt-3">
                 <SingleAnalysisCard result={uploadResult.analysis} />
               </div>
             </div>
