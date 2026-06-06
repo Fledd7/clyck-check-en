@@ -51,7 +51,7 @@ export default function ResultPreview({
   onContinue,
   onAddChannelLink,
 }: Props) {
-  const [tab, setTab] = useState<"assessment" | "analysis">("analysis");
+  const [tab, setTab] = useState<"assessment" | "analysis">(uploadResult ? "assessment" : "analysis");
   const [linkCopied, setLinkCopied] = useState(false);
   const [openVideoId, setOpenVideoId] = useState<string | null>(null);
 
@@ -133,15 +133,31 @@ export default function ResultPreview({
     };
   })();
 
+  const uploadHeadline = uploadResult
+    ? uploadResult.analysis.score >= 5
+      ? "Strong Thumbnail"
+      : uploadResult.analysis.score >= 4
+      ? "Good Thumbnail"
+      : uploadResult.analysis.score >= 3
+      ? "Solid Thumbnail with Potential"
+      : "Weak Thumbnail"
+    : null;
+
   return (
     <section className="container-narrow fade-in py-8">
       <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-accent">
-        First Assessment
+        {uploadResult ? "Thumbnail Analysis" : "First Assessment"}
       </p>
       <h1 className="mt-3 text-[28px] font-bold leading-snug sm:text-[34px]">
-        {category.headline}
+        {uploadResult ? uploadHeadline : category.headline}
       </h1>
-      {hasEnoughData && clarityLabel ? (
+      {uploadResult ? (
+        <p className="mt-2">
+          <span className="inline-flex items-center rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
+            {uploadResult.analysis.label} · {uploadResult.analysis.score}/5
+          </span>
+        </p>
+      ) : hasEnoughData && clarityLabel ? (
         <>
           <p className="mt-2">
             <span
@@ -175,8 +191,8 @@ export default function ResultPreview({
               : "text-gray1 hover:text-ink"
           }`}
         >
-          Channel Analysis
-          {titleAnalysisLoading && (
+          {uploadResult ? "Analysis" : "Channel Analysis"}
+          {!uploadResult && titleAnalysisLoading && (
             <span className="ml-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-gray1" />
           )}
         </button>
@@ -320,56 +336,97 @@ export default function ResultPreview({
       {/* Tab 2: Assessment */}
       {tab === "assessment" && (
         <>
-          {deltaInfo && (
-            <p className={`mt-4 text-sm leading-relaxed ${deltaInfo.tone}`}>
-              {deltaInfo.text}
-            </p>
-          )}
+          {uploadResult ? (
+            /* Upload path — show thumbnail evaluation */
+            <>
+              {uploadResult.analysis.reason && (
+                <p className="mt-6 text-[17px] leading-relaxed italic text-gray1">
+                  "{uploadResult.analysis.reason}"
+                </p>
+              )}
 
-          {summaryLine && (
-            <button
-              type="button"
-              onClick={() => setTab("analysis")}
-              className="mt-3 text-left text-xs text-gray1 underline-offset-2 hover:text-ink hover:underline"
-            >
-              {summaryLine}
-            </button>
-          )}
-
-          <p className="mt-6 text-[15px] leading-relaxed text-gray1">{category.explanation}</p>
-
-          {channelNote && <p className="mt-5 text-sm italic text-gray1">{channelNote}</p>}
-
-          <div className="mt-10">
-            <h2 className="text-lg font-bold">What stands out</h2>
-            <div className="mt-4 grid gap-3">
-              {insights.map((ins, i) => (
-                <div key={i} className="card">
-                  <h3 className="text-[15px] font-bold">{ins.headline}</h3>
-                  <p className="mt-1.5 text-sm text-gray1 leading-relaxed">{ins.text}</p>
+              {uploadResult.analysis.strong && (
+                <div className="mt-6 card">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-green-700">
+                    What works
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-relaxed">{uploadResult.analysis.strong}</p>
                 </div>
-              ))}
-            </div>
-          </div>
+              )}
 
-          <div className="mt-10">
-            <h2 className="text-lg font-bold">Your next 3 levers</h2>
-            <ol className="mt-4 grid gap-3">
-              {levers.map((lv, i) => (
-                <li key={i} className="card">
-                  <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-ink text-[13px] font-bold text-white">
-                      {i + 1}
-                    </span>
-                    <div>
-                      <h3 className="text-[15px] font-semibold">{lv.headline}</h3>
-                      <p className="mt-1 text-[13px] text-gray1 leading-relaxed">{lv.text}</p>
+              {uploadResult.analysis.weak && (
+                <div className="mt-3 card">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">
+                    What's missing
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-relaxed">{uploadResult.analysis.weak}</p>
+                </div>
+              )}
+
+              {uploadResult.analysis.score <= 3 && uploadResult.analysis.concept && (
+                <div className="mt-3 card">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray1">
+                    Better concept
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-relaxed">{uploadResult.analysis.concept}</p>
+                </div>
+              )}
+            </>
+          ) : (
+            /* Channel / quiz path — existing assessment content */
+            <>
+              {deltaInfo && (
+                <p className={`mt-4 text-sm leading-relaxed ${deltaInfo.tone}`}>
+                  {deltaInfo.text}
+                </p>
+              )}
+
+              {summaryLine && (
+                <button
+                  type="button"
+                  onClick={() => setTab("analysis")}
+                  className="mt-3 text-left text-xs text-gray1 underline-offset-2 hover:text-ink hover:underline"
+                >
+                  {summaryLine}
+                </button>
+              )}
+
+              <p className="mt-6 text-[15px] leading-relaxed text-gray1">{category.explanation}</p>
+
+              {channelNote && <p className="mt-5 text-sm italic text-gray1">{channelNote}</p>}
+
+              <div className="mt-10">
+                <h2 className="text-lg font-bold">What stands out</h2>
+                <div className="mt-4 grid gap-3">
+                  {insights.map((ins, i) => (
+                    <div key={i} className="card">
+                      <h3 className="text-[15px] font-bold">{ins.headline}</h3>
+                      <p className="mt-1.5 text-sm text-gray1 leading-relaxed">{ins.text}</p>
                     </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-10">
+                <h2 className="text-lg font-bold">Your next 3 levers</h2>
+                <ol className="mt-4 grid gap-3">
+                  {levers.map((lv, i) => (
+                    <li key={i} className="card">
+                      <div className="flex items-start gap-3">
+                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-ink text-[13px] font-bold text-white">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <h3 className="text-[15px] font-semibold">{lv.headline}</h3>
+                          <p className="mt-1 text-[13px] text-gray1 leading-relaxed">{lv.text}</p>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </>
+          )}
 
           {/* CTA card */}
           <div className="mt-10 rounded-[20px] bg-ink p-7">
