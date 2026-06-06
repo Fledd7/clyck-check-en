@@ -86,9 +86,3 @@ export type TitleAnalysisResult = {
   concept?: string;
 };
 
-export type UploadAnalysisResult = {
-  imageBase64: string;
-  mimeType: string;
-  title: string;
-  analysis: TitleAnalysisResult;
-};
