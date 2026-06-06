@@ -5,11 +5,13 @@ import type {
   Insight,
   Lever,
   TitleAnalysisResult,
+  UploadAnalysisResult,
   VideoItem,
 } from "../lib/types";
 import ThumbnailGrid from "./ThumbnailGrid";
 import TitleAnalysis from "./TitleAnalysis";
 import ThumbnailModal from "./ThumbnailModal";
+import SingleAnalysisCard from "./SingleAnalysisCard";
 import {
   getBenchmarkText,
   loadCheckHistory,
@@ -27,6 +29,7 @@ type Props = {
   levers: Lever[];
   titleAnalysis: TitleAnalysisResult[];
   titleAnalysisLoading: boolean;
+  uploadResult?: UploadAnalysisResult | null;
   shareUrl: string;
   onContinue: () => void;
   onAddChannelLink: () => void;
@@ -43,6 +46,7 @@ export default function ResultPreview({
   levers,
   titleAnalysis,
   titleAnalysisLoading,
+  uploadResult,
   shareUrl,
   onContinue,
   onAddChannelLink,
@@ -192,7 +196,21 @@ export default function ResultPreview({
       {/* Tab 1: Channel Analysis */}
       {tab === "analysis" && (
         <>
-          {!channelData ? (
+          {uploadResult ? (
+            /* Upload path — show uploaded thumbnail + single analysis */
+            <div>
+              <p className="text-[13px] font-semibold mb-3">Your thumbnail</p>
+              <img
+                src={`data:${uploadResult.mimeType};base64,${uploadResult.imageBase64}`}
+                alt="Uploaded thumbnail"
+                className="w-full rounded-xl object-cover"
+                style={{ aspectRatio: "16/9" }}
+              />
+              <div className="mt-4">
+                <SingleAnalysisCard result={uploadResult.analysis} />
+              </div>
+            </div>
+          ) : !channelData ? (
             <div className="card">
               <p className="text-sm leading-relaxed text-gray1">
                 You haven't entered a channel link. The assessment is based

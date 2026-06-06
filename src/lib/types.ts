@@ -85,3 +85,10 @@ export type TitleAnalysisResult = {
   weak: string;
   concept?: string;
 };
+
+export type UploadAnalysisResult = {
+  imageBase64: string;
+  mimeType: string;
+  title: string;
+  analysis: TitleAnalysisResult;
+};

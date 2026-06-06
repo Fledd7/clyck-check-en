@@ -17,7 +17,7 @@ import {
   selectCategory,
 } from "./lib/results";
 import { calculateClyckScore, getChannelMaturity, leadClassFromScore } from "./lib/scoring";
-import type { Answers, ChannelData, QuestionId, TitleAnalysisResult } from "./lib/types";
+import type { Answers, ChannelData, QuestionId, TitleAnalysisResult, UploadAnalysisResult } from "./lib/types";
 
 // ── localStorage ──────────────────────────────────────────────────────────────
 const LS_KEY = "klarheitscheck_progress";
@@ -114,6 +114,7 @@ export default function App() {
   const [channelData, setChannelData] = useState<ChannelData | null>(null);
   const [titleAnalysis, setTitleAnalysis] = useState<TitleAnalysisResult[]>([]);
   const [titleAnalysisLoading, setTitleAnalysisLoading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<UploadAnalysisResult | null>(null);
 
   const totalQuestions = questions.length;
 
@@ -188,6 +189,7 @@ export default function App() {
     setAnswers({});
     setTitleAnalysis([]);
     setTitleAnalysisLoading(false);
+    setUploadResult(null);
     window.history.replaceState(null, "", window.location.pathname);
   }
 
@@ -272,9 +274,18 @@ export default function App() {
     }
   }
 
+  function handleUploadComplete(result: UploadAnalysisResult) {
+    setUploadResult(result);
+    setChannelData(null);
+    setChannelUrl("");
+    setTitleAnalysis([]);
+    setStep({ kind: "result" });
+  }
+
   function skipChannel() {
     setChannelData(null);
     setChannelUrl("");
+    setUploadResult(null);
     setStep({ kind: "result" });
   }
 
@@ -396,6 +407,7 @@ export default function App() {
         <ChannelLinkStep
           initialUrl={channelUrl}
           onSubmitWithUrl={submitChannel}
+          onUploadComplete={handleUploadComplete}
           onSkip={skipChannel}
           onBack={backFromChannel}
         />
@@ -425,6 +437,7 @@ export default function App() {
           levers={levers}
           titleAnalysis={titleAnalysis}
           titleAnalysisLoading={titleAnalysisLoading}
+          uploadResult={uploadResult}
           shareUrl={shareUrl}
           onAddChannelLink={goToChannelFromResult}
           onContinue={goToLead}
